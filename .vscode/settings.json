@@ -1,0 +1,6 @@
+{
+  "editor.trimAutoWhitespace": true,
+  "editor.formatOnSave": true,
+  "files.eol": "\n",
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
+}
