@@ -18,9 +18,6 @@
     "type": "git",
     "url": "git+https://github.com/lstatro/cloud-search.git"
   },
-  "files": [
-    "build/**/*"
-  ],
   "preferGlobal": true,
   "prettier": {
     "singleQuote": true,

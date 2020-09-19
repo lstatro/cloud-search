@@ -1,0 +1,7 @@
+.vscode
+.eslintrc.js
+.gitattributes
+.prettierignore
+types.d.ts
+*.tgz
+tsconfig.json
