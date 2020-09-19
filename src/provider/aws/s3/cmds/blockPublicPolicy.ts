@@ -10,7 +10,7 @@ import toTerminal from '../../../../lib/toTerminal'
 const rule = 'blockPublicPolicy'
 
 export const command = `${rule} [args]`
-export const desc = 'report on s3 buckets block public ACLs toggle'
+export const desc = 'report on the block public policy toggle'
 
 export class Scanner {
   options: { [key: string]: string | undefined }
