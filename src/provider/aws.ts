@@ -1,0 +1,22 @@
+import { Argv } from 'yargs'
+
+export const command = 'aws'
+export const desc = 'aws cloud provider'
+
+export const builder = (yargs: Argv) => {
+  return yargs
+    .commandDir('./aws/ec2')
+    .commandDir('./aws/s3')
+    .demandCommand(1)
+    .option('region', {
+      alias: 'r',
+      describe: 'aws region name',
+      type: 'string',
+      default: 'all',
+    })
+    .option('profile', {
+      alias: 'p',
+      describe: 'aws profile name',
+      type: 'string',
+    })
+}
