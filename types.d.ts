@@ -23,7 +23,8 @@ declare module 'cloud-scan' {
   export interface AuditResultInterface {
     name?: ResourceFriendlyNameType
     provider: CloudProviderNameType
-    physicalId: PhysicalIdType
+    comment?: string
+    physicalId?: PhysicalIdType
     region: string
     service: CloudServiceType
     time: ScanTimeType

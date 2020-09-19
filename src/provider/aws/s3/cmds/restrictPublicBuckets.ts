@@ -7,7 +7,7 @@ import assert from 'assert'
 import getOptions from '../../../../lib/aws/options'
 import toTerminal from '../../../../lib/toTerminal'
 
-const rule = 'blockPublicAcls'
+const rule = 'restrictPublicBuckets'
 
 export const command = `${rule} [args]`
 export const desc = 'report on s3 buckets block public ACLs toggle'
@@ -92,11 +92,11 @@ export class Scanner {
       profile: this.profile,
       time: new Date().toISOString(),
     }
-    if (config?.BlockPublicAcls === true) {
+    if (config?.RestrictPublicBuckets === true) {
       auditObject.state = 'OK'
-    } else if (config?.BlockPublicAcls === false) {
+    } else if (config?.RestrictPublicBuckets === false) {
       auditObject.state = 'FAIL'
-      auditObject.comment = 'BlockPublicAcls explicitly disabled'
+      auditObject.comment = 'RestrictPublicBuckets explicitly disabled'
     }
     this.audits.push(auditObject)
   }

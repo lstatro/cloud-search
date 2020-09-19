@@ -1,6 +1,6 @@
 import { Argv } from 'yargs'
 
-export const command = 's3 [args]'
+export const command = 's3'
 export const desc = 'simple storage service (s3)'
 
 export const builder = (yargs: Argv) => {

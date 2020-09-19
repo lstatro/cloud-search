@@ -7,7 +7,7 @@ export default (audits: AuditResultInterface[]) => {
   log(
     chalk.bold('state'.padEnd(10)),
     chalk.bold('region'.padEnd(15)),
-    chalk.bold('rule'.padEnd(20)),
+    chalk.bold('rule'.padEnd(25)),
     chalk.bold('physicalId')
   )
 
@@ -16,21 +16,21 @@ export default (audits: AuditResultInterface[]) => {
       log(
         chalk.green.bold(audit.state.padEnd(10)),
         chalk.bold(audit.region.padEnd(15)),
-        chalk.bold(audit.rule.padEnd(20)),
+        chalk.bold(audit.rule.padEnd(25)),
         chalk.bold(audit.physicalId)
       )
     } else if (audit.state === 'FAIL') {
       log(
         chalk.red.bold(audit.state.padEnd(10)),
         chalk.bold(audit.region.padEnd(15)),
-        chalk.bold(audit.rule.padEnd(20)),
+        chalk.bold(audit.rule.padEnd(25)),
         chalk.bold(audit.physicalId)
       )
     } else {
       log(
         chalk.yellow.bold(audit.state.padEnd(10)),
         chalk.bold(audit.region.padEnd(15)),
-        chalk.bold(audit.rule.padEnd(20)),
+        chalk.bold(audit.rule.padEnd(25)),
         chalk.bold(audit.physicalId)
       )
     }

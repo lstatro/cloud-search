@@ -19,4 +19,9 @@ export const builder = (yargs: Argv) => {
       describe: 'aws profile name',
       type: 'string',
     })
+    .option('resourceId', {
+      alias: 'rid',
+      describe: 'resource id',
+      type: 'string',
+    })
 }
