@@ -32,4 +32,14 @@ declare module 'cloud-scan' {
     state: AuditStateType
     profile: string
   }
+
+  /** aws-sdk client options */
+  export interface AWSClientOptionsInterface {
+    credentials?: {
+      accessKeyId: string
+      secretAccessKey: string
+      sessionToken: string
+    }
+    region?: string
+  }
 }

@@ -20,8 +20,16 @@ export const builder = (yargs: Argv) => {
       type: 'string',
     })
     .option('resourceId', {
-      alias: 'rid',
+      alias: 'i',
       describe: 'resource id',
       type: 'string',
+    })
+    .option('domain', {
+      alias: 'd',
+      describe: 'public or us-gov cloud',
+      type: 'string',
+      choices: ['pub', 'gov'],
+      default: 'pub',
+      demandOption: true,
     })
 }

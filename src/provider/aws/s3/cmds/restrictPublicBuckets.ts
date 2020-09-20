@@ -1,6 +1,6 @@
 import { S3 } from 'aws-sdk'
 import { GetPublicAccessBlockOutput } from 'aws-sdk/clients/s3'
-import { AuditResultInterface } from 'cloud-scan'
+import { AuditResultInterface, AWSClientOptionsInterface } from 'cloud-scan'
 import { Arguments } from 'yargs'
 import ora, { Ora } from 'ora'
 import assert from 'assert'
@@ -13,7 +13,7 @@ export const command = `${rule} [args]`
 export const desc = 'report on the restrict public access toggle'
 
 export class Scanner {
-  options: { [key: string]: string | undefined }
+  options: AWSClientOptionsInterface
   audits: AuditResultInterface[] = []
   service = 's3'
   spinner: Ora
