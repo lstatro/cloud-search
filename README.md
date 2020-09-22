@@ -70,7 +70,7 @@ FAIL       ap-northeast-2  igwAttachedToVpc          igw-xxxxxxxx
 
 ```bash
 
-lstatro@sooty:~$cloud-search aws ec2 sg publicPermission -p fluffy
+lstatro@sooty:~$ cloud-search aws ec2 sg publicPermission -p fluffy
 publicPermission √ us-west-2
 state      region          rule                      physicalId
 OK         af-south-1      publicPermission          sg-xxxxxxxx
