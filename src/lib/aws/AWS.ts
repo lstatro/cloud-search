@@ -108,6 +108,15 @@ export default abstract class AWS extends Provider {
     }
   }
 
+  handleRegions = async () => {
+    await this.getRegions()
+
+    for (const region of this.regions) {
+      this.spinner.text = region
+      await this.scan({ region })
+    }
+  }
+
   start = async () => {
     try {
       this.spinner.start()

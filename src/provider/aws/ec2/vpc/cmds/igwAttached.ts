@@ -1,7 +1,6 @@
 import { EC2 } from 'aws-sdk'
-import { AuditResultInterface, AWSClientOptionsInterface } from 'cloud-scan'
+import { AuditResultInterface } from 'cloud-scan'
 import { Arguments } from 'yargs'
-import ora, { Ora } from 'ora'
 import getOptions from '../../../../../lib/aws/options'
 import toTerminal from '../../../../../lib/toTerminal'
 import getRegions from '../../../../../lib/aws/getRegions'
@@ -61,7 +60,13 @@ export class Scanner extends AWS {
     })
   }
 
-  scan = async (region: string, igwId?: string) => {
+  scan = async ({
+    region,
+    resourceId,
+  }: {
+    region: string
+    resourceId?: string
+  }) => {
     const options = getOptions(this.profile)
     options.region = region
 
@@ -74,7 +79,7 @@ export class Scanner extends AWS {
         const describeInternetGateways = await ec2
           .describeInternetGateways({
             NextToken: nextToken,
-            InternetGatewayIds: igwId ? [igwId] : undefined,
+            InternetGatewayIds: resourceId ? [resourceId] : undefined,
           })
           .promise()
 
@@ -90,7 +95,7 @@ export class Scanner extends AWS {
       this.audits.push({
         provider: 'aws',
         comment: `unable to audit resource ${err.code} - ${err.message}`,
-        physicalId: igwId,
+        physicalId: resourceId,
         service: this.service,
         rule,
         region: region,
@@ -106,7 +111,7 @@ export class Scanner extends AWS {
 
     for (const region of regions) {
       this.spinner.text = region
-      await this.scan(region)
+      await this.scan({ region })
     }
   }
 }
