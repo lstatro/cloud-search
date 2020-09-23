@@ -105,15 +105,6 @@ export class Scanner extends AWS {
       })
     }
   }
-
-  handleRegions = async () => {
-    const regions = await getRegions(this.region, this.profile, this.domain)
-
-    for (const region of regions) {
-      this.spinner.text = region
-      await this.scan({ region })
-    }
-  }
 }
 
 export const handler = async (args: Arguments) => {
