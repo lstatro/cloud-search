@@ -1,12 +1,11 @@
 import { EC2 } from 'aws-sdk'
-import { AuditResultInterface, AWSClientOptionsInterface } from 'cloud-scan'
+import { AuditResultInterface } from 'cloud-scan'
 import { Arguments } from 'yargs'
-import ora, { Ora } from 'ora'
 import getOptions from '../../../../../lib/aws/options'
 import toTerminal from '../../../../../lib/toTerminal'
 import getRegions from '../../../../../lib/aws/getRegions'
 import { InternetGateway } from 'aws-sdk/clients/ec2'
-import { assert } from 'console'
+import AWS from '../../../../../lib/aws/AWS'
 
 const rule = 'igwAttachedToVpc'
 
@@ -16,11 +15,9 @@ are detached Note, shared VPC's don't necessarily own the IGW so they may not
 show up in this scan. 
 `
 
-export class Scanner {
-  options: AWSClientOptionsInterface
+export class Scanner extends AWS {
   audits: AuditResultInterface[] = []
   service = 'ec2'
-  spinner: Ora
 
   constructor(
     public region: string,
@@ -28,31 +25,10 @@ export class Scanner {
     public resourceId: string,
     public domain: string
   ) {
-    this.options = getOptions(profile)
-    this.spinner = ora({
-      prefixText: rule,
-    })
+    super({ profile, rule, resourceId, domain, region })
   }
 
-  start = async () => {
-    try {
-      this.spinner.start()
-      if (this.resourceId) {
-        assert(
-          this.region !== 'all',
-          'must provide the resources specific region'
-        )
-        await this.scan(this.region, this.resourceId)
-      } else {
-        await this.handleRegions()
-      }
-      this.spinner.succeed()
-    } catch (err) {
-      this.spinner.fail(err.message)
-    }
-  }
-
-  audit = async (igw: InternetGateway, region: string) => {
+  async audit(igw: InternetGateway, region: string) {
     let suspect = false
 
     if (igw.Attachments) {
@@ -84,7 +60,13 @@ export class Scanner {
     })
   }
 
-  scan = async (region: string, igwId?: string) => {
+  scan = async ({
+    region,
+    resourceId,
+  }: {
+    region: string
+    resourceId?: string
+  }) => {
     const options = getOptions(this.profile)
     options.region = region
 
@@ -97,7 +79,7 @@ export class Scanner {
         const describeInternetGateways = await ec2
           .describeInternetGateways({
             NextToken: nextToken,
-            InternetGatewayIds: igwId ? [igwId] : undefined,
+            InternetGatewayIds: resourceId ? [resourceId] : undefined,
           })
           .promise()
 
@@ -113,7 +95,7 @@ export class Scanner {
       this.audits.push({
         provider: 'aws',
         comment: `unable to audit resource ${err.code} - ${err.message}`,
-        physicalId: igwId,
+        physicalId: resourceId,
         service: this.service,
         rule,
         region: region,
@@ -129,7 +111,7 @@ export class Scanner {
 
     for (const region of regions) {
       this.spinner.text = region
-      await this.scan(region)
+      await this.scan({ region })
     }
   }
 }
