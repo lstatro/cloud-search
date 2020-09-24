@@ -50,7 +50,6 @@ declare module 'cloud-scan' {
     profile: string
     domain: string
     resourceId?: string
-    rule: string
   }
 
   interface AWSScannerCliArgsInterface extends AWSScannerInterface, Arguments {}

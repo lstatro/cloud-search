@@ -24,10 +24,10 @@ export default class IgwAttachedToVpc extends AWS {
   constructor(public params: AWSScannerInterface) {
     super({
       profile: params.profile,
-      rule: params.rule,
       resourceId: params.resourceId,
       domain: params.domain,
       region: params.region,
+      rule,
     })
   }
 
@@ -116,7 +116,6 @@ export const handler = async (args: AWSScannerCliArgsInterface) => {
     profile: args.profile,
     resourceId: args.resourceId,
     domain: args.domain,
-    rule: rule,
   })
   await scanner.start()
   toTerminal(scanner.audits)
