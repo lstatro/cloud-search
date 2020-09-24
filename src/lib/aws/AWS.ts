@@ -25,6 +25,7 @@ export default abstract class AWS extends Provider {
   domain: string
   region: string
   regions: string[] = []
+  global = false
 
   profile: string
   resourceId?: string
@@ -41,7 +42,7 @@ export default abstract class AWS extends Provider {
 
   abstract async scan(params: ScanInterface): Promise<void>
 
-  abstract audit<T>(resource: T, region: string): Promise<void>
+  abstract audit(resource: unknown, region: string): Promise<void>
 
   getOptions = () => {
     let options: AWSClientOptionsInterface
@@ -68,17 +69,22 @@ export default abstract class AWS extends Provider {
     if (this.domain === 'pub') {
       /** are we set to do all regions? */
       if (this.region === 'all') {
-        /** welp, lets start with by setting us-east-1 and getting a list of all regions */
-        this.options.region = 'us-east-1'
-        const describeRegions = await new EC2(this.options)
-          .describeRegions()
-          .promise()
+        /** if this is not a global rule we need to get all regions, if it is, then we default o just one */
+        if (this.global === false) {
+          /** welp, lets start with by setting us-east-1 and getting a list of all regions */
+          this.options.region = 'us-east-1'
+          const describeRegions = await new EC2(this.options)
+            .describeRegions()
+            .promise()
 
-        /** we should have a list of regions, if so for each region get the name and push it to the regions list */
-        assert(describeRegions.Regions, 'unable to describe regions')
-        for (const region of describeRegions.Regions) {
-          assert(region.RegionName, 'region does not have a name')
-          this.regions.push(region.RegionName)
+          /** we should have a list of regions, if so for each region get the name and push it to the regions list */
+          assert(describeRegions.Regions, 'unable to describe regions')
+          for (const region of describeRegions.Regions) {
+            assert(region.RegionName, 'region does not have a name')
+            this.regions.push(region.RegionName)
+          }
+        } else {
+          this.regions.push('us-east-1')
         }
       } else {
         /**
@@ -92,14 +98,19 @@ export default abstract class AWS extends Provider {
       /** go read the comments for pub cloud and repeat for gov cloud :P */
     } else if (this.domain === 'gov') {
       if (this.region === 'all') {
-        this.options.region = 'us-gov-west-1'
-        const describeRegions = await new EC2(this.options)
-          .describeRegions()
-          .promise()
-        assert(describeRegions.Regions, 'unable to describe regions')
-        for (const region of describeRegions.Regions) {
-          assert(region.RegionName, 'region does not have a name')
-          this.regions.push(region.RegionName)
+        /** if this is not a global rule we need to get all regions, if it is, then we default o just one */
+        if (this.global === false) {
+          this.options.region = 'us-gov-west-1'
+          const describeRegions = await new EC2(this.options)
+            .describeRegions()
+            .promise()
+          assert(describeRegions.Regions, 'unable to describe regions')
+          for (const region of describeRegions.Regions) {
+            assert(region.RegionName, 'region does not have a name')
+            this.regions.push(region.RegionName)
+          }
+        } else {
+          this.regions.push('us-gov-west-1')
         }
       } else {
         this.regions.push(this.region)

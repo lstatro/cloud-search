@@ -1,5 +1,5 @@
 import { Arguments } from 'yargs'
-import { Scanner as BlockPublicAcls } from './blockPublicAcls'
+import BlockPublicAcls from './blockPublicAcls'
 import { Scanner as BlockPublicPolicy } from './blockPublicPolicy'
 import { Scanner as IgnorePublicAcls } from './ignorePublicAcls'
 import { Scanner as RestrictPublicBuckets } from './restrictPublicBuckets'
