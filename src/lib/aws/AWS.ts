@@ -22,20 +22,19 @@ export default abstract class AWS extends Provider {
 
   options: AWSClientOptionsInterface
 
-  rule: string
   domain: string
   region: string
   regions: string[] = []
 
-  profile?: string
+  profile: string
   resourceId?: string
 
   constructor(params: AWSParamsInterface) {
     super(params.rule)
 
-    this.rule = params.rule
     this.domain = params.domain
     this.region = params.region
+    this.profile = params.profile
 
     this.options = this.getOptions()
   }
@@ -121,7 +120,7 @@ export default abstract class AWS extends Provider {
     try {
       this.spinner.start()
       if (this.resourceId) {
-        await this.scan(this.region, this.resourceId)
+        await this.scan({ region: this.region, resourceId: this.resourceId })
       } else {
         await this.handleRegions()
       }

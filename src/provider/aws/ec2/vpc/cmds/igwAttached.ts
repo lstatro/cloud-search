@@ -1,9 +1,11 @@
 import { EC2 } from 'aws-sdk'
-import { AuditResultInterface } from 'cloud-scan'
-import { Arguments } from 'yargs'
+import {
+  AuditResultInterface,
+  AWSScannerCliArgsInterface,
+  AWSScannerInterface,
+} from 'cloud-scan'
 import getOptions from '../../../../../lib/aws/options'
 import toTerminal from '../../../../../lib/toTerminal'
-import getRegions from '../../../../../lib/aws/getRegions'
 import { InternetGateway } from 'aws-sdk/clients/ec2'
 import AWS from '../../../../../lib/aws/AWS'
 
@@ -15,17 +17,18 @@ are detached Note, shared VPC's don't necessarily own the IGW so they may not
 show up in this scan. 
 `
 
-export class Scanner extends AWS {
+export default class IgwAttachedToVpc extends AWS {
   audits: AuditResultInterface[] = []
   service = 'ec2'
 
-  constructor(
-    public region: string,
-    public profile: string,
-    public resourceId: string,
-    public domain: string
-  ) {
-    super({ profile, rule, resourceId, domain, region })
+  constructor(public params: AWSScannerInterface) {
+    super({
+      profile: params.profile,
+      rule: params.rule,
+      resourceId: params.resourceId,
+      domain: params.domain,
+      region: params.region,
+    })
   }
 
   async audit(igw: InternetGateway, region: string) {
@@ -107,14 +110,14 @@ export class Scanner extends AWS {
   }
 }
 
-export const handler = async (args: Arguments) => {
-  const { region, profile, resourceId, domain } = args
-  const scanner = await new Scanner(
-    region as string,
-    profile as string,
-    resourceId as string,
-    domain as string
-  )
+export const handler = async (args: AWSScannerCliArgsInterface) => {
+  const scanner = await new IgwAttachedToVpc({
+    region: args.region,
+    profile: args.profile,
+    resourceId: args.resourceId,
+    domain: args.domain,
+    rule: rule,
+  })
   await scanner.start()
   toTerminal(scanner.audits)
 }

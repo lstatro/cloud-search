@@ -1,4 +1,6 @@
 declare module 'cloud-scan' {
+  import { Arguments } from 'yargs'
+
   /** the friendly name of the resource */
   export type ResourceFriendlyNameType = string
 
@@ -42,4 +44,14 @@ declare module 'cloud-scan' {
     }
     region?: string
   }
+
+  export interface AWSScannerInterface {
+    region: string
+    profile: string
+    domain: string
+    resourceId?: string
+    rule: string
+  }
+
+  interface AWSScannerCliArgsInterface extends AWSScannerInterface, Arguments {}
 }

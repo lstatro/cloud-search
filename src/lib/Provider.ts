@@ -5,8 +5,10 @@ import ora, { Ora } from 'ora'
 export default abstract class Provider {
   audits: AuditResultInterface[] = []
   spinner: Ora
+  rule: string
 
   constructor(rule: string) {
+    this.rule = rule
     this.spinner = ora({
       prefixText: rule,
     })

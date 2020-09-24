@@ -1,5 +1,7 @@
 import { Argv } from 'yargs'
 
+import thing from './cmds/igwAttached'
+
 export const command = 'vpc'
 export const desc = 'virtual private cloud (VPC)'
 
