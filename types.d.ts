@@ -19,7 +19,7 @@ declare module 'cloud-scan' {
   /** the name of the rule that scanned the resource */
   export type RuleNameType = string
 
-  export type AuditStateType = 'OK' | 'FAIL' | 'UNKNOWN'
+  export type AuditStateType = 'OK' | 'FAIL' | 'UNKNOWN' | 'WARNING'
 
   /** The compliance data about the resource */
   export interface AuditResultInterface {

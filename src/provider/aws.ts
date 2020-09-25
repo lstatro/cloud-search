@@ -7,6 +7,7 @@ export const builder = (yargs: Argv) => {
   return yargs
     .commandDir('./aws/ec2')
     .commandDir('./aws/s3')
+    .commandDir('./aws/iam')
     .demandCommand(1)
     .option('region', {
       alias: 'r',
