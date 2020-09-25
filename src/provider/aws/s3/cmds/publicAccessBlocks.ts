@@ -1,54 +1,92 @@
-import BlockPublicAcls from './blockPublicAcls'
-import { Scanner as BlockPublicPolicy } from './blockPublicPolicy'
-import { Scanner as IgnorePublicAcls } from './ignorePublicAcls'
-import { Scanner as RestrictPublicBuckets } from './restrictPublicBuckets'
-import toTerminal from '../../../../lib/toTerminal'
-import { AuditResultInterface, AWSScannerCliArgsInterface } from 'cloud-scan'
+import { S3 } from 'aws-sdk'
+import { GetPublicAccessBlockOutput } from 'aws-sdk/clients/s3'
+import { AuditResultInterface, AWSScannerInterface } from 'cloud-scan'
+import assert from 'assert'
+import AWS from '../../../../lib/aws/AWS'
 
-const rule = 'publicAccessBlocks'
+interface PublicAccessBlocksInterface extends AWSScannerInterface {
+  rule: string
+}
 
-export const command = `${rule} [args]`
-export const desc = 'report on the four s3 public access blocks toggles'
+export default class PublicAccessBlocks extends AWS {
+  audits: AuditResultInterface[] = []
+  service = 's3'
+  global = true
 
-export const handler = async (args: AWSScannerCliArgsInterface) => {
-  const { region, profile, resourceId } = args
-  const blockPublicAcls = await new BlockPublicAcls({
-    region: args.region,
-    profile: args.profile,
-    resourceId: args.resourceId,
-    domain: args.domain,
-  })
-  await blockPublicAcls.start()
+  constructor(public params: PublicAccessBlocksInterface) {
+    super({
+      profile: params.profile,
+      resourceId: params.resourceId,
+      domain: params.domain,
+      region: params.region,
+      rule: params.rule,
+    })
+  }
 
-  const blockPublicPolicy = await new BlockPublicPolicy(
-    region as string,
-    profile as string,
-    resourceId as string
-  )
-  await blockPublicPolicy.start()
+  async audit(bucketName: string, region: string) {
+    const s3 = new S3(this.options)
+    try {
+      const getPublicAccessBlock = await s3
+        .getPublicAccessBlock({ Bucket: bucketName })
+        .promise()
+      assert(getPublicAccessBlock, 'unable to locate bucket')
+      this.validate(getPublicAccessBlock, bucketName)
+    } catch (err) {
+      const auditObject: AuditResultInterface = {
+        name: bucketName,
+        comment: err.code,
+        provider: 'aws',
+        physicalId: bucketName,
+        service: this.service,
+        rule: this.rule,
+        region: region,
+        state: 'UNKNOWN',
+        profile: this.profile,
+        time: new Date().toISOString(),
+      }
+      if (err.code === 'NoSuchPublicAccessBlockConfiguration') {
+        auditObject.state = 'FAIL'
+        auditObject.comment = err.code
+      }
+      this.audits.push(auditObject)
+    }
+  }
 
-  const ignorePublicAcls = await new IgnorePublicAcls(
-    region as string,
-    profile as string,
-    resourceId as string
-  )
-  await ignorePublicAcls.start()
+  validate = (
+    getPublicAccessBlock: GetPublicAccessBlockOutput,
+    bucketName: string
+  ) => {
+    const config = getPublicAccessBlock.PublicAccessBlockConfiguration as {
+      [key: string]: boolean
+    }
+    const auditObject: AuditResultInterface = {
+      name: bucketName,
+      provider: 'aws',
+      physicalId: bucketName,
+      service: this.service,
+      rule: this.rule,
+      region: this.region,
+      state: 'UNKNOWN',
+      profile: this.profile,
+      time: new Date().toISOString(),
+    }
+    if (config[this.rule] === true) {
+      auditObject.state = 'OK'
+    } else if (config[this.rule] === false) {
+      auditObject.state = 'FAIL'
+      auditObject.comment = `${this.rule} explicitly disabled`
+    }
+    this.audits.push(auditObject)
+  }
 
-  const restrictPublicBuckets = await new RestrictPublicBuckets(
-    region as string,
-    profile as string,
-    resourceId as string
-  )
-  await restrictPublicBuckets.start()
+  scan = async () => {
+    const s3 = new S3(this.options)
 
-  let audits: AuditResultInterface[] = []
-
-  audits = [
-    ...blockPublicAcls.audits,
-    ...blockPublicPolicy.audits,
-    ...ignorePublicAcls.audits,
-    ...restrictPublicBuckets.audits,
-  ]
-
-  toTerminal(audits)
+    const listBuckets = await s3.listBuckets().promise()
+    if (listBuckets.Buckets)
+      for (const bucket of listBuckets.Buckets) {
+        assert(bucket.Name, 'bucket does nto have a name')
+        await this.audit(bucket.Name, this.region)
+      }
+  }
 }
