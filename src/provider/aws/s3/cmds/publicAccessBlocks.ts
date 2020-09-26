@@ -85,7 +85,7 @@ export default class PublicAccessBlocks extends AWS {
     const listBuckets = await s3.listBuckets().promise()
     if (listBuckets.Buckets)
       for (const bucket of listBuckets.Buckets) {
-        assert(bucket.Name, 'bucket does nto have a name')
+        assert(bucket.Name, 'bucket does not have a name')
         await this.audit(bucket.Name, this.region)
       }
   }
