@@ -3,9 +3,7 @@ import {
   AuditResultInterface,
   AWSScannerCliArgsInterface,
   AWSScannerInterface,
-} from 'cloud-scan'
-import getOptions from '../../../../../lib/aws/options'
-import toTerminal from '../../../../../lib/toTerminal'
+} from 'cloud-search'
 import { SecurityGroup } from 'aws-sdk/clients/ec2'
 import AWS from '../../../../../lib/aws/AWS'
 
@@ -83,10 +81,9 @@ export default class PublicPermission extends AWS {
     region: string
     resourceId?: string
   }) => {
-    const options = getOptions(this.profile)
-    options.region = region
+    this.options.region = region
 
-    const ec2 = new EC2(options)
+    const ec2 = new EC2(this.options)
 
     let nextToken: string | undefined
 
@@ -142,5 +139,5 @@ export const handler = async (args: AWSScannerCliArgsInterface) => {
     domain: args.domain,
   })
   await scanner.start()
-  toTerminal(scanner.audits)
+  scanner.output()
 }

@@ -1,4 +1,4 @@
-import { AWSClientOptionsInterface } from 'cloud-scan'
+import { AWSClientOptionsInterface } from 'cloud-search'
 import { SharedIniFileCredentials, EC2 } from 'aws-sdk'
 import Provider from '../Provider'
 

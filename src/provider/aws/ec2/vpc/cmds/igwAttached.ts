@@ -3,13 +3,11 @@ import {
   AuditResultInterface,
   AWSScannerCliArgsInterface,
   AWSScannerInterface,
-} from 'cloud-scan'
-import getOptions from '../../../../../lib/aws/options'
-import toTerminal from '../../../../../lib/toTerminal'
+} from 'cloud-search'
 import { InternetGateway } from 'aws-sdk/clients/ec2'
 import AWS from '../../../../../lib/aws/AWS'
 
-const rule = 'igwAttachedToVpc'
+const rule = 'IgwAttachedToVpc'
 
 export const command = `${rule} [args]`
 export const desc = `Verifies that all internet gateways owned by this account.
@@ -70,7 +68,7 @@ export default class IgwAttachedToVpc extends AWS {
     region: string
     resourceId?: string
   }) => {
-    const options = getOptions(this.profile)
+    const options = this.getOptions()
     options.region = region
 
     const ec2 = new EC2(options)
@@ -118,5 +116,5 @@ export const handler = async (args: AWSScannerCliArgsInterface) => {
     domain: args.domain,
   })
   await scanner.start()
-  toTerminal(scanner.audits)
+  scanner.output()
 }

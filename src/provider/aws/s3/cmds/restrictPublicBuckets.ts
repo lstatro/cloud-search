@@ -1,5 +1,4 @@
-import { AWSScannerCliArgsInterface } from 'cloud-scan'
-import toTerminal from '../../../../lib/toTerminal'
+import { AWSScannerCliArgsInterface } from 'cloud-search'
 import PublicAccessBlocks from './publicAccessBlocks'
 
 const rule = 'RestrictPublicBuckets'
@@ -16,5 +15,5 @@ export const handler = async (args: AWSScannerCliArgsInterface) => {
     rule,
   })
   await scanner.start()
-  toTerminal(scanner.audits)
+  scanner.output()
 }

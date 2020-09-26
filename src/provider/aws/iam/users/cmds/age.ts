@@ -1,5 +1,5 @@
 import { IAM } from 'aws-sdk'
-import { AuditResultInterface, AWSScannerInterface } from 'cloud-scan'
+import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import assert from 'assert'
 import AWS from '../../../../../lib/aws/AWS'
 import { AccessKeyMetadata, User } from 'aws-sdk/clients/iam'

@@ -1,6 +1,6 @@
 import { S3 } from 'aws-sdk'
 import { GetPublicAccessBlockOutput } from 'aws-sdk/clients/s3'
-import { AuditResultInterface, AWSScannerInterface } from 'cloud-scan'
+import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import assert from 'assert'
 import AWS from '../../../../lib/aws/AWS'
 

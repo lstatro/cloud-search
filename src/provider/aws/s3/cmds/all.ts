@@ -1,6 +1,5 @@
 import PublicAccessBlocks from './publicAccessBlocks'
-import toTerminal from '../../../../lib/toTerminal'
-import { AuditResultInterface, AWSScannerCliArgsInterface } from 'cloud-scan'
+import { AuditResultInterface, AWSScannerCliArgsInterface } from 'cloud-search'
 
 export const command = 'PublicAccessBlocks [args]'
 export const desc = 'report on all four s3 public access blocks toggles'
@@ -51,5 +50,5 @@ export const handler = async (args: AWSScannerCliArgsInterface) => {
     ...restrictPublicBuckets.audits,
   ]
 
-  toTerminal(audits)
+  // ugh
 }

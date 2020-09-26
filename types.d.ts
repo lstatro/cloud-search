@@ -1,4 +1,4 @@
-declare module 'cloud-scan' {
+declare module 'cloud-search' {
   import { Arguments } from 'yargs'
 
   /** the friendly name of the resource */

@@ -1,4 +1,4 @@
-import { AuditResultInterface } from 'cloud-scan'
+import { AuditResultInterface } from 'cloud-search'
 import chalk from 'chalk'
 import ora, { Ora } from 'ora'
 
