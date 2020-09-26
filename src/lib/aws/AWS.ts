@@ -68,8 +68,6 @@ export default abstract class AWS extends Provider {
   getRegions = async () => {
     /** is this pub or gov clouds? */
 
-    console.log('asdfasdfasdfasdfasdfasdfasdfasdfasdf', this.domain)
-
     if (this.domain === 'pub') {
       /** are we set to do all regions? */
       if (this.region === 'all') {
