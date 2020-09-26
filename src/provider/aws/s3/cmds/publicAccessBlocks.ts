@@ -75,6 +75,8 @@ export default class PublicAccessBlocks extends AWS {
     } else if (config[this.rule] === false) {
       auditObject.state = 'FAIL'
       auditObject.comment = `${this.rule} explicitly disabled`
+    } else {
+      auditObject.comment = `${this.rule} unknown state`
     }
     this.audits.push(auditObject)
   }
@@ -83,10 +85,13 @@ export default class PublicAccessBlocks extends AWS {
     const s3 = new S3(this.options)
 
     const listBuckets = await s3.listBuckets().promise()
-    if (listBuckets.Buckets)
+    if (listBuckets.Buckets) {
       for (const bucket of listBuckets.Buckets) {
         assert(bucket.Name, 'bucket does not have a name')
         await this.audit(bucket.Name, this.region)
       }
+    } else {
+      this.spinner.text = 'no buckets found'
+    }
   }
 }

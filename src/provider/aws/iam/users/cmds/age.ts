@@ -1,6 +1,5 @@
 import { IAM } from 'aws-sdk'
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
-import assert from 'assert'
 import AWS from '../../../../../lib/aws/AWS'
 import { AccessKeyMetadata, User } from 'aws-sdk/clients/iam'
 import { CommandBuilder } from 'yargs'
@@ -57,6 +56,8 @@ export default class MaxKeyAge extends AWS {
         for (const keyMetaData of listAccessKeys.AccessKeyMetadata) {
           this.validate(user, keyMetaData)
         }
+      } else {
+        this.validate(user, {})
       }
     } while (marker)
   }
@@ -76,17 +77,21 @@ export default class MaxKeyAge extends AWS {
       time: now.toISOString(),
     }
 
-    assert(keyMetaData.CreateDate, 'key does not have a creation date')
-    const delta = now.getTime() - keyMetaData.CreateDate.getTime()
+    if (keyMetaData.CreateDate) {
+      const delta = now.getTime() - keyMetaData.CreateDate.getTime()
 
-    const seconds = delta / 1000
-    const hours = seconds / 3600
-    const days = hours / 24
+      const seconds = delta / 1000
+      const hours = seconds / 3600
+      const days = hours / 24
 
-    if (days >= this.maxAge) {
-      auditObject.state = 'FAIL'
+      if (days >= this.maxAge) {
+        auditObject.state = 'FAIL'
+      } else {
+        auditObject.state = 'OK'
+      }
     } else {
       auditObject.state = 'OK'
+      auditObject.comment = 'no key metadata found'
     }
 
     this.audits.push(auditObject)
@@ -112,6 +117,8 @@ export default class MaxKeyAge extends AWS {
         for (const user of listUsers.Users) {
           users.push(user)
         }
+      } else {
+        this.spinner.text = 'no users found'
       }
     } while (marker)
 
@@ -121,7 +128,7 @@ export default class MaxKeyAge extends AWS {
   }
 }
 
-interface MaxKeyAgeCliInterface
+export interface MaxKeyAgeCliInterface
   extends AWSScannerInterface,
     MaxKeyAgeInterface {}
 
@@ -133,6 +140,7 @@ export const handler = async (args: MaxKeyAgeCliInterface) => {
     domain: args.domain,
     maxAge: args.maxAge,
   })
+
   await scanner.start()
-  scanner.output()
+  // scanner.output()
 }

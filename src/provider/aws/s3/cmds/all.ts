@@ -50,5 +50,7 @@ export const handler = async (args: AWSScannerCliArgsInterface) => {
     ...restrictPublicBuckets.audits,
   ]
 
-  // ugh
+  restrictPublicBuckets.audits = audits
+
+  restrictPublicBuckets.output()
 }

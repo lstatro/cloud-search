@@ -27,7 +27,7 @@ export default abstract class AWS extends Provider {
   regions: string[] = []
   global = false
 
-  profile: string
+  profile?: string
   resourceId?: string
 
   constructor(params: AWSParamsInterface) {
@@ -36,6 +36,7 @@ export default abstract class AWS extends Provider {
     this.domain = params.domain
     this.region = params.region
     this.profile = params.profile
+    this.resourceId = params.resourceId
 
     this.options = this.getOptions()
   }
@@ -66,6 +67,9 @@ export default abstract class AWS extends Provider {
 
   getRegions = async () => {
     /** is this pub or gov clouds? */
+
+    console.log('asdfasdfasdfasdfasdfasdfasdfasdfasdf', this.domain)
+
     if (this.domain === 'pub') {
       /** are we set to do all regions? */
       if (this.region === 'all') {

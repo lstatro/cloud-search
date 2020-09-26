@@ -32,7 +32,7 @@ declare module 'cloud-search' {
     time: ScanTimeType
     rule: RuleNameType
     state: AuditStateType
-    profile: string
+    profile?: string
   }
 
   /** aws-sdk client options */

@@ -90,6 +90,8 @@ export default class IgwAttachedToVpc extends AWS {
           for (const igw of describeInternetGateways.InternetGateways) {
             this.audit(igw, region)
           }
+        } else {
+          this.spinner.text = 'no internet gateways found'
         }
       } while (nextToken)
     } catch (err) {
@@ -117,4 +119,5 @@ export const handler = async (args: AWSScannerCliArgsInterface) => {
   })
   await scanner.start()
   scanner.output()
+  return scanner.audits
 }
