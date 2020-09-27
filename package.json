@@ -10,7 +10,7 @@
     "build": "rm -rf ./build && tsc",
     "lint": "eslint . --ext .ts",
     "format": "prettier --check .",
-    "preversion": "npm run build && npm run lint && npm run format"
+    "preversion": "npm run build && npm run lint && npm run format && npm run test"
   },
   "bin": {
     "cloud-search": "build/cli.js"
