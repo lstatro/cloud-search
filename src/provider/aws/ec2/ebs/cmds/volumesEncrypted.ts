@@ -63,12 +63,14 @@ export default class VolumesEncrypted extends AWS {
     if (volume.Encrypted) {
       audit.state = 'WARNING'
       audit.comment = 'encrypted but with an unknown key'
-    }
-    if (volume.KmsKeyId) {
-      if (this.cmks.includes(volume.KmsKeyId)) {
-        audit.state = 'OK'
-        audit.comment = 'encrypted with a known key'
+      if (volume.KmsKeyId) {
+        if (this.cmks.includes(volume.KmsKeyId)) {
+          audit.state = 'OK'
+          audit.comment = 'encrypted with a known key'
+        }
       }
+    } else {
+      audit.state = 'FAIL'
     }
   }
 
@@ -76,6 +78,8 @@ export default class VolumesEncrypted extends AWS {
     if (volume.Encrypted === true) {
       audit.state = 'OK'
       audit.comment = 'encrypted with aws account ebs key'
+    } else {
+      audit.state = 'FAIL'
     }
   }
 
@@ -86,7 +90,7 @@ export default class VolumesEncrypted extends AWS {
       service: this.service,
       rule,
       region: region,
-      state: 'FAIL',
+      state: 'UNKNOWN',
       profile: this.profile,
       time: new Date().toISOString(),
     }
