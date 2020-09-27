@@ -1,4 +1,5 @@
 import { EC2, KMS } from 'aws-sdk'
+import { CommandBuilder } from 'yargs'
 import { Volume } from 'aws-sdk/clients/ec2'
 import {
   AuditResultInterface,
@@ -19,9 +20,24 @@ type VolumeHandlerFunctions = (
 export const command = `${rule} [args]`
 export const desc = 'Verifies that EBS volume are encrypted'
 
+export const builder: CommandBuilder = {
+  keyType: {
+    alias: 't',
+    describe: 'the AWS key type',
+    type: 'string',
+    default: 'aws',
+    choices: ['aws', 'cmk'],
+  },
+  keyArn: {
+    alias: 'a',
+    describe: 'a KMS key arn',
+    type: 'string',
+  },
+}
+
 export interface VolumesEncryptedInterface extends AWSScannerInterface {
   KeyArn?: string
-  type: 'aws' | 'cmk'
+  keyType: 'aws' | 'cmk'
 }
 
 export default class VolumesEncrypted extends AWS {
@@ -29,7 +45,7 @@ export default class VolumesEncrypted extends AWS {
   service = 'ebs'
   cmks: string[] = []
   KeyArn?: string
-  type: string
+  keyType: string
 
   constructor(public params: VolumesEncryptedInterface) {
     super({
@@ -40,22 +56,20 @@ export default class VolumesEncrypted extends AWS {
       rule,
     })
     this.KeyArn = params.KeyArn
-    this.type = params.type
+    this.keyType = params.keyType
   }
 
   handleCmkType = (volume: Volume, audit: AuditResultInterface) => {
-    let isEncrypted = false
-    let withCmk = false
     if (volume.Encrypted) {
-      isEncrypted = true
+      audit.state = 'WARNING'
+      audit.comment = 'encrypted but with an unknown key'
     }
     if (volume.KmsKeyId) {
       if (this.cmks.includes(volume.KmsKeyId)) {
-        withCmk = true
+        audit.state = 'OK'
+        audit.comment = 'encrypted with a known key'
       }
     }
-
-    if (isEncrypted) return true
   }
 
   handleAwsType = (volume: Volume, audit: AuditResultInterface) => {
@@ -63,7 +77,6 @@ export default class VolumesEncrypted extends AWS {
       audit.state = 'OK'
       audit.comment = 'encrypted with aws account ebs key'
     }
-    return true
   }
 
   async audit(volume: Volume, region: string) {
@@ -73,7 +86,7 @@ export default class VolumesEncrypted extends AWS {
       service: this.service,
       rule,
       region: region,
-      state: 'UNKNOWN',
+      state: 'FAIL',
       profile: this.profile,
       time: new Date().toISOString(),
     }
@@ -82,8 +95,8 @@ export default class VolumesEncrypted extends AWS {
       aws: this.handleAwsType,
       cmk: this.handleCmkType,
     }
-    const handled = types[this.type](volume, audit)
-    assert(handled, 'unknown kms type requested')
+    types[this.keyType](volume, audit)
+    this.audits.push(audit)
   }
 
   getCustomerMangedKeys = async (options: AWSClientOptionsInterface) => {
@@ -166,7 +179,7 @@ export const handler = async (args: VolumesEncryptedCliInterface) => {
     resourceId: args.resourceId,
     domain: args.domain,
     KeyArn: args.KeyArn,
-    type: args.type,
+    keyType: args.keyType,
   })
   await scanner.start()
   scanner.output()
