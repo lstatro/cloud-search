@@ -1,14 +1,27 @@
 import 'mocha'
-import 'aws-sdk-mock'
+import { useFakeTimers, SinonFakeTimers } from 'sinon'
+import { mock, restore } from 'aws-sdk-mock'
 import { handler as all } from './all'
 import { handler as ignorePublicAcls } from './ignorePublicAcls'
 import { handler as blockPublicAcls } from './blockPublicAcls'
 import { handler as restrictPublicBuckets } from './restrictPublicBuckets'
 import { handler as blockPublicPolicy } from './blockPublicPolicy'
-import AWS from 'aws-sdk-mock'
 import { AWSError } from 'aws-sdk'
+import { expect } from 'chai'
 
 describe('publicAccessBlocks', () => {
+  const now = new Date(0)
+  let clock: SinonFakeTimers
+
+  beforeEach(() => {
+    clock = useFakeTimers(now)
+  })
+
+  afterEach(() => {
+    clock.restore()
+    restore()
+  })
+
   const handlers = [
     all,
     ignorePublicAcls,
@@ -18,8 +31,8 @@ describe('publicAccessBlocks', () => {
   ]
 
   for (const handler of handlers) {
-    it('should handle passing types', async () => {
-      AWS.mock('S3', 'getPublicAccessBlock', {
+    it('should handle OK types', async () => {
+      mock('S3', 'getPublicAccessBlock', {
         PublicAccessBlockConfiguration: {
           BlockPublicAcls: true,
           BlockPublicPolicy: true,
@@ -27,14 +40,14 @@ describe('publicAccessBlocks', () => {
           RestrictPublicBuckets: true,
         },
       })
-      AWS.mock('S3', 'listBuckets', {
+      mock('S3', 'listBuckets', {
         Buckets: [
           {
             Name: 'test',
           },
         ],
       })
-      await handler({
+      const audits = await handler({
         _: ['test'],
         $0: 'test',
         profile: 'test',
@@ -42,10 +55,10 @@ describe('publicAccessBlocks', () => {
         domain: 'pub',
         region: 'us-east-1',
       })
-      AWS.restore()
+      expect(audits[0].state).to.equal('OK')
     })
     it('should handle failed types', async () => {
-      AWS.mock('S3', 'getPublicAccessBlock', {
+      mock('S3', 'getPublicAccessBlock', {
         PublicAccessBlockConfiguration: {
           BlockPublicAcls: false,
           BlockPublicPolicy: false,
@@ -53,14 +66,14 @@ describe('publicAccessBlocks', () => {
           RestrictPublicBuckets: false,
         },
       })
-      AWS.mock('S3', 'listBuckets', {
+      mock('S3', 'listBuckets', {
         Buckets: [
           {
             Name: 'test',
           },
         ],
       })
-      await handler({
+      const audits = await handler({
         _: ['test'],
         $0: 'test',
         profile: 'test',
@@ -68,10 +81,10 @@ describe('publicAccessBlocks', () => {
         domain: 'pub',
         region: 'us-east-1',
       })
-      AWS.restore()
+      expect(audits[0].state).to.equal('FAIL')
     })
-    it('should handle unknown block types', async () => {
-      AWS.mock('S3', 'getPublicAccessBlock', {
+    it('should handle UNKNOWN types', async () => {
+      mock('S3', 'getPublicAccessBlock', {
         PublicAccessBlockConfiguration: {
           BlockPublicAcls: 'test',
           BlockPublicPolicy: 'test',
@@ -79,14 +92,14 @@ describe('publicAccessBlocks', () => {
           RestrictPublicBuckets: 'test',
         },
       })
-      AWS.mock('S3', 'listBuckets', {
+      mock('S3', 'listBuckets', {
         Buckets: [
           {
             Name: 'test',
           },
         ],
       })
-      await handler({
+      const audits = await handler({
         _: ['test'],
         $0: 'test',
         profile: 'test',
@@ -94,19 +107,19 @@ describe('publicAccessBlocks', () => {
         domain: 'pub',
         region: 'us-east-1',
       })
-      AWS.restore()
+      expect(audits[0].state).to.equal('UNKNOWN')
     })
-    it('should handle unknown types', async () => {
+    it('should handle UNKNOWN types', async () => {
       const err = new Error('test') as AWSError
-      AWS.mock('S3', 'getPublicAccessBlock', Promise.reject(err))
-      AWS.mock('S3', 'listBuckets', {
+      mock('S3', 'getPublicAccessBlock', Promise.reject(err))
+      mock('S3', 'listBuckets', {
         Buckets: [
           {
             Name: 'test',
           },
         ],
       })
-      await handler({
+      const audits = await handler({
         _: ['test'],
         $0: 'test',
         profile: 'test',
@@ -114,21 +127,21 @@ describe('publicAccessBlocks', () => {
         domain: 'pub',
         region: 'us-east-1',
       })
-      AWS.restore()
+      expect(audits[0].state).to.equal('UNKNOWN')
     })
-    it('should handle NoSuchPublicAccessBlockConfiguration', async () => {
+    it('should handle FAIL types', async () => {
       const err = new Error('test') as AWSError
       err.code = 'NoSuchPublicAccessBlockConfiguration'
 
-      AWS.mock('S3', 'getPublicAccessBlock', Promise.reject(err))
-      AWS.mock('S3', 'listBuckets', {
+      mock('S3', 'getPublicAccessBlock', Promise.reject(err))
+      mock('S3', 'listBuckets', {
         Buckets: [
           {
             Name: 'test',
           },
         ],
       })
-      await handler({
+      const audits = await handler({
         _: ['test'],
         $0: 'test',
         profile: 'test',
@@ -136,11 +149,11 @@ describe('publicAccessBlocks', () => {
         domain: 'pub',
         region: 'us-east-1',
       })
-      AWS.restore()
+      expect(audits[0].state).to.equal('FAIL')
     })
     it('should handle no buckets', async () => {
-      AWS.mock('S3', 'listBuckets', {})
-      await handler({
+      mock('S3', 'listBuckets', {})
+      const audits = await handler({
         _: ['test'],
         $0: 'test',
         profile: 'test',
@@ -148,7 +161,7 @@ describe('publicAccessBlocks', () => {
         domain: 'pub',
         region: 'us-east-1',
       })
-      AWS.restore()
+      expect(audits).to.eql([])
     })
   }
 })

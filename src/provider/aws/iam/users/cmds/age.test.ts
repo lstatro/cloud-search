@@ -1,9 +1,17 @@
 import 'mocha'
 import { mock, restore } from 'aws-sdk-mock'
 import { handler, MaxKeyAgeCliInterface } from './age'
-
+import { expect } from 'chai'
 describe('iam user key age', () => {
-  it('should report okay', async () => {
+  beforeEach(() => {
+    mock('EC2', 'describeRegions', { Regions: [{ RegionName: 'us-east-1' }] })
+  })
+
+  afterEach(() => {
+    restore()
+  })
+
+  it('should report OK', async () => {
     mock('IAM', 'listUsers', {
       Users: [
         {
@@ -19,13 +27,14 @@ describe('iam user key age', () => {
         },
       ],
     })
-    await handler({
+    const audits = await handler({
       resourceId: 'test',
       domain: 'pub',
+      region: 'all',
       maxAge: 30,
     } as MaxKeyAgeCliInterface)
 
-    restore()
+    expect(audits[0].state).to.eql('OK')
   })
 
   it('should report error', async () => {
@@ -44,13 +53,14 @@ describe('iam user key age', () => {
         },
       ],
     })
-    await handler({
+    const audits = await handler({
       resourceId: 'test',
       domain: 'pub',
+      region: 'all',
       maxAge: 30,
     } as MaxKeyAgeCliInterface)
 
-    restore()
+    expect(audits[0].state).to.eql('FAIL')
   })
 
   it('should handle users without keys', async () => {
@@ -62,23 +72,23 @@ describe('iam user key age', () => {
       ],
     })
     mock('IAM', 'listAccessKeys', {})
-    await handler({
+    const audits = await handler({
       resourceId: 'test',
       domain: 'pub',
+      region: 'all',
       maxAge: 30,
     } as MaxKeyAgeCliInterface)
-
-    restore()
+    expect(audits[0].state).to.eql('OK')
   })
 
   it('should handle no users', async () => {
     mock('IAM', 'listUsers', {})
-    await handler({
+    const audits = await handler({
       resourceId: 'test',
       domain: 'pub',
+      region: 'all',
       maxAge: 30,
     } as MaxKeyAgeCliInterface)
-
-    restore()
+    expect(audits).to.eql([])
   })
 })

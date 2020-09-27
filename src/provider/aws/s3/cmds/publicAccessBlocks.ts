@@ -9,7 +9,6 @@ interface PublicAccessBlocksInterface extends AWSScannerInterface {
 }
 
 export default class PublicAccessBlocks extends AWS {
-  audits: AuditResultInterface[] = []
   service = 's3'
   global = true
 

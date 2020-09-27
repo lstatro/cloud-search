@@ -2,13 +2,13 @@ import 'mocha'
 import 'chai'
 import { useFakeTimers, SinonFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { handler } from './igwAttached'
+import { handler } from './publicPermission'
 import { AWSScannerCliArgsInterface } from 'cloud-search'
 import { expect } from 'chai'
 
 /** none of these tests should throw */
 
-describe('igw vpc attachment', () => {
+describe('security group with a public permission', () => {
   const now = new Date(0)
   let clock: SinonFakeTimers
   beforeEach(() => {
@@ -21,13 +21,17 @@ describe('igw vpc attachment', () => {
     restore()
   })
 
-  it('should report FAIL if the gateway is attched', async () => {
-    mock('EC2', 'describeInternetGateways', {
-      InternetGateways: [
+  it('should report FAIL if there is a public permission', async () => {
+    mock('EC2', 'describeSecurityGroups', {
+      SecurityGroups: [
         {
-          Attachments: [
+          IpPermissions: [
             {
-              State: 'available',
+              IpRanges: [
+                {
+                  CidrIp: '0.0.0.0/0',
+                },
+              ],
             },
           ],
         },
@@ -45,7 +49,7 @@ describe('igw vpc attachment', () => {
         provider: 'aws',
         physicalId: undefined,
         service: 'ec2',
-        rule: 'IgwAttachedToVpc',
+        rule: 'PublicPermission',
         region: 'us-east-1',
         state: 'FAIL',
         profile: 'test',
@@ -54,13 +58,17 @@ describe('igw vpc attachment', () => {
     ])
   })
 
-  it('should report OK if the state does not indicate its ready', async () => {
-    mock('EC2', 'describeInternetGateways', {
-      InternetGateways: [
+  it('should report OK if it is not 0.0.0.0/0', async () => {
+    mock('EC2', 'describeSecurityGroups', {
+      SecurityGroups: [
         {
-          Attachments: [
+          IpPermissions: [
             {
-              State: 'test',
+              IpRanges: [
+                {
+                  CidrIp: '10.0.0.0/16',
+                },
+              ],
             },
           ],
         },
@@ -72,14 +80,13 @@ describe('igw vpc attachment', () => {
       resourceId: 'test',
       domain: 'pub',
     } as AWSScannerCliArgsInterface)
-
     expect(audits).to.eql([
       {
         name: undefined,
         provider: 'aws',
         physicalId: undefined,
         service: 'ec2',
-        rule: 'IgwAttachedToVpc',
+        rule: 'PublicPermission',
         region: 'us-east-1',
         state: 'OK',
         profile: 'test',
@@ -88,184 +95,219 @@ describe('igw vpc attachment', () => {
     ])
   })
 
-  it('should report OK if there is not attachment state', async () => {
-    mock('EC2', 'describeInternetGateways', {
-      InternetGateways: [
+  it('should report OK if it is not 0.0.0.0/0 without a resourceId', async () => {
+    mock('EC2', 'describeSecurityGroups', {
+      SecurityGroups: [
         {
-          Attachments: [{}],
+          IpPermissions: [
+            {
+              IpRanges: [
+                {
+                  CidrIp: '10.0.0.0/16',
+                },
+              ],
+            },
+          ],
         },
       ],
     })
     const audits = await handler({
-      region: 'us-east-1',
       profile: 'test',
-      resourceId: 'test',
-      domain: 'pub',
-    } as AWSScannerCliArgsInterface)
-
-    expect(audits).to.eql([
-      {
-        name: undefined,
-        provider: 'aws',
-        physicalId: undefined,
-        service: 'ec2',
-        rule: 'IgwAttachedToVpc',
-        region: 'us-east-1',
-        state: 'OK',
-        profile: 'test',
-        time: now.toISOString(),
-      },
-    ])
-  })
-
-  it('should report OK if there are no attachments state objects', async () => {
-    mock('EC2', 'describeInternetGateways', {
-      InternetGateways: [
-        {
-          Attachments: [],
-        },
-      ],
-    })
-    const audits = await handler({
-      region: 'us-east-1',
-      profile: 'test',
-      resourceId: 'test',
-      domain: 'pub',
-    } as AWSScannerCliArgsInterface)
-
-    expect(audits).to.eql([
-      {
-        name: undefined,
-        provider: 'aws',
-        physicalId: undefined,
-        service: 'ec2',
-        rule: 'IgwAttachedToVpc',
-        region: 'us-east-1',
-        state: 'OK',
-        profile: 'test',
-        time: now.toISOString(),
-      },
-    ])
-  })
-
-  it('should report OK if there are no internet gateways', async () => {
-    mock('EC2', 'describeInternetGateways', {
-      InternetGateways: [{}],
-    })
-    const audits = await handler({
-      region: 'us-east-1',
-      profile: 'test',
-      resourceId: 'test',
-      domain: 'pub',
-    } as AWSScannerCliArgsInterface)
-
-    expect(audits).to.eql([
-      {
-        name: undefined,
-        provider: 'aws',
-        physicalId: undefined,
-        service: 'ec2',
-        rule: 'IgwAttachedToVpc',
-        region: 'us-east-1',
-        state: 'OK',
-        profile: 'test',
-        time: now.toISOString(),
-      },
-    ])
-  })
-
-  it('should report OK with no attachments via a scan', async () => {
-    mock('EC2', 'describeInternetGateways', {
-      InternetGateways: [
-        {
-          Attachments: [],
-        },
-      ],
-    })
-    const audits = await handler({
       region: 'all',
       domain: 'pub',
     } as AWSScannerCliArgsInterface)
-
     expect(audits).to.eql([
       {
         name: undefined,
         provider: 'aws',
         physicalId: undefined,
         service: 'ec2',
-        rule: 'IgwAttachedToVpc',
+        rule: 'PublicPermission',
         region: 'us-east-1',
         state: 'OK',
-        profile: undefined,
+        profile: 'test',
         time: now.toISOString(),
       },
     ])
   })
 
-  it('should report UNKNOWN if the describe call fails', async () => {
-    mock('EC2', 'describeInternetGateways', Promise.reject('test'))
+  it('should report OK if there are no ipRanges', async () => {
+    mock('EC2', 'describeSecurityGroups', {
+      SecurityGroups: [
+        {
+          IpPermissions: [{}],
+        },
+      ],
+    })
     const audits = await handler({
-      region: 'all',
-      domain: 'pub',
+      region: 'us-east-1',
+      profile: 'test',
       resourceId: 'test',
+      domain: 'pub',
     } as AWSScannerCliArgsInterface)
+    expect(audits).to.eql([
+      {
+        name: undefined,
+        provider: 'aws',
+        physicalId: undefined,
+        service: 'ec2',
+        rule: 'PublicPermission',
+        region: 'us-east-1',
+        state: 'OK',
+        profile: 'test',
+        time: now.toISOString(),
+      },
+    ])
+  })
 
+  it('should report OK if there are no IpPermissions', async () => {
+    mock('EC2', 'describeSecurityGroups', {
+      SecurityGroups: [{}],
+    })
+    const audits = await handler({
+      region: 'us-east-1',
+      profile: 'test',
+      resourceId: 'test',
+      domain: 'pub',
+    } as AWSScannerCliArgsInterface)
+    expect(audits).to.eql([
+      {
+        name: undefined,
+        provider: 'aws',
+        physicalId: undefined,
+        service: 'ec2',
+        rule: 'PublicPermission',
+        region: 'us-east-1',
+        state: 'OK',
+        profile: 'test',
+        time: now.toISOString(),
+      },
+    ])
+  })
+
+  it('should report FAIL if there ::/0 is permitted', async () => {
+    mock('EC2', 'describeSecurityGroups', {
+      SecurityGroups: [
+        {
+          IpPermissions: [
+            {
+              Ipv6Ranges: [
+                {
+                  CidrIpv6: '::/0',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    })
+    const audits = await handler({
+      region: 'us-east-1',
+      profile: 'test',
+      resourceId: 'test',
+      domain: 'pub',
+    } as AWSScannerCliArgsInterface)
+    expect(audits).to.eql([
+      {
+        name: undefined,
+        provider: 'aws',
+        physicalId: undefined,
+        service: 'ec2',
+        rule: 'PublicPermission',
+        region: 'us-east-1',
+        state: 'FAIL',
+        profile: 'test',
+        time: now.toISOString(),
+      },
+    ])
+  })
+
+  it('should report FAIL if there ::/0 is not permitted', async () => {
+    mock('EC2', 'describeSecurityGroups', {
+      SecurityGroups: [
+        {
+          IpPermissions: [
+            {
+              Ipv6Ranges: [
+                {
+                  CidrIpv6: '1:see:bad:c0de/128',
+                },
+              ],
+            },
+          ],
+        },
+      ],
+    })
+    const audits = await handler({
+      region: 'us-east-1',
+      profile: 'test',
+      resourceId: 'test',
+      domain: 'pub',
+    } as AWSScannerCliArgsInterface)
+    expect(audits).to.eql([
+      {
+        name: undefined,
+        provider: 'aws',
+        physicalId: undefined,
+        service: 'ec2',
+        rule: 'PublicPermission',
+        region: 'us-east-1',
+        state: 'OK',
+        profile: 'test',
+        time: now.toISOString(),
+      },
+    ])
+  })
+
+  it('should report nothing if there are no security groups', async () => {
+    mock('EC2', 'describeSecurityGroups', {})
+    const audits = await handler({
+      region: 'us-east-1',
+      profile: 'test',
+      resourceId: 'test',
+      domain: 'pub',
+    } as AWSScannerCliArgsInterface)
+    expect(audits).to.eql([])
+  })
+
+  it('should report UNKNOWN if the group is not found', async () => {
+    class Err extends Error {
+      code = 'InvalidGroup.NotFound'
+    }
+    const myErr = new Err()
+    mock('EC2', 'describeSecurityGroups', Promise.reject(myErr))
+    const audits = await handler({
+      region: 'us-east-1',
+      profile: 'test',
+      resourceId: 'test',
+      domain: 'pub',
+    } as AWSScannerCliArgsInterface)
     expect(audits).to.eql([
       {
         provider: 'aws',
+        comment: 'unable to audit resource InvalidGroup.NotFound - ',
         physicalId: 'test',
-        comment: 'unable to audit resource undefined - undefined',
         service: 'ec2',
-        rule: 'IgwAttachedToVpc',
-        region: 'all',
+        rule: 'PublicPermission',
+        region: 'us-east-1',
         state: 'UNKNOWN',
-        profile: undefined,
+        profile: 'test',
         time: now.toISOString(),
       },
     ])
   })
 
-  it('should report nothing if there are no gateways', async () => {
-    mock('EC2', 'describeInternetGateways', {})
-    const audits = await handler({
-      region: 'all',
-      domain: 'pub',
-    } as AWSScannerCliArgsInterface)
-    expect(audits).to.eql([])
-  })
-
-  it('should report nothing if there are not gateways in gov cloud', async () => {
-    mock('EC2', 'describeInternetGateways', {})
-    const audits = await handler({
-      region: 'all',
-      domain: 'gov',
-    } as AWSScannerCliArgsInterface)
-    expect(audits).to.eql([])
-  })
-
-  it('should report nothing if the domain is incorrect', async () => {
-    mock('EC2', 'describeInternetGateways', {})
-    const audits = await handler({
-      region: 'all',
-      domain: 'test',
-    } as AWSScannerCliArgsInterface)
-    expect(audits).to.eql([])
-  })
-
-  it('should report nothing if there are no gateways but with a single pub region', async () => {
-    mock('EC2', 'describeInternetGateways', {})
+  it('should throw if the describe groups fails for an unknown reason', async () => {
+    class Err extends Error {
+      code = 'potato'
+    }
+    const myErr = new Err('lol')
+    mock('EC2', 'describeSecurityGroups', Promise.reject(myErr))
     const audits = await handler({
       region: 'us-east-1',
+      profile: 'test',
+      resourceId: 'test',
       domain: 'pub',
-    } as AWSScannerCliArgsInterface)
-    expect(audits).to.eql([])
-  })
-
-  it('should report nothing if there are no gateways but in a single gov region', async () => {
-    mock('EC2', 'describeInternetGateways', {})
-    const audits = await handler({
-      region: 'us-gov-west-1',
-      domain: 'gov',
     } as AWSScannerCliArgsInterface)
     expect(audits).to.eql([])
   })

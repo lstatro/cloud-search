@@ -23,7 +23,7 @@ interface MaxKeyAgeInterface extends AWSScannerInterface {
 
 export default class MaxKeyAge extends AWS {
   audits: AuditResultInterface[] = []
-  service = 's3'
+  service = 'iam'
   global = true
   maxAge: number
 
@@ -142,5 +142,6 @@ export const handler = async (args: MaxKeyAgeCliInterface) => {
   })
 
   await scanner.start()
-  // scanner.output()
+  scanner.output()
+  return scanner.audits
 }

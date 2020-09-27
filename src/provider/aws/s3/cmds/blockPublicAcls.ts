@@ -16,4 +16,5 @@ export const handler = async (args: AWSScannerCliArgsInterface) => {
   })
   await scanner.start()
   scanner.output()
+  return scanner.audits
 }

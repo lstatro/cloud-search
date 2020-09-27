@@ -7,7 +7,7 @@ import {
 import { SecurityGroup } from 'aws-sdk/clients/ec2'
 import AWS from '../../../../../lib/aws/AWS'
 
-const rule = 'publicPermission'
+const rule = 'PublicPermission'
 
 export const command = `${rule} [args]`
 export const desc = 'searches security groups for 0.0.0.0/0 or ::/0 on any port'
@@ -112,6 +112,7 @@ export default class PublicPermission extends AWS {
       } while (nextToken)
     } catch (err) {
       const errs = ['InvalidGroup.NotFound', 'InvalidGroupId.Malformed']
+      console.log(err)
       if (errs.includes(err.code)) {
         this.audits.push({
           provider: 'aws',
@@ -140,4 +141,5 @@ export const handler = async (args: AWSScannerCliArgsInterface) => {
   })
   await scanner.start()
   scanner.output()
+  return scanner.audits
 }
