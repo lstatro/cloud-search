@@ -163,5 +163,23 @@ describe('publicAccessBlocks', () => {
       })
       expect(audits).to.eql([])
     })
+
+    /**
+     * smoke test to see if we can step into global false and default
+     * the region, I know it works, it's just hard to test without testing
+     * the AWS provider directly
+     */
+    it('default to us-east-1 if passed all and global is true', async () => {
+      mock('S3', 'listBuckets', {
+        Buckets: [],
+      })
+      await handler({
+        _: ['test'],
+        $0: 'test',
+        profile: 'test',
+        domain: 'pub',
+        region: 'all',
+      })
+    })
   }
 })

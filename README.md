@@ -1,26 +1,26 @@
+# Cloud-search
+
+A node based CLI that attempts to find and report on common cloud misconfigurations or insecure practices.
+
+This tool is meant to be used by security professionals, system admins, and developers to validate resources are in sane states.
+
+If nothing else, this tool should help spark conversations that lead to better security practices and better dialog with security professionals.
+
+It should go without saying, that passing scans do not mean resources are secure. This tool only takes aim at high level patterns. It's possible that a resource follows established practices, and passes all scans, but still gets breached. This is why it's important to engage in dialog with security professionals early in and often in a project.
+
+Oh, one last note, **this is a scanning and reporting tool, no write actions are taken on the target account.**
+
 # Disclaimer
 
 Hi Person Behind The Keyboard,
 
-Please understand this tool is still in its infancy, as of now this only supports scanning AWS resources, and only a handful of rules at that. More will come in the coming weeks and months.
+Please understand this tool is in its infancy, as of now this only supports scanning AWS resources, and only a handful of rules at that. More will come in the coming weeks and months.
 
-There are plans to expose some functionality via import/require methods so that users can create their own scanning scripts. But until then, baby steps.
+There are plans to expose some functionality via import/require methods so that users can create their own scanning scripts.
 
 Thanks,
 
 -lst
-
-# Cloud-search
-
-A node based CLI that attempts to find and report on common cloud misconfigrations or insecure practices.
-
-This tool is meant to be used by security professionals, system admins, and developers to validate resources are in sane states.
-
-If nothing else, this tool should help spark conversations that lead to better practices and hopefully better security dialog.
-
-It should go without saying, that passing scans do not mean resources are secure. This tool only aims at high level patterns. It's possible that a resource follows established practices and passes all scans, but still gets breached. This is why it's important to engage in dialog with security professionals.
-
-Oh, one last note, **this is a scanning and reporting tool, no write actions are taken on the target account.**
 
 # Install
 
@@ -30,7 +30,9 @@ This tool was designed as a global install, however it should still work if inst
 
 # How to find help
 
-- `cloud-search --help`
+Use the `--help` option on any level of the CLI, it should explain what the control is looking for and any additional options it may take.
+
+- The list of services changes often, `cloud-search --help`
 - tease though the cli, it should tell you what it wants
 - lol, look at the code, we're not perfect!
 
@@ -40,9 +42,7 @@ Credential management will vary by cloud provider.
 
 ## AWS
 
-**The preferred method of use use credential profiles and pass that profile name into the request.**
-
-However, this also works with the other nodejs standard methods of storing and using AWS credentials. The beasts heart beats to the rhythm of the javascript aws-sdk- and ultimately how [AWS handles credentials precedence](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/setting-credentials-node.html).
+**The tool supports AWS credential profiles.** However, this also works with the other nodejs standard methods of storing and using AWS credentials. The beasts heart beats to the rhythm of the javascript aws-sdk- and ultimately how [AWS handles credentials precedence](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/setting-credentials-node.html).
 
 # Command Examples
 

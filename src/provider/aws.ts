@@ -33,4 +33,14 @@ export const builder = (yargs: Argv) => {
       default: 'pub',
       demandOption: true,
     })
+    .example([
+      [
+        'aws s3 PublicAccessBlocks -p lolComplianceProfile',
+        'runs all four public access block checks against all buckets',
+      ],
+      [
+        'aws ec2 vpc IgwAttachedToVpc -r us-east-1',
+        'checks all VPCs in us-east-1 for an attached IGW',
+      ],
+    ])
 }

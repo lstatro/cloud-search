@@ -19,7 +19,6 @@ type VolumeHandlerFunctions = (
 
 export const command = `${rule} [args]`
 export const desc = 'Verifies that EBS volume are encrypted'
-
 export const builder: CommandBuilder = {
   keyType: {
     alias: 't',
@@ -36,7 +35,7 @@ export const builder: CommandBuilder = {
 }
 
 export interface VolumesEncryptedInterface extends AWSScannerInterface {
-  KeyArn?: string
+  keyArn?: string
   keyType: 'aws' | 'cmk'
 }
 
@@ -44,7 +43,7 @@ export default class VolumesEncrypted extends AWS {
   audits: AuditResultInterface[] = []
   service = 'ebs'
   cmks: string[] = []
-  KeyArn?: string
+  keyArn?: string
   keyType: string
 
   constructor(public params: VolumesEncryptedInterface) {
@@ -55,7 +54,7 @@ export default class VolumesEncrypted extends AWS {
       region: params.region,
       rule,
     })
-    this.KeyArn = params.KeyArn
+    this.keyArn = params.keyArn
     this.keyType = params.keyType
   }
 
@@ -78,6 +77,11 @@ export default class VolumesEncrypted extends AWS {
     if (volume.Encrypted === true) {
       audit.state = 'OK'
       audit.comment = 'encrypted with aws account ebs key'
+      if (this.keyArn) {
+        if (this.keyArn !== volume.KmsKeyId) {
+          audit.state = 'WARNING'
+        }
+      }
     } else {
       audit.state = 'FAIL'
     }
@@ -104,8 +108,8 @@ export default class VolumesEncrypted extends AWS {
   }
 
   getCustomerMangedKeys = async (options: AWSClientOptionsInterface) => {
-    if (typeof this.KeyArn === 'string') {
-      this.cmks.push(this.KeyArn)
+    if (typeof this.keyArn === 'string') {
+      this.cmks.push(this.keyArn)
     } else {
       const kms = new KMS(options)
       let marker: string | undefined
@@ -118,8 +122,17 @@ export default class VolumesEncrypted extends AWS {
         marker = listKeys.NextMarker
         assert(listKeys.Keys, 'key has no keys')
         for (const key of listKeys.Keys) {
-          assert(key.KeyArn, 'key has no id')
-          this.cmks.push(key.KeyArn)
+          assert(key.KeyId, 'key has no id')
+          assert(key.KeyArn, 'key has no ARN')
+          const describeKey = await kms
+            .describeKey({
+              KeyId: key.KeyId,
+            })
+            .promise()
+          assert(describeKey.KeyMetadata, 'key missing metadata')
+          if (describeKey.KeyMetadata.KeyManager === 'CUSTOMER') {
+            this.cmks.push(key.KeyArn)
+          }
         }
       } while (marker)
     }
@@ -139,36 +152,22 @@ export default class VolumesEncrypted extends AWS {
 
     let nextToken: string | undefined
 
-    try {
-      await this.getCustomerMangedKeys(options)
-      do {
-        const describeVolumes = await ec2
-          .describeVolumes({
-            NextToken: nextToken,
-            VolumeIds: resourceId ? [resourceId] : undefined,
-          })
-          .promise()
-        nextToken = describeVolumes.NextToken
+    await this.getCustomerMangedKeys(options)
+    do {
+      const describeVolumes = await ec2
+        .describeVolumes({
+          NextToken: nextToken,
+          VolumeIds: resourceId ? [resourceId] : undefined,
+        })
+        .promise()
+      nextToken = describeVolumes.NextToken
 
-        if (describeVolumes.Volumes) {
-          for (const volume of describeVolumes.Volumes) {
-            this.audit(volume, region)
-          }
+      if (describeVolumes.Volumes) {
+        for (const volume of describeVolumes.Volumes) {
+          this.audit(volume, region)
         }
-      } while (nextToken)
-    } catch (err) {
-      this.audits.push({
-        provider: 'aws',
-        comment: `unable to audit resource ${err.code} - ${err.message}`,
-        physicalId: resourceId,
-        service: this.service,
-        rule,
-        region: region,
-        state: 'UNKNOWN',
-        profile: this.profile,
-        time: new Date().toISOString(),
-      })
-    }
+      }
+    } while (nextToken)
   }
 }
 
@@ -182,7 +181,7 @@ export const handler = async (args: VolumesEncryptedCliInterface) => {
     profile: args.profile,
     resourceId: args.resourceId,
     domain: args.domain,
-    KeyArn: args.KeyArn,
+    keyArn: args.keyArn,
     keyType: args.keyType,
   })
   await scanner.start()
