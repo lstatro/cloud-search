@@ -7,3 +7,5 @@ types.d.ts
 tsconfig.json
 .nyc_output
 coverage
+*.ts
+!.d.ts
