@@ -117,6 +117,14 @@ For global service, the region may be safely omitted. When the system goes to ge
 
 **OK** states mean that the resource has an expected configuration for the specific rule in question
 
+## <span style="color:yellow">**WARNING**</span>
+
+**WARNING** states occur when some but not all of the scan's criteria are met. For example, EBS volumes results in a **WARNING** state if the volume is encrypted with an AWS managed key, but the desired type is AWS CMK.
+
+### How to fix <span style="color:yellow">**WARNING**</span> states
+
+It depends on the rule, but it's typically the result of some but not all of the compliance criteria not being met.
+
 ## <span style="color:orange">**UNKNOWN**</span>
 
 **UNKNOWN** states occur when the system is aware of a resource but for some reason is unable to determine its specific compliance state.
