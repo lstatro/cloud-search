@@ -1,6 +1,8 @@
 import { AWSClientOptionsInterface } from 'cloud-search'
-import { SharedIniFileCredentials, EC2 } from 'aws-sdk'
+import _AWS, { SharedIniFileCredentials, EC2 } from 'aws-sdk'
 import Provider from '../Provider'
+
+_AWS.AWSError
 
 import assert from 'assert'
 
@@ -44,6 +46,24 @@ export default abstract class AWS extends Provider {
   abstract async scan(params: ScanInterface): Promise<void>
 
   abstract audit(resource: unknown, region: string): Promise<void>
+
+  call = async <T>(promise: T) => {
+    let result: unknown
+    let attempt = 0
+    do {
+      try {
+        result = await promise
+        attempt = attempt + 1
+      } catch (err) {
+        this.spinner.text = err.message
+        assert(err.retryable === true, err)
+        attempt++
+        await this.sleep(attempt)
+      }
+    } while (attempt < 5)
+    assert(result, 'unable to make the api call')
+    return result as T
+  }
 
   getOptions = () => {
     let options: AWSClientOptionsInterface
