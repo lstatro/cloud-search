@@ -1,4 +1,3 @@
-import { S3 } from 'aws-sdk'
 import { GetPublicAccessBlockOutput } from 'aws-sdk/clients/s3'
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import assert from 'assert'
@@ -23,7 +22,7 @@ export default class PublicAccessBlocks extends AWS {
   }
 
   async audit(bucketName: string, region: string) {
-    const s3 = new S3(this.options)
+    const s3 = new this.AWS.S3(this.options)
     try {
       const getPublicAccessBlock = await s3
         .getPublicAccessBlock({ Bucket: bucketName })
@@ -81,7 +80,7 @@ export default class PublicAccessBlocks extends AWS {
   }
 
   scan = async () => {
-    const s3 = new S3(this.options)
+    const s3 = new this.AWS.S3(this.options)
 
     const listBuckets = await s3.listBuckets().promise()
     if (listBuckets.Buckets) {

@@ -1,4 +1,3 @@
-import { IAM } from 'aws-sdk'
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import AWS from '../../../../../lib/aws/AWS'
 import { AccessKeyMetadata, User } from 'aws-sdk/clients/iam'
@@ -39,7 +38,7 @@ export default class MaxKeyAge extends AWS {
   }
 
   async audit(user: User) {
-    const iam = new IAM(this.options)
+    const iam = new this.AWS.IAM(this.options)
 
     let marker: string | undefined
 
@@ -98,7 +97,7 @@ export default class MaxKeyAge extends AWS {
   }
 
   scan = async () => {
-    const iam = new IAM(this.options)
+    const iam = new this.AWS.IAM(this.options)
 
     const users: User[] = []
 

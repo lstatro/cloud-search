@@ -1,4 +1,3 @@
-import { EC2 } from 'aws-sdk'
 import {
   AuditResultInterface,
   AWSScannerCliArgsInterface,
@@ -83,7 +82,7 @@ export default class PublicPermission extends AWS {
   }) => {
     this.options.region = region
 
-    const ec2 = new EC2(this.options)
+    const ec2 = new this.AWS.EC2(this.options)
 
     let nextToken: string | undefined
 

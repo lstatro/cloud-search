@@ -15,7 +15,7 @@ export default abstract class Provider {
   }
 
   getBackOff = (modifier: number) => {
-    return (modifier + Math.random()) ** 2 * 1000
+    return 100 * (modifier + Math.random()) ** 2
   }
 
   sleep = async (attempt: number) => {

@@ -1,8 +1,6 @@
 import { AWSClientOptionsInterface } from 'cloud-search'
-import _AWS, { SharedIniFileCredentials, EC2 } from 'aws-sdk'
+import _AWS from 'aws-sdk'
 import Provider from '../Provider'
-
-_AWS.AWSError
 
 import assert from 'assert'
 
@@ -19,7 +17,7 @@ interface ScanInterface {
   resourceId?: string
 }
 
-export default abstract class AWS extends Provider {
+export default abstract class AwsService extends Provider {
   abstract service: string
 
   options: AWSClientOptionsInterface
@@ -28,6 +26,7 @@ export default abstract class AWS extends Provider {
   region: string
   regions: string[] = []
   global = false
+  AWS = _AWS
 
   profile?: string
   resourceId?: string
@@ -40,6 +39,13 @@ export default abstract class AWS extends Provider {
     this.profile = params.profile
     this.resourceId = params.resourceId
 
+    this.AWS.config.update({
+      maxRetries: 20,
+      retryDelayOptions: {
+        customBackoff: this.getBackOff,
+      },
+    })
+
     this.options = this.getOptions()
   }
 
@@ -47,28 +53,10 @@ export default abstract class AWS extends Provider {
 
   abstract audit(resource: unknown, region: string): Promise<void>
 
-  call = async <T>(promise: T) => {
-    let result: unknown
-    let attempt = 0
-    do {
-      try {
-        result = await promise
-        attempt = attempt + 1
-      } catch (err) {
-        this.spinner.text = err.message
-        assert(err.retryable === true, err)
-        attempt++
-        await this.sleep(attempt)
-      }
-    } while (attempt < 5)
-    assert(result, 'unable to make the api call')
-    return result as T
-  }
-
   getOptions = () => {
     let options: AWSClientOptionsInterface
     if (this.profile) {
-      const credentials = new SharedIniFileCredentials({
+      const credentials = new this.AWS.SharedIniFileCredentials({
         profile: this.profile,
       })
       options = {
@@ -95,7 +83,7 @@ export default abstract class AWS extends Provider {
         if (this.global === false) {
           /** welp, lets start with by setting us-east-1 and getting a list of all regions */
           this.options.region = 'us-east-1'
-          const describeRegions = await new EC2(this.options)
+          const describeRegions = await new this.AWS.EC2(this.options)
             .describeRegions()
             .promise()
 
@@ -123,7 +111,7 @@ export default abstract class AWS extends Provider {
         /** if this is not a global rule we need to get all regions, if it is, then we default o just one */
         if (this.global === false) {
           this.options.region = 'us-gov-west-1'
-          const describeRegions = await new EC2(this.options)
+          const describeRegions = await new this.AWS.EC2(this.options)
             .describeRegions()
             .promise()
           assert(describeRegions.Regions, 'unable to describe regions')

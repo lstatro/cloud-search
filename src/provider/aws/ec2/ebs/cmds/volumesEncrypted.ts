@@ -1,4 +1,3 @@
-import { EC2, KMS } from 'aws-sdk'
 import { CommandBuilder } from 'yargs'
 import { Volume } from 'aws-sdk/clients/ec2'
 import {
@@ -111,7 +110,7 @@ export default class VolumesEncrypted extends AWS {
     if (typeof this.keyArn === 'string') {
       this.cmks.push(this.keyArn)
     } else {
-      const kms = new KMS(options)
+      const kms = new this.AWS.KMS(options)
       let marker: string | undefined
       do {
         const listKeys = await kms
@@ -148,7 +147,7 @@ export default class VolumesEncrypted extends AWS {
     const options = this.getOptions()
     options.region = region
 
-    const ec2 = new EC2(options)
+    const ec2 = new this.AWS.EC2(options)
 
     let nextToken: string | undefined
 

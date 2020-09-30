@@ -1,4 +1,3 @@
-import { EC2 } from 'aws-sdk'
 import {
   AuditResultInterface,
   AWSScannerCliArgsInterface,
@@ -71,7 +70,7 @@ export default class IgwAttachedToVpc extends AWS {
     const options = this.getOptions()
     options.region = region
 
-    const ec2 = new EC2(options)
+    const ec2 = new this.AWS.EC2(options)
 
     let nextToken: string | undefined
 
