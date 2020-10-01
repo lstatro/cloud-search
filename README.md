@@ -10,18 +10,6 @@ It should go without saying, that passing scans do not mean resources are secure
 
 Oh, one last note, **this is a scanning and reporting tool, no write actions are taken on the target account.**
 
-# Disclaimer
-
-Hi Person Behind The Keyboard,
-
-Please understand this tool is in its infancy, as of now this only supports scanning AWS resources, and only a handful of rules at that. More will come in the coming weeks and months.
-
-There are plans to expose some functionality via import/require methods so that users can create their own scanning scripts.
-
-Thanks,
-
--lst
-
 # Install
 
 This tool was designed as a global install, however it should still work if installed locally via npx
@@ -36,26 +24,14 @@ Use the `--help` option on any level of the CLI, it should explain what the cont
 - tease though the cli, it should tell you what it wants
 - Want to know what a specific compliance state means? Use the `--help` it'll have an explanation of what each state means.
 
-# Credentials
+# Disclaimer
 
-Credential management will vary by cloud provider.
+Hi Person Behind The Keyboard,
 
-## AWS
+Please understand this tool is in its infancy, as of now this only supports scanning AWS resources, and only a handful of rules at that. More will come in the coming weeks and months.
 
-**The tool supports AWS credential profiles.** However, this also works with the other nodejs standard methods of storing and using AWS credentials. The beasts heart beats to the rhythm of the javascript aws-sdk- and ultimately how [AWS handles credentials precedence](https://docs.aws.amazon.com/sdk-for-javascript/v2/developer-guide/setting-credentials-node.html).
+There are plans to expose some functionality via import/require methods so that users can create their own scanning scripts.
 
-# Regions and Scans
+Thanks,
 
-Unless told otherwise, the tool will run scans across all regions returned by `ec2.describeRegions()`. It is possible to override this behavior by passing a specific region into a request.
-
-If requesting a scan of a specific resource, you will also have to pass in the region that resource lives in.
-
-For global service, the region may be safely omitted. When the system goes to generate the API end-point it'll default to something sane like `us-east-1`.
-
-> **Note**, opt in regions are omitted by the describe call therefore they're omitted by the tool until they're opted in.
-
-Services that are global will default to their home region, typically `us-east-1` or `us-gov-west-1` depending on the domain
-
-```
-
-```
+-lst
