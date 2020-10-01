@@ -11,7 +11,12 @@ const rule = 'IgwAttachedToVpc'
 export const command = `${rule} [args]`
 export const desc = `Verifies that all internet gateways owned by this account.
 are detached Note, shared VPC's don't necessarily own the IGW so they may not 
-show up in this scan. 
+show up in this scan.
+
+  OK      - the vpc does not have an IGW attached
+  UNKNOWN - unable to determine if the VPC has an IGW attached
+  FAIL    - the vpc has an IGW attached
+
 `
 
 export default class IgwAttachedToVpc extends AWS {
@@ -49,11 +54,6 @@ export default class IgwAttachedToVpc extends AWS {
       service: this.service,
       rule,
       region: region,
-      /**
-       * ew ternary- did we find something sketchy when reviewing the group?
-       * - yea? FAIL!  this is crap, we should seek out an adult
-       * - nah bro (or broette), we OK
-       */
       state: suspect ? 'FAIL' : 'OK',
       profile: this.profile,
       time: new Date().toISOString(),
@@ -67,44 +67,9 @@ export default class IgwAttachedToVpc extends AWS {
     region: string
     resourceId?: string
   }) => {
-    const options = this.getOptions()
-    options.region = region
-
-    const ec2 = new this.AWS.EC2(options)
-
-    let nextToken: string | undefined
-
-    try {
-      do {
-        const describeInternetGateways = await ec2
-          .describeInternetGateways({
-            NextToken: nextToken,
-            InternetGatewayIds: resourceId ? [resourceId] : undefined,
-          })
-          .promise()
-
-        nextToken = describeInternetGateways.NextToken
-
-        if (describeInternetGateways.InternetGateways) {
-          for (const igw of describeInternetGateways.InternetGateways) {
-            this.audit(igw, region)
-          }
-        } else {
-          this.spinner.text = 'no internet gateways found'
-        }
-      } while (nextToken)
-    } catch (err) {
-      this.audits.push({
-        provider: 'aws',
-        comment: `unable to audit resource ${err.code} - ${err.message}`,
-        physicalId: resourceId,
-        service: this.service,
-        rule,
-        region: region,
-        state: 'UNKNOWN',
-        profile: this.profile,
-        time: new Date().toISOString(),
-      })
+    const igws = await this.describeInternetGateways(region, resourceId)
+    for (const igw of igws) {
+      this.audit(igw, region)
     }
   }
 }

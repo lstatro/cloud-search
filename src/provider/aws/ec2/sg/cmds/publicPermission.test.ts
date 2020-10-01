@@ -270,33 +270,6 @@ describe('security group with a public permission', () => {
     expect(audits).to.eql([])
   })
 
-  it('should report UNKNOWN if the group is not found', async () => {
-    class Err extends Error {
-      code = 'InvalidGroup.NotFound'
-    }
-    const myErr = new Err()
-    mock('EC2', 'describeSecurityGroups', Promise.reject(myErr))
-    const audits = await handler({
-      region: 'us-east-1',
-      profile: 'test',
-      resourceId: 'test',
-      domain: 'pub',
-    } as AWSScannerCliArgsInterface)
-    expect(audits).to.eql([
-      {
-        provider: 'aws',
-        comment: 'unable to audit resource InvalidGroup.NotFound - ',
-        physicalId: 'test',
-        service: 'ec2',
-        rule: 'PublicPermission',
-        region: 'us-east-1',
-        state: 'UNKNOWN',
-        profile: 'test',
-        time: now.toISOString(),
-      },
-    ])
-  })
-
   it('should throw if the describe groups fails for an unknown reason', async () => {
     class Err extends Error {
       code = 'potato'

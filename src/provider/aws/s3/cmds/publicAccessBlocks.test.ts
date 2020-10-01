@@ -83,52 +83,7 @@ describe('publicAccessBlocks', () => {
       })
       expect(audits[0].state).to.equal('FAIL')
     })
-    it('should handle UNKNOWN types', async () => {
-      mock('S3', 'getPublicAccessBlock', {
-        PublicAccessBlockConfiguration: {
-          BlockPublicAcls: 'test',
-          BlockPublicPolicy: 'test',
-          IgnorePublicAcls: 'test',
-          RestrictPublicBuckets: 'test',
-        },
-      })
-      mock('S3', 'listBuckets', {
-        Buckets: [
-          {
-            Name: 'test',
-          },
-        ],
-      })
-      const audits = await handler({
-        _: ['test'],
-        $0: 'test',
-        profile: 'test',
-        resourceId: 'test',
-        domain: 'pub',
-        region: 'us-east-1',
-      })
-      expect(audits[0].state).to.equal('UNKNOWN')
-    })
-    it('should handle UNKNOWN types', async () => {
-      const err = new Error('test') as AWSError
-      mock('S3', 'getPublicAccessBlock', Promise.reject(err))
-      mock('S3', 'listBuckets', {
-        Buckets: [
-          {
-            Name: 'test',
-          },
-        ],
-      })
-      const audits = await handler({
-        _: ['test'],
-        $0: 'test',
-        profile: 'test',
-        resourceId: 'test',
-        domain: 'pub',
-        region: 'us-east-1',
-      })
-      expect(audits[0].state).to.equal('UNKNOWN')
-    })
+
     it('should handle FAIL types', async () => {
       const err = new Error('test') as AWSError
       err.code = 'NoSuchPublicAccessBlockConfiguration'

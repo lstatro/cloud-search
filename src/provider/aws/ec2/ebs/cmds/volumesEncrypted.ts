@@ -4,7 +4,6 @@ import {
   AuditResultInterface,
   AWSScannerCliArgsInterface,
   AWSScannerInterface,
-  AWSClientOptionsInterface,
 } from 'cloud-search'
 import assert from 'assert'
 import AWS from '../../../../../lib/aws/AWS'
@@ -17,7 +16,6 @@ type VolumeHandlerFunctions = (
 ) => void
 
 export const command = `${rule} [args]`
-export const desc = 'Verifies that EBS volume are encrypted'
 export const builder: CommandBuilder = {
   keyType: {
     alias: 't',
@@ -32,6 +30,15 @@ export const builder: CommandBuilder = {
     type: 'string',
   },
 }
+
+export const desc = `Verifies that EBS volume are encrypted
+
+  OK      - The volume is encrypted with the specified key
+  UNKNOWN - unable to determine the volume's encryption state
+  WARNING - the volume is encrypted, but not with the right key
+  FAIL    - the volume is not encrypted
+
+`
 
 export interface VolumesEncryptedInterface extends AWSScannerInterface {
   keyArn?: string
@@ -106,34 +113,30 @@ export default class VolumesEncrypted extends AWS {
     this.audits.push(audit)
   }
 
-  getCustomerMangedKeys = async (options: AWSClientOptionsInterface) => {
+  getCustomerMangedKeys = async (region: string) => {
     if (typeof this.keyArn === 'string') {
       this.cmks.push(this.keyArn)
     } else {
+      const options = this.getOptions()
+      options.region = region
+
       const kms = new this.AWS.KMS(options)
-      let marker: string | undefined
-      do {
-        const listKeys = await kms
-          .listKeys({
-            Marker: marker,
+
+      const keys = await this.listKeys(region)
+
+      for (const key of keys) {
+        assert(key.KeyId, 'key has no id')
+        assert(key.KeyArn, 'key has no ARN')
+        const describeKey = await kms
+          .describeKey({
+            KeyId: key.KeyId,
           })
           .promise()
-        marker = listKeys.NextMarker
-        assert(listKeys.Keys, 'key has no keys')
-        for (const key of listKeys.Keys) {
-          assert(key.KeyId, 'key has no id')
-          assert(key.KeyArn, 'key has no ARN')
-          const describeKey = await kms
-            .describeKey({
-              KeyId: key.KeyId,
-            })
-            .promise()
-          assert(describeKey.KeyMetadata, 'key missing metadata')
-          if (describeKey.KeyMetadata.KeyManager === 'CUSTOMER') {
-            this.cmks.push(key.KeyArn)
-          }
+        assert(describeKey.KeyMetadata, 'key missing metadata')
+        if (describeKey.KeyMetadata.KeyManager === 'CUSTOMER') {
+          this.cmks.push(key.KeyArn)
         }
-      } while (marker)
+      }
     }
   }
 
@@ -147,26 +150,13 @@ export default class VolumesEncrypted extends AWS {
     const options = this.getOptions()
     options.region = region
 
-    const ec2 = new this.AWS.EC2(options)
+    await this.getCustomerMangedKeys(region)
 
-    let nextToken: string | undefined
+    const volumes = await this.describeVolumes(region, resourceId)
 
-    await this.getCustomerMangedKeys(options)
-    do {
-      const describeVolumes = await ec2
-        .describeVolumes({
-          NextToken: nextToken,
-          VolumeIds: resourceId ? [resourceId] : undefined,
-        })
-        .promise()
-      nextToken = describeVolumes.NextToken
-
-      if (describeVolumes.Volumes) {
-        for (const volume of describeVolumes.Volumes) {
-          this.audit(volume, region)
-        }
-      }
-    } while (nextToken)
+    for (const volume of volumes) {
+      this.audit(volume, region)
+    }
   }
 }
 

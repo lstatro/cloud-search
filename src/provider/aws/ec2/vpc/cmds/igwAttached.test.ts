@@ -202,29 +202,6 @@ describe('igw vpc attachment', () => {
     ])
   })
 
-  it('should report UNKNOWN if the describe call fails', async () => {
-    mock('EC2', 'describeInternetGateways', Promise.reject('test'))
-    const audits = await handler({
-      region: 'all',
-      domain: 'pub',
-      resourceId: 'test',
-    } as AWSScannerCliArgsInterface)
-
-    expect(audits).to.eql([
-      {
-        provider: 'aws',
-        physicalId: 'test',
-        comment: 'unable to audit resource undefined - undefined',
-        service: 'ec2',
-        rule: 'IgwAttachedToVpc',
-        region: 'all',
-        state: 'UNKNOWN',
-        profile: undefined,
-        time: now.toISOString(),
-      },
-    ])
-  })
-
   it('should report nothing if there are no gateways', async () => {
     mock('EC2', 'describeInternetGateways', {})
     const audits = await handler({

@@ -4,7 +4,13 @@ import PublicAccessBlocks from './publicAccessBlocks'
 const rule = 'BlockPublicPolicy'
 
 export const command = `${rule} [args]`
-export const desc = 'report on the block public policy toggle'
+export const desc = `report on the block public policy toggle
+
+  OK      - BlockPublicPolicy set to true
+  UNKNOWN - BlockPublicPolicy state us unknown
+  FAIL    - BlockPublicPolicy set to false
+
+`
 
 export const handler = async (args: AWSScannerCliArgsInterface) => {
   const scanner = new PublicAccessBlocks({

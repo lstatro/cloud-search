@@ -3,6 +3,10 @@ import _AWS from 'aws-sdk'
 import Provider from '../Provider'
 
 import assert from 'assert'
+import { Bucket } from 'aws-sdk/clients/s3'
+import { InternetGateway, SecurityGroup, Volume } from 'aws-sdk/clients/ec2'
+import { KeyListEntry } from 'aws-sdk/clients/kms'
+import { User } from 'aws-sdk/clients/iam'
 
 interface AWSParamsInterface {
   profile: string
@@ -149,5 +153,151 @@ export default abstract class AwsService extends Provider {
     } catch (err) {
       this.spinner.fail(err.message)
     }
+  }
+
+  describeInternetGateways = async (region: string, resourceId?: string) => {
+    const options = this.getOptions()
+    options.region = region
+
+    const ec2 = new this.AWS.EC2(options)
+
+    let nextToken: string | undefined
+
+    let igws: InternetGateway[] = []
+
+    do {
+      const describeInternetGateways = await ec2
+        .describeInternetGateways({
+          NextToken: nextToken,
+          InternetGatewayIds: resourceId ? [resourceId] : undefined,
+        })
+        .promise()
+
+      nextToken = describeInternetGateways.NextToken
+
+      if (describeInternetGateways.InternetGateways) {
+        igws = igws.concat(describeInternetGateways.InternetGateways)
+      }
+    } while (nextToken)
+
+    return igws
+  }
+
+  listBuckets = async () => {
+    /** no need to define a region, s3 endpoint is global */
+    const s3 = new this.AWS.S3(this.options)
+    let buckets: Bucket[] = []
+
+    const listBuckets = await s3.listBuckets().promise()
+
+    if (listBuckets.Buckets) {
+      buckets = buckets.concat(listBuckets.Buckets)
+    }
+
+    return buckets
+  }
+
+  describeSecurityGroups = async (region: string, resourceId?: string) => {
+    const options = this.getOptions()
+    options.region = region
+
+    const ec2 = new this.AWS.EC2(options)
+
+    let nextToken: string | undefined
+
+    let groups: SecurityGroup[] = []
+
+    do {
+      const describeSecurityGroups = await ec2
+        .describeSecurityGroups({
+          NextToken: nextToken,
+          GroupIds: resourceId ? [resourceId] : undefined,
+        })
+        .promise()
+      nextToken = describeSecurityGroups.NextToken
+      if (describeSecurityGroups.SecurityGroups) {
+        groups = groups.concat(describeSecurityGroups.SecurityGroups)
+      }
+    } while (nextToken)
+
+    return groups
+  }
+
+  describeVolumes = async (region: string, resourceId?: string) => {
+    const options = this.getOptions()
+    options.region = region
+
+    const ec2 = new this.AWS.EC2(options)
+
+    let nextToken: string | undefined
+
+    let volumes: Volume[] = []
+
+    do {
+      const describeVolumes = await ec2
+        .describeVolumes({
+          NextToken: nextToken,
+          VolumeIds: resourceId ? [resourceId] : undefined,
+        })
+        .promise()
+
+      nextToken = describeVolumes.NextToken
+
+      if (describeVolumes.Volumes) {
+        volumes = volumes.concat(describeVolumes.Volumes)
+      }
+    } while (nextToken)
+
+    return volumes
+  }
+
+  listKeys = async (region: string) => {
+    const options = this.getOptions()
+    options.region = region
+
+    const kms = new this.AWS.KMS(options)
+
+    let marker: string | undefined
+
+    let keys: KeyListEntry[] = []
+
+    do {
+      const listKeys = await kms
+        .listKeys({
+          Marker: marker,
+        })
+        .promise()
+      marker = listKeys.NextMarker
+      if (listKeys.Keys) {
+        keys = keys.concat(listKeys.Keys)
+      }
+    } while (marker)
+
+    return keys
+  }
+
+  listUsers = async () => {
+    /** no need to set a region iam is global */
+    const iam = new this.AWS.IAM(this.options)
+
+    let users: User[] = []
+
+    let marker: string | undefined
+
+    do {
+      const listUsers = await iam
+        .listUsers({
+          Marker: marker,
+        })
+        .promise()
+
+      marker = listUsers.Marker
+
+      if (listUsers.Users) {
+        users = users.concat(listUsers.Users)
+      }
+    } while (marker)
+
+    return users
   }
 }

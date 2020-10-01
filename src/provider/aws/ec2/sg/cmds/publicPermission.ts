@@ -9,7 +9,13 @@ import AWS from '../../../../../lib/aws/AWS'
 const rule = 'PublicPermission'
 
 export const command = `${rule} [args]`
-export const desc = 'searches security groups for 0.0.0.0/0 or ::/0 on any port'
+export const desc = `searches security groups for 0.0.0.0/0 or ::/0 on any port
+
+  OK      - the group does not contain 0.0.0.0/0 or ::/0 ingress permissions
+  UNKNOWN - unable to determine if the group includes 0.0.0.0/0 or ::/0
+  FAIL    - the group allows 0.0.0.0/0 or ::/0 ingress
+
+`
 
 export default class PublicPermission extends AWS {
   audits: AuditResultInterface[] = []
@@ -80,53 +86,9 @@ export default class PublicPermission extends AWS {
     region: string
     resourceId?: string
   }) => {
-    this.options.region = region
-
-    const ec2 = new this.AWS.EC2(this.options)
-
-    let nextToken: string | undefined
-
-    /**
-     * try to search for the group, if we find it neat,
-     * if we don't return an unknown state object
-     */
-    try {
-      do {
-        const describeSecurityGroups = await ec2
-          .describeSecurityGroups({
-            NextToken: nextToken,
-            /**
-             * ew, listen- did we pass in a group, yea? well then lets filter
-             * for only that.  No? then lets leave this undefined
-             */
-            GroupIds: resourceId ? [resourceId] : undefined,
-          })
-          .promise()
-        nextToken = describeSecurityGroups.NextToken
-        if (describeSecurityGroups.SecurityGroups) {
-          for (const group of describeSecurityGroups.SecurityGroups) {
-            this.audit(group, region)
-          }
-        }
-      } while (nextToken)
-    } catch (err) {
-      const errs = ['InvalidGroup.NotFound', 'InvalidGroupId.Malformed']
-      console.log(err)
-      if (errs.includes(err.code)) {
-        this.audits.push({
-          provider: 'aws',
-          comment: `unable to audit resource ${err.code} - ${err.message}`,
-          physicalId: resourceId,
-          service: this.service,
-          rule,
-          region: region,
-          state: 'UNKNOWN',
-          profile: this.profile,
-          time: new Date().toISOString(),
-        })
-      } else {
-        throw err
-      }
+    const groups = await this.describeSecurityGroups(region, resourceId)
+    for (const group of groups) {
+      await this.audit(group, region)
     }
   }
 }

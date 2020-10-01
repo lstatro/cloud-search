@@ -6,7 +6,6 @@ import { CommandBuilder } from 'yargs'
 const rule = 'MaxKeyAge'
 
 export const command = `${rule} [args]`
-export const desc = 'Keys may not be older then so many days'
 export const builder: CommandBuilder = {
   maxAge: {
     alias: 'm',
@@ -15,6 +14,15 @@ export const builder: CommandBuilder = {
     default: 90,
   },
 }
+export const desc = `Keys may not be older then so many days
+
+  OK      - Keys are within the rotation period
+  UNKNOWN - unable to determine the key's age
+  FAIL    - they keys need rotation
+
+  note: iam is global, passing in a region won't change results
+
+`
 
 interface MaxKeyAgeInterface extends AWSScannerInterface {
   maxAge: number
@@ -97,29 +105,7 @@ export default class MaxKeyAge extends AWS {
   }
 
   scan = async () => {
-    const iam = new this.AWS.IAM(this.options)
-
-    const users: User[] = []
-
-    let marker: string | undefined
-
-    do {
-      const listUsers = await iam
-        .listUsers({
-          Marker: marker,
-        })
-        .promise()
-
-      marker = listUsers.Marker
-
-      if (listUsers.Users) {
-        for (const user of listUsers.Users) {
-          users.push(user)
-        }
-      } else {
-        this.spinner.text = 'no users found'
-      }
-    } while (marker)
+    const users = await this.listUsers()
 
     for (const user of users) {
       await this.audit(user)

@@ -4,7 +4,13 @@ import PublicAccessBlocks from './publicAccessBlocks'
 const rule = 'IgnorePublicAcls'
 
 export const command = `${rule} [args]`
-export const desc = 'report the ignore public ACLs toggle'
+export const desc = `report the ignore public ACLs toggle
+
+  OK      - IgnorePublicAcls set to true
+  UNKNOWN - IgnorePublicAcls state us unknown
+  FAIL    - IgnorePublicAcls set to false
+
+`
 
 export const handler = async (args: AWSScannerCliArgsInterface) => {
   const scanner = new PublicAccessBlocks({
