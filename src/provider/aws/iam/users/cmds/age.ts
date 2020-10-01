@@ -107,6 +107,7 @@ export default class MaxKeyAge extends AWS {
   scan = async () => {
     const users = await this.listUsers()
 
+    /** TODO: this needs to support resourceId */
     for (const user of users) {
       await this.audit(user)
     }
