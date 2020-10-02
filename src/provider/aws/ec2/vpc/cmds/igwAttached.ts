@@ -17,6 +17,8 @@ show up in this scan.
   UNKNOWN - unable to determine if the IGW has an attachment
   FAIL    - the IGW is attached to a VPC
 
+  resourceId - IGW ID (igw-xxxxxx)
+  
 `
 
 export default class IgwAttachedToVpc extends AWS {

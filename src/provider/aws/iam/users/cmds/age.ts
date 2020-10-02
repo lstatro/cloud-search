@@ -1,3 +1,5 @@
+/** TODO: this needs to support resourceId */
+
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import AWS from '../../../../../lib/aws/AWS'
 import { AccessKeyMetadata, User } from 'aws-sdk/clients/iam'
@@ -21,6 +23,7 @@ export const desc = `Keys may not be older then so many days
   FAIL    - they keys need rotation
 
   note: iam is global, passing in a region won't change results
+  note: does not support single user requests (yet!)
 
 `
 
@@ -107,7 +110,6 @@ export default class MaxKeyAge extends AWS {
   scan = async () => {
     const users = await this.listUsers()
 
-    /** TODO: this needs to support resourceId */
     for (const user of users) {
       await this.audit(user)
     }

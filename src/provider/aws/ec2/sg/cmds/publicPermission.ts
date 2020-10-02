@@ -15,6 +15,8 @@ export const desc = `searches security groups for 0.0.0.0/0 or ::/0 on any port
   UNKNOWN - unable to determine if the group includes 0.0.0.0/0 or ::/0
   FAIL    - the group allows 0.0.0.0/0 or ::/0 ingress
 
+  resourceId - security group id (sg-xxxxxx)
+
 `
 
 export default class PublicPermission extends AWS {

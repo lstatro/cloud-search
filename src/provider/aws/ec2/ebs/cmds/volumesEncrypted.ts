@@ -38,6 +38,8 @@ export const desc = `Verifies that EBS volume are encrypted
   WARNING - the volume is encrypted, but not with the right key
   FAIL    - the volume is not encrypted
 
+  resourceId - volume id (vol-xxxxxx)
+
 `
 
 export interface VolumesEncryptedInterface extends AWSScannerInterface {

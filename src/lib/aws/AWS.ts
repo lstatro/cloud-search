@@ -7,6 +7,7 @@ import { Bucket } from 'aws-sdk/clients/s3'
 import { InternetGateway, SecurityGroup, Volume } from 'aws-sdk/clients/ec2'
 import { KeyListEntry } from 'aws-sdk/clients/kms'
 import { User } from 'aws-sdk/clients/iam'
+import { Topic } from 'aws-sdk/clients/sns'
 
 interface AWSParamsInterface {
   profile: string
@@ -299,5 +300,30 @@ export default abstract class AwsService extends Provider {
     } while (marker)
 
     return users
+  }
+
+  listTopics = async (region: string) => {
+    const options = this.getOptions()
+    options.region = region
+
+    const sns = new this.AWS.SNS(options)
+
+    let nextToken: string | undefined
+
+    let topics: Topic[] = []
+
+    do {
+      const listTopics = await sns
+        .listTopics({
+          NextToken: nextToken,
+        })
+        .promise()
+      nextToken = listTopics.NextToken
+      if (listTopics.Topics) {
+        topics = topics.concat(listTopics.Topics)
+      }
+    } while (nextToken)
+
+    return topics
   }
 }

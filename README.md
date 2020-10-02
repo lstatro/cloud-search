@@ -12,26 +12,12 @@ Oh, one last note, **this is a scanning and reporting tool, no write actions are
 
 # Install
 
-This tool was designed as a global install, however it should still work if installed locally via npx
-
 `npm install -g @lstatro/cloud-search`
 
 # How to find help
 
-Use the `--help` option on any level of the CLI, it should explain what the control is looking for and any additional options it may take.
+Use `--help` at any CLI level, it will contain information about the control and any additional options it may take.
 
 - The list of services changes often, `cloud-search --help`
 - tease though the cli, it should tell you what it wants
 - Want to know what a specific compliance state means? Use the `--help` it'll have an explanation of what each state means.
-
-# Disclaimer
-
-Hi Person Behind The Keyboard,
-
-Please understand this tool is in its infancy, as of now this only supports scanning AWS resources, and only a handful of rules at that. More will come in the coming weeks and months.
-
-There are plans to expose some functionality via import/require methods so that users can create their own scanning scripts.
-
-Thanks,
-
--lst
