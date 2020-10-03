@@ -3,6 +3,24 @@ import { Argv } from 'yargs'
 export const command = 'aws'
 export const desc = 'aws cloud provider'
 
+const epilogue = `
+********************************** Encryption **********************************
+
+• Encryption keys in AWS comes in two general flavors, AWS managed and customer
+  managed (CMK).  We view CMK's as "more secure" then AWS managed keys as they
+  support more levels of rotation.  
+
+• Scans looking for CMK as the source key type will report resources  using AWS 
+  managed keys for encryption as 'WARNING' instead of 'FAIL'.  This was done 
+  intentionally as some level of encryption is better then no encryption.
+
+• All keys in all regions regardless of the requested region have metadata read
+  into the system.  This is because keys may encrypt resources in any region
+  regardless of the region the key resides.
+
+********************************************************************************
+`
+
 export const builder = (yargs: Argv) => {
   return yargs
     .commandDir('./aws/ec2')
@@ -44,4 +62,5 @@ export const builder = (yargs: Argv) => {
         'checks all VPCs in us-east-1 for an attached IGW',
       ],
     ])
+    .epilogue(epilogue)
 }

@@ -5,7 +5,7 @@ import Provider from '../Provider'
 import assert from 'assert'
 import { Bucket } from 'aws-sdk/clients/s3'
 import { InternetGateway, SecurityGroup, Volume } from 'aws-sdk/clients/ec2'
-import { KeyListEntry } from 'aws-sdk/clients/kms'
+import { KeyListEntry, KeyMetadata } from 'aws-sdk/clients/kms'
 import { User } from 'aws-sdk/clients/iam'
 import { Topic } from 'aws-sdk/clients/sns'
 
@@ -32,7 +32,7 @@ export default abstract class AwsService extends Provider {
   regions: string[] = []
   global = false
   AWS = _AWS
-
+  keyMetaData?: KeyMetadata[]
   profile?: string
   resourceId?: string
 
@@ -46,9 +46,6 @@ export default abstract class AwsService extends Provider {
 
     this.AWS.config.update({
       maxRetries: 20,
-      retryDelayOptions: {
-        customBackoff: this.getBackOff,
-      },
     })
 
     this.options = this.getOptions()
@@ -78,6 +75,24 @@ export default abstract class AwsService extends Provider {
     return options
   }
 
+  describeRegions = async () => {
+    const options = this.getOptions()
+    options.region = 'us-east-1'
+    const describeRegions = await new this.AWS.EC2(options)
+      .describeRegions()
+      .promise()
+
+    const regions: string[] = []
+
+    /** we should have a list of regions, if so for each region get the name and push it to the regions list */
+    assert(describeRegions.Regions, 'unable to describe regions')
+    for (const region of describeRegions.Regions) {
+      assert(region.RegionName, 'region does not have a name')
+      regions.push(region.RegionName)
+    }
+    return regions
+  }
+
   getRegions = async () => {
     /** is this pub or gov clouds? */
 
@@ -87,17 +102,8 @@ export default abstract class AwsService extends Provider {
         /** if this is not a global rule we need to get all regions, if it is, then we default o just one */
         if (this.global === false) {
           /** welp, lets start with by setting us-east-1 and getting a list of all regions */
-          this.options.region = 'us-east-1'
-          const describeRegions = await new this.AWS.EC2(this.options)
-            .describeRegions()
-            .promise()
-
-          /** we should have a list of regions, if so for each region get the name and push it to the regions list */
-          assert(describeRegions.Regions, 'unable to describe regions')
-          for (const region of describeRegions.Regions) {
-            assert(region.RegionName, 'region does not have a name')
-            this.regions.push(region.RegionName)
-          }
+          const regions = await this.describeRegions()
+          this.regions = this.regions.concat(regions)
         } else {
           this.regions.push('us-east-1')
         }
@@ -326,4 +332,83 @@ export default abstract class AwsService extends Provider {
 
     return topics
   }
+
+  getKeyMetadata = async (keyArn?: string, region?: string) => {
+    const options = this.getOptions()
+    const kms = new this.AWS.KMS(options)
+
+    /** if we haven't populated a list of key IDs from within this account */
+    this.keyMetaData = []
+
+    if (keyArn) {
+      assert(region, 'must provide a region this key lives in')
+      const describeKey = await kms
+        .describeKey({
+          KeyId: keyArn,
+        })
+        .promise()
+      if (describeKey.KeyMetadata) {
+        this.keyMetaData = this.keyMetaData.concat(describeKey.KeyMetadata)
+      }
+    } else {
+      const regions = await this.describeRegions()
+
+      for (const region of regions) {
+        this.spinner.text = `${region} - key inventory`
+        options.region = region
+        const keys = await this.listKeys(region)
+        for (const key of keys) {
+          assert(key.KeyArn, 'kms key missing arn')
+          const describeKey = await kms
+            .describeKey({
+              KeyId: key.KeyArn,
+            })
+            .promise()
+          if (describeKey.KeyMetadata) {
+            this.keyMetaData = this.keyMetaData.concat(describeKey.KeyMetadata)
+          }
+        }
+      }
+    }
+  }
+
+  findKey = async (keyArn: string, region: string) => {
+    /** metadata array is undefined on class init, populate it as needed */
+    if (this.keyMetaData === undefined) {
+      await this.getKeyMetadata(keyArn, region)
+    }
+
+    assert(this.keyMetaData, 'key metadata not set')
+
+    return this.keyMetaData.find((metaData) => metaData.Arn === keyArn)
+  }
+
+  isKeyTrusted = async (keyArn: string, type: 'aws' | 'cmk' = 'aws') => {
+    const matched = await this.findKey(keyArn)
+    let trusted: 'UNKNOWN' | 'TRUSTED' | 'WARNING' = 'UNKNOWN'
+    if (matched) {
+      if (type === 'aws') {
+        trusted = 'TRUSTED'
+      } else if (type === 'cmk') {
+        /**
+         * any encryption is better then no encryption, set to warning and
+         * override to TRUSTED if this is in fact a CMK
+         */
+        trusted = 'WARNING'
+        if (matched.KeyManager === 'CUSTOMER') {
+          trusted = 'TRUSTED'
+        }
+      }
+    }
+
+    return trusted
+  }
+
+  /**
+   * check the specified key against what?
+   * what lvl of key is it?
+   * is it a cmk?  If so is it trusted?
+   * what is a trusted cmdk?
+   *   any cmk "in" this account or part of a trusted account array
+   */
 }

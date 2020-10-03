@@ -14,14 +14,14 @@ export default abstract class Provider {
     })
   }
 
-  getBackOff = (modifier: number) => {
-    return 100 * (modifier + Math.random()) ** 2
-  }
+  // getBackOff = (modifier: number) => {
+  //   return 100 * (modifier + Math.random()) ** 2
+  // }
 
-  sleep = async (attempt: number) => {
-    const timer = this.getBackOff(attempt)
-    await new Promise((resolve) => setTimeout(resolve, this.getBackOff(timer)))
-  }
+  // sleep = async (attempt: number) => {
+  //   const timer = this.getBackOff(attempt)
+  //   await new Promise((resolve) => setTimeout(resolve, this.getBackOff(timer)))
+  // }
 
   output = () => {
     const log = console.log

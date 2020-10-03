@@ -4,6 +4,7 @@
  * - TODO: support alias and key arns
  */
 
+import { CommandBuilder } from 'yargs'
 import {
   AuditResultInterface,
   AWSScannerInterface,
@@ -16,6 +17,21 @@ const rule = 'TopicEncrypted'
 
 export const command = `${rule} [args]`
 
+export const builder: CommandBuilder = {
+  keyType: {
+    alias: 't',
+    describe: 'the AWS key type',
+    type: 'string',
+    default: 'aws',
+    choices: ['aws', 'cmk'],
+  },
+  keyArn: {
+    alias: 'a',
+    describe: 'a KMS key arn',
+    type: 'string',
+  },
+}
+
 export const desc = `SNS topics must be encrypted
 
   OK      - Topic is encrypted
@@ -26,12 +42,19 @@ export const desc = `SNS topics must be encrypted
 
 `
 
+export interface TopicEncryptedInterface extends AWSScannerInterface {
+  keyArn?: string
+  keyType: 'aws' | 'cmk'
+}
+
 export default class TopicEncrypted extends AWS {
   audits: AuditResultInterface[] = []
   service = 'sns'
   global = false
+  keyArn?: string
+  keyType: string
 
-  constructor(public params: AWSScannerInterface) {
+  constructor(public params: TopicEncryptedInterface) {
     super({
       profile: params.profile,
       resourceId: params.resourceId,
@@ -39,6 +62,8 @@ export default class TopicEncrypted extends AWS {
       region: params.region,
       rule,
     })
+    this.keyArn = params.keyArn
+    this.keyType = params.keyType
   }
 
   async audit(topicArn: string, region: string) {
@@ -52,6 +77,16 @@ export default class TopicEncrypted extends AWS {
         TopicArn: topicArn,
       })
       .promise()
+
+    // const describeKey = await new this.AWS.KMS(options)
+    //   .describeKey({
+    //     KeyId: 'alias/aws/sns',
+    //     // KeyId:
+    //     // 'arn:aws:kms:us-east-1:814535775158:key/19368815-24d1-4efa-8a72-4f3b32d81c16',
+    //   })
+    //   .promise()
+
+    // console.log(describeKey.KeyMetadata)
 
     const auditObject: AuditResultInterface = {
       name: topicArn,
@@ -67,6 +102,8 @@ export default class TopicEncrypted extends AWS {
 
     if (getTopicAttributes.Attributes) {
       if (getTopicAttributes.Attributes.KmsMasterKeyId) {
+        console.log(this.keyType, this.keyArn)
+        await this.isKeyTrusted(getTopicAttributes.Attributes.KmsMasterKeyId)
         auditObject.state = 'OK'
       } else {
         auditObject.state = 'FAIL'
@@ -95,12 +132,18 @@ export default class TopicEncrypted extends AWS {
   }
 }
 
-export const handler = async (args: AWSScannerCliArgsInterface) => {
+export interface TopicEncryptedCliInterface
+  extends TopicEncryptedInterface,
+    AWSScannerCliArgsInterface {}
+
+export const handler = async (args: TopicEncryptedCliInterface) => {
   const scanner = new TopicEncrypted({
     region: args.region,
     profile: args.profile,
     resourceId: args.resourceId,
     domain: args.domain,
+    keyType: args.keyType,
+    keyArn: args.keyArn,
   })
 
   await scanner.start()
