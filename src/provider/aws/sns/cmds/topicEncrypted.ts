@@ -25,8 +25,7 @@ export const builder: CommandBuilder = {
     default: 'aws',
     choices: ['aws', 'cmk'],
   },
-  keyArn: {
-    alias: 'a',
+  keyId: {
     describe: 'a KMS key arn',
     type: 'string',
   },
@@ -43,7 +42,7 @@ export const desc = `SNS topics must be encrypted
 `
 
 export interface TopicEncryptedInterface extends AWSScannerInterface {
-  keyArn?: string
+  keyId?: string
   keyType: 'aws' | 'cmk'
 }
 
@@ -51,8 +50,8 @@ export default class TopicEncrypted extends AWS {
   audits: AuditResultInterface[] = []
   service = 'sns'
   global = false
-  keyArn?: string
-  keyType: string
+  keyId?: string
+  keyType: 'aws' | 'cmk'
 
   constructor(public params: TopicEncryptedInterface) {
     super({
@@ -62,7 +61,7 @@ export default class TopicEncrypted extends AWS {
       region: params.region,
       rule,
     })
-    this.keyArn = params.keyArn
+    this.keyId = params.keyId
     this.keyType = params.keyType
   }
 
@@ -80,7 +79,8 @@ export default class TopicEncrypted extends AWS {
 
     // const describeKey = await new this.AWS.KMS(options)
     //   .describeKey({
-    //     KeyId: 'alias/aws/sns',
+    //     KeyId:
+    //       'arn:aws:kms:us-east-1:814535775158:key/19368815-24d1-4efa-8a72-4f3b32d81c16',
     //     // KeyId:
     //     // 'arn:aws:kms:us-east-1:814535775158:key/19368815-24d1-4efa-8a72-4f3b32d81c16',
     //   })
@@ -102,9 +102,13 @@ export default class TopicEncrypted extends AWS {
 
     if (getTopicAttributes.Attributes) {
       if (getTopicAttributes.Attributes.KmsMasterKeyId) {
-        console.log(this.keyType, this.keyArn)
-        await this.isKeyTrusted(getTopicAttributes.Attributes.KmsMasterKeyId)
-        auditObject.state = 'OK'
+        const isTrusted = await this.isKeyTrusted(
+          getTopicAttributes.Attributes.KmsMasterKeyId,
+          this.keyType,
+          region,
+          this.keyId
+        )
+        auditObject.state = isTrusted
       } else {
         auditObject.state = 'FAIL'
       }
@@ -143,7 +147,7 @@ export const handler = async (args: TopicEncryptedCliInterface) => {
     resourceId: args.resourceId,
     domain: args.domain,
     keyType: args.keyType,
-    keyArn: args.keyArn,
+    keyId: args.keyId,
   })
 
   await scanner.start()

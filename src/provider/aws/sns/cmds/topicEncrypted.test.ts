@@ -1,9 +1,8 @@
 import 'mocha'
 import { useFakeTimers, SinonFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { handler } from './topicEncrypted'
+import { handler, TopicEncryptedCliInterface } from './topicEncrypted'
 import { expect } from 'chai'
-import { AWSScannerCliArgsInterface } from 'cloud-search'
 
 describe('sns topic encryption', () => {
   const now = new Date(0)
@@ -28,7 +27,8 @@ describe('sns topic encryption', () => {
       region: 'us-east-1',
       profile: 'test',
       domain: 'pub',
-    } as AWSScannerCliArgsInterface)
+      keyType: 'aws',
+    } as TopicEncryptedCliInterface)
     expect(audits).to.eql([])
   })
 
@@ -49,7 +49,8 @@ describe('sns topic encryption', () => {
       region: 'us-east-1',
       profile: 'test',
       domain: 'pub',
-    } as AWSScannerCliArgsInterface)
+      keyType: 'aws',
+    } as TopicEncryptedCliInterface)
     expect(audits).to.eql([
       {
         name: 'test',
@@ -80,7 +81,8 @@ describe('sns topic encryption', () => {
       region: 'us-east-1',
       profile: 'test',
       domain: 'pub',
-    } as AWSScannerCliArgsInterface)
+      keyType: 'aws',
+    } as TopicEncryptedCliInterface)
     expect(audits).to.eql([
       {
         name: 'test',
@@ -109,7 +111,7 @@ describe('sns topic encryption', () => {
       region: 'us-east-1',
       profile: 'test',
       domain: 'pub',
-    } as AWSScannerCliArgsInterface)
+    } as TopicEncryptedCliInterface)
     expect(audits).to.eql([
       {
         name: 'test',
@@ -143,7 +145,7 @@ describe('sns topic encryption', () => {
       profile: 'test',
       domain: 'pub',
       resourceId: 'test',
-    } as AWSScannerCliArgsInterface)
+    } as TopicEncryptedCliInterface)
     expect(audits).to.eql([
       {
         name: 'test',

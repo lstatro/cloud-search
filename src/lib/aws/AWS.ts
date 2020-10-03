@@ -22,6 +22,10 @@ interface ScanInterface {
   resourceId?: string
 }
 
+interface KeyCacheInterface extends KeyMetadata {
+  givenKeyId?: string
+}
+
 export default abstract class AwsService extends Provider {
   abstract service: string
 
@@ -32,7 +36,7 @@ export default abstract class AwsService extends Provider {
   regions: string[] = []
   global = false
   AWS = _AWS
-  keyMetaData?: KeyMetadata[]
+  keyMetaData: KeyCacheInterface[] = []
   profile?: string
   resourceId?: string
 
@@ -333,62 +337,105 @@ export default abstract class AwsService extends Provider {
     return topics
   }
 
-  getKeyMetadata = async (keyArn?: string, region?: string) => {
+  getKeyMetadata = async (keyId: string, region: string) => {
     const options = this.getOptions()
-    const kms = new this.AWS.KMS(options)
 
-    /** if we haven't populated a list of key IDs from within this account */
-    this.keyMetaData = []
-
-    if (keyArn) {
-      assert(region, 'must provide a region this key lives in')
+    try {
+      options.region = region
+      const kms = new this.AWS.KMS(options)
       const describeKey = await kms
         .describeKey({
-          KeyId: keyArn,
+          KeyId: keyId,
         })
         .promise()
       if (describeKey.KeyMetadata) {
-        this.keyMetaData = this.keyMetaData.concat(describeKey.KeyMetadata)
+        const keyMetaData = { ...describeKey.KeyMetadata, givenKeyId: keyId }
+        this.keyMetaData = this.keyMetaData.concat(keyMetaData)
       }
-    } else {
-      const regions = await this.describeRegions()
+      return
+    } catch (err) {
+      /** do nothing, just move on to checking all regions for the key */
+    }
 
-      for (const region of regions) {
-        this.spinner.text = `${region} - key inventory`
-        options.region = region
-        const keys = await this.listKeys(region)
-        for (const key of keys) {
-          assert(key.KeyArn, 'kms key missing arn')
-          const describeKey = await kms
-            .describeKey({
-              KeyId: key.KeyArn,
-            })
-            .promise()
-          if (describeKey.KeyMetadata) {
-            this.keyMetaData = this.keyMetaData.concat(describeKey.KeyMetadata)
-          }
+    const regions = await this.describeRegions()
+
+    for (const _region of regions) {
+      try {
+        this.spinner.text = `${_region} - key inventory`
+
+        options.region = _region
+
+        const kms = new this.AWS.KMS(options)
+        const describeKey = await kms
+          .describeKey({
+            KeyId: keyId,
+          })
+          .promise()
+        if (describeKey.KeyMetadata) {
+          const keyMetaData = { ...describeKey.KeyMetadata, givenKeyId: keyId }
+          this.keyMetaData = this.keyMetaData.concat(keyMetaData)
         }
+        return
+      } catch (err) {
+        /** do nothing, just keep checking the next region */
       }
     }
+
+    /**
+     * if we make it out of the region loop w/o finding the key it doesn't
+     * exist
+     */
   }
 
-  findKey = async (keyArn: string, region: string) => {
-    /** metadata array is undefined on class init, populate it as needed */
-    if (this.keyMetaData === undefined) {
-      await this.getKeyMetadata(keyArn, region)
+  findKey = async (keyId: string, region: string) => {
+    let matched = this.keyMetaData.find((metaData) => metaData.Arn === keyId)
+
+    /** can we find the key with it's given name? */
+    if (!matched) {
+      matched = this.keyMetaData.find(
+        (metaData) => metaData.givenKeyId === keyId
+      )
     }
 
-    assert(this.keyMetaData, 'key metadata not set')
+    /** can we find the key with it's key ID name? */
+    if (!matched) {
+      matched = this.keyMetaData.find((metaData) => metaData.KeyId === keyId)
+    }
 
-    return this.keyMetaData.find((metaData) => metaData.Arn === keyArn)
+    /** is this even a key in AWS? */
+    if (!matched) {
+      await this.getKeyMetadata(keyId, region)
+    }
+
+    /** if the is not in the cache by now, then it doesn't exist */
+    return this.keyMetaData.find((metaData) => metaData.givenKeyId === keyId)
   }
 
-  isKeyTrusted = async (keyArn: string, type: 'aws' | 'cmk' = 'aws') => {
-    const matched = await this.findKey(keyArn)
-    let trusted: 'UNKNOWN' | 'TRUSTED' | 'WARNING' = 'UNKNOWN'
+  isKeyTrusted = async (
+    keyId: string,
+    type: 'aws' | 'cmk' = 'aws',
+    region: string,
+    trustedKeyId?: string
+  ) => {
+    const matched = await this.findKey(keyId, region)
+    let trusted: 'UNKNOWN' | 'OK' | 'WARNING' | 'FAIL' = 'UNKNOWN'
+
+    // console.log({
+    //   keyId,
+    //   region,
+    //   matched,
+    //   keyMetaData: this.keyMetaData,
+    // })
+
     if (matched) {
       if (type === 'aws') {
-        trusted = 'TRUSTED'
+        trusted = 'OK'
+        if (trustedKeyId) {
+          trusted = 'WARNING'
+          if (keyId === trustedKeyId) {
+            trusted = 'OK'
+          }
+        }
       } else if (type === 'cmk') {
         /**
          * any encryption is better then no encryption, set to warning and
@@ -396,9 +443,11 @@ export default abstract class AwsService extends Provider {
          */
         trusted = 'WARNING'
         if (matched.KeyManager === 'CUSTOMER') {
-          trusted = 'TRUSTED'
+          trusted = 'OK'
         }
       }
+    } else {
+      trusted = 'FAIL'
     }
 
     return trusted
