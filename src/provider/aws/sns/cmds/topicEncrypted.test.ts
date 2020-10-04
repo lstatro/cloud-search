@@ -32,40 +32,6 @@ describe('sns topic encryption', () => {
     expect(audits).to.eql([])
   })
 
-  it('should report OK for encrypted topics', async () => {
-    mock('SNS', 'listTopics', {
-      Topics: [
-        {
-          TopicArn: 'test',
-        },
-      ],
-    })
-    mock('SNS', 'getTopicAttributes', {
-      Attributes: {
-        KmsMasterKeyId: 'test',
-      },
-    })
-    const audits = await handler({
-      region: 'us-east-1',
-      profile: 'test',
-      domain: 'pub',
-      keyType: 'aws',
-    } as TopicEncryptedCliInterface)
-    expect(audits).to.eql([
-      {
-        name: 'test',
-        physicalId: 'test',
-        profile: 'test',
-        provider: 'aws',
-        region: 'us-east-1',
-        rule: 'TopicEncrypted',
-        service: 'sns',
-        state: 'OK',
-        time: now.toISOString(),
-      },
-    ])
-  })
-
   it('should report FAIL for topics that are not encrypted', async () => {
     mock('SNS', 'listTopics', {
       Topics: [
@@ -111,6 +77,7 @@ describe('sns topic encryption', () => {
       region: 'us-east-1',
       profile: 'test',
       domain: 'pub',
+      keyType: 'aws',
     } as TopicEncryptedCliInterface)
     expect(audits).to.eql([
       {
@@ -127,7 +94,7 @@ describe('sns topic encryption', () => {
     ])
   })
 
-  it('should handle single resource requests', async () => {
+  it('should report OK for topics with AWS keys', async () => {
     mock('SNS', 'listTopics', {
       Topics: [
         {
@@ -140,11 +107,14 @@ describe('sns topic encryption', () => {
         KmsMasterKeyId: 'test',
       },
     })
+    mock('KMS', 'describeKey', {
+      KeyMetadata: { Arn: 'test', KeyManager: 'AWS' },
+    })
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
       domain: 'pub',
-      resourceId: 'test',
+      keyType: 'aws',
     } as TopicEncryptedCliInterface)
     expect(audits).to.eql([
       {
@@ -159,5 +129,190 @@ describe('sns topic encryption', () => {
         time: now.toISOString(),
       },
     ])
+  })
+
+  it('should report WARNING for when looking for topics encrypted with CMKs but finds AWS keys', async () => {
+    mock('SNS', 'listTopics', {
+      Topics: [
+        {
+          TopicArn: 'test',
+        },
+      ],
+    })
+    mock('SNS', 'getTopicAttributes', {
+      Attributes: {
+        KmsMasterKeyId: 'test',
+      },
+    })
+    mock('KMS', 'describeKey', {
+      KeyMetadata: { Arn: 'test', KeyManager: 'AWS' },
+    })
+    const audits = await handler({
+      region: 'us-east-1',
+      profile: 'test',
+      domain: 'pub',
+      resourceId: 'test',
+      keyType: 'cmk',
+    } as TopicEncryptedCliInterface)
+    expect(audits).to.eql([
+      {
+        name: 'test',
+        physicalId: 'test',
+        profile: 'test',
+        provider: 'aws',
+        region: 'us-east-1',
+        rule: 'TopicEncrypted',
+        service: 'sns',
+        state: 'WARNING',
+        time: now.toISOString(),
+      },
+    ])
+  })
+
+  it('should report OK topics encrypted with a CMK when looking for CMKs', async () => {
+    mock('SNS', 'listTopics', {
+      Topics: [
+        {
+          TopicArn: 'test',
+        },
+      ],
+    })
+    mock('SNS', 'getTopicAttributes', {
+      Attributes: {
+        KmsMasterKeyId: 'test',
+      },
+    })
+    mock('KMS', 'describeKey', {
+      KeyMetadata: { Arn: 'test', KeyManager: 'CUSTOMER' },
+    })
+    const audits = await handler({
+      region: 'us-east-1',
+      profile: 'test',
+      domain: 'pub',
+      resourceId: 'test',
+      keyType: 'cmk',
+    } as TopicEncryptedCliInterface)
+    expect(audits).to.eql([
+      {
+        name: 'test',
+        physicalId: 'test',
+        profile: 'test',
+        provider: 'aws',
+        region: 'us-east-1',
+        rule: 'TopicEncrypted',
+        service: 'sns',
+        state: 'OK',
+        time: now.toISOString(),
+      },
+    ])
+  })
+
+  it('should report FAIL topics with poorly form key responses ', async () => {
+    mock('SNS', 'listTopics', {
+      Topics: [
+        {
+          TopicArn: 'test',
+        },
+      ],
+    })
+    mock('SNS', 'getTopicAttributes', {
+      Attributes: {
+        KmsMasterKeyId: 'test',
+      },
+    })
+    mock('KMS', 'describeKey', {})
+    const audits = await handler({
+      region: 'us-east-1',
+      profile: 'test',
+      domain: 'pub',
+      resourceId: 'test',
+      keyType: 'cmk',
+    } as TopicEncryptedCliInterface)
+    expect(audits).to.eql([
+      {
+        name: 'test',
+        physicalId: 'test',
+        profile: 'test',
+        provider: 'aws',
+        region: 'us-east-1',
+        rule: 'TopicEncrypted',
+        service: 'sns',
+        state: 'FAIL',
+        time: now.toISOString(),
+      },
+    ])
+  })
+
+  it('should report FAIL for a topic when unable to KMS keys ', async () => {
+    mock('SNS', 'listTopics', {
+      Topics: [
+        {
+          TopicArn: 'test',
+        },
+      ],
+    })
+    mock('SNS', 'getTopicAttributes', {
+      Attributes: {
+        KmsMasterKeyId: 'test',
+      },
+    })
+    mock('KMS', 'describeKey', Promise.reject('test'))
+    const audits = await handler({
+      region: 'us-east-1',
+      profile: 'test',
+      domain: 'pub',
+      resourceId: 'test',
+      keyType: 'cmk',
+    } as TopicEncryptedCliInterface)
+    expect(audits).to.eql([
+      {
+        name: 'test',
+        physicalId: 'test',
+        profile: 'test',
+        provider: 'aws',
+        region: 'us-east-1',
+        rule: 'TopicEncrypted',
+        service: 'sns',
+        state: 'FAIL',
+        time: now.toISOString(),
+      },
+    ])
+  })
+
+  it('should report nothing if given the wrong key type', async () => {
+    mock('SNS', 'listTopics', {
+      Topics: [
+        {
+          TopicArn: 'test',
+        },
+      ],
+    })
+    mock('SNS', 'getTopicAttributes', {
+      Attributes: {
+        KmsMasterKeyId: 'test',
+      },
+    })
+    mock('KMS', 'describeKey', {
+      KeyMetadata: { Arn: 'test', KeyManager: 'CUSTOMER' },
+    })
+    const audits = await handler({
+      region: 'us-east-1',
+      profile: 'test',
+      domain: 'pub',
+      resourceId: 'test',
+      keyType: 'test' as 'aws',
+    } as TopicEncryptedCliInterface)
+    expect(audits).to.eql([])
+  })
+
+  it('should report nothing for when there are no topics to scan', async () => {
+    mock('SNS', 'listTopics', {})
+    const audits = await handler({
+      region: 'us-east-1',
+      profile: 'test',
+      domain: 'pub',
+      keyType: 'aws',
+    } as TopicEncryptedCliInterface)
+    expect(audits).to.eql([])
   })
 })

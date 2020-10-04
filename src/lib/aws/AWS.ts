@@ -339,7 +339,6 @@ export default abstract class AwsService extends Provider {
 
   getKeyMetadata = async (keyId: string, region: string) => {
     const options = this.getOptions()
-
     try {
       options.region = region
       const kms = new this.AWS.KMS(options)
@@ -411,31 +410,12 @@ export default abstract class AwsService extends Provider {
     return this.keyMetaData.find((metaData) => metaData.givenKeyId === keyId)
   }
 
-  isKeyTrusted = async (
-    keyId: string,
-    type: 'aws' | 'cmk' = 'aws',
-    region: string,
-    trustedKeyId?: string
-  ) => {
-    const matched = await this.findKey(keyId, region)
+  isKeyTrusted = async (keyId: string, type: 'aws' | 'cmk', region: string) => {
     let trusted: 'UNKNOWN' | 'OK' | 'WARNING' | 'FAIL' = 'UNKNOWN'
-
-    // console.log({
-    //   keyId,
-    //   region,
-    //   matched,
-    //   keyMetaData: this.keyMetaData,
-    // })
-
+    const matched = await this.findKey(keyId, region)
     if (matched) {
       if (type === 'aws') {
         trusted = 'OK'
-        if (trustedKeyId) {
-          trusted = 'WARNING'
-          if (keyId === trustedKeyId) {
-            trusted = 'OK'
-          }
-        }
       } else if (type === 'cmk') {
         /**
          * any encryption is better then no encryption, set to warning and
@@ -445,19 +425,12 @@ export default abstract class AwsService extends Provider {
         if (matched.KeyManager === 'CUSTOMER') {
           trusted = 'OK'
         }
+      } else {
+        throw new Error('key type must be cmk or aws')
       }
     } else {
       trusted = 'FAIL'
     }
-
     return trusted
   }
-
-  /**
-   * check the specified key against what?
-   * what lvl of key is it?
-   * is it a cmk?  If so is it trusted?
-   * what is a trusted cmdk?
-   *   any cmk "in" this account or part of a trusted account array
-   */
 }

@@ -57,6 +57,7 @@ describe('publicAccessBlocks', () => {
       })
       expect(audits[0].state).to.equal('OK')
     })
+
     it('should handle failed types', async () => {
       mock('S3', 'getPublicAccessBlock', {
         PublicAccessBlockConfiguration: {
@@ -84,7 +85,34 @@ describe('publicAccessBlocks', () => {
       expect(audits[0].state).to.equal('FAIL')
     })
 
-    it('should handle FAIL types', async () => {
+    it('should report UNKNOWN for resources toggles that are not boolean', async () => {
+      mock('S3', 'getPublicAccessBlock', {
+        PublicAccessBlockConfiguration: {
+          BlockPublicAcls: 'test',
+          BlockPublicPolicy: 'test',
+          IgnorePublicAcls: 'test',
+          RestrictPublicBuckets: 'test',
+        },
+      })
+      mock('S3', 'listBuckets', {
+        Buckets: [
+          {
+            Name: 'test',
+          },
+        ],
+      })
+      const audits = await handler({
+        _: ['test'],
+        $0: 'test',
+        profile: 'test',
+        resourceId: 'test',
+        domain: 'pub',
+        region: 'us-east-1',
+      })
+      expect(audits[0].state).to.equal('UNKNOWN')
+    })
+
+    it('should handle buckets that predate the public access blocks', async () => {
       const err = new Error('test') as AWSError
       err.code = 'NoSuchPublicAccessBlockConfiguration'
 
@@ -104,15 +132,40 @@ describe('publicAccessBlocks', () => {
         domain: 'pub',
         region: 'us-east-1',
       })
+
       expect(audits[0].state).to.equal('FAIL')
     })
+
+    it('should report UNKNOWN if there was an unknown error getting the bucket', async () => {
+      const err = new Error('test') as AWSError
+      err.code = 'test'
+
+      mock('S3', 'getPublicAccessBlock', Promise.reject(err))
+      mock('S3', 'listBuckets', {
+        Buckets: [
+          {
+            Name: 'test',
+          },
+        ],
+      })
+      const audits = await handler({
+        _: ['test'],
+        $0: 'test',
+        profile: 'test',
+        resourceId: 'test',
+        domain: 'pub',
+        region: 'us-east-1',
+      })
+
+      expect(audits[0].state).to.equal('UNKNOWN')
+    })
+
     it('should handle no buckets', async () => {
       mock('S3', 'listBuckets', {})
       const audits = await handler({
         _: ['test'],
         $0: 'test',
         profile: 'test',
-        resourceId: 'test',
         domain: 'pub',
         region: 'us-east-1',
       })

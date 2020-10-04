@@ -46,8 +46,8 @@ export default class PublicAccessBlocks extends AWS {
       if (err.code === 'NoSuchPublicAccessBlockConfiguration') {
         auditObject.state = 'FAIL'
         auditObject.comment = err.code
-        this.audits.push(auditObject)
       }
+      this.audits.push(auditObject)
     }
   }
 

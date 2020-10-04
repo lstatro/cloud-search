@@ -25,10 +25,6 @@ export const builder: CommandBuilder = {
     default: 'aws',
     choices: ['aws', 'cmk'],
   },
-  keyId: {
-    describe: 'a KMS key arn',
-    type: 'string',
-  },
 }
 
 export const desc = `SNS topics must be encrypted
@@ -77,17 +73,6 @@ export default class TopicEncrypted extends AWS {
       })
       .promise()
 
-    // const describeKey = await new this.AWS.KMS(options)
-    //   .describeKey({
-    //     KeyId:
-    //       'arn:aws:kms:us-east-1:814535775158:key/19368815-24d1-4efa-8a72-4f3b32d81c16',
-    //     // KeyId:
-    //     // 'arn:aws:kms:us-east-1:814535775158:key/19368815-24d1-4efa-8a72-4f3b32d81c16',
-    //   })
-    //   .promise()
-
-    // console.log(describeKey.KeyMetadata)
-
     const auditObject: AuditResultInterface = {
       name: topicArn,
       provider: 'aws',
@@ -105,8 +90,7 @@ export default class TopicEncrypted extends AWS {
         const isTrusted = await this.isKeyTrusted(
           getTopicAttributes.Attributes.KmsMasterKeyId,
           this.keyType,
-          region,
-          this.keyId
+          region
         )
         auditObject.state = isTrusted
       } else {
