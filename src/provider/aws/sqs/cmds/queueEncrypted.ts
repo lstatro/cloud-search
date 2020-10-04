@@ -4,10 +4,10 @@ import {
   AWSScannerInterface,
   AWSScannerCliArgsInterface,
 } from 'cloud-search'
-import assert from 'assert'
+
 import AWS from '../../../../lib/aws/AWS'
 
-const rule = 'TopicEncrypted'
+const rule = 'QueueEncrypted'
 
 export const command = `${rule} [args]`
 
@@ -21,18 +21,18 @@ export const builder: CommandBuilder = {
   },
 }
 
-export const desc = `SNS topics must be encrypted
+export const desc = `SQS topics must be encrypted
 
-  OK      - Topic is encrypted
-  UNKNOWN - Unable to determine topic encryption
-  WARNING - Topic encrypted but not with the specified key type
-  FAIL    - Topic is not encrypted
+  OK      - Queue is encrypted
+  UNKNOWN - Unable to determine Queue encryption
+  WARNING - Queue encrypted but not with the specified key type
+  FAIL    - Queue is not encrypted
 
-  resourceId - Topic ARN
+  resourceId - Queue ARN
 
 `
 
-export interface TopicEncryptedInterface extends AWSScannerInterface {
+export interface QueueEncryptedInterface extends AWSScannerInterface {
   keyType: 'aws' | 'cmk'
 }
 
@@ -43,7 +43,7 @@ export default class TopicEncrypted extends AWS {
   keyId?: string
   keyType: 'aws' | 'cmk'
 
-  constructor(public params: TopicEncryptedInterface) {
+  constructor(public params: QueueEncryptedInterface) {
     super({
       profile: params.profile,
       resourceId: params.resourceId,
@@ -54,22 +54,20 @@ export default class TopicEncrypted extends AWS {
     this.keyType = params.keyType
   }
 
-  async audit(topicArn: string, region: string) {
+  async audit(queue: string, region: string) {
     const options = this.getOptions()
     options.region = region
-
-    const sns = new this.AWS.SNS(options)
-
-    const getTopicAttributes = await sns
-      .getTopicAttributes({
-        TopicArn: topicArn,
+    const sqs = new this.AWS.SQS(options)
+    const getQueueAttributes = await sqs
+      .getQueueAttributes({
+        QueueUrl: queue,
+        AttributeNames: ['KmsMasterKeyId'],
       })
       .promise()
-
     const auditObject: AuditResultInterface = {
-      name: topicArn,
+      name: queue,
       provider: 'aws',
-      physicalId: topicArn,
+      physicalId: queue,
       service: this.service,
       rule: this.rule,
       region: region,
@@ -78,10 +76,14 @@ export default class TopicEncrypted extends AWS {
       time: new Date().toISOString(),
     }
 
-    if (getTopicAttributes.Attributes) {
-      if (getTopicAttributes.Attributes.KmsMasterKeyId) {
+    /**
+     * if we have attributes and that includes the key id attribute.
+     * If we don't have attributes we know it's not encrypted
+     */
+    if (getQueueAttributes.Attributes) {
+      if (getQueueAttributes.Attributes.KmsMasterKeyId) {
         const isTrusted = await this.isKeyTrusted(
-          getTopicAttributes.Attributes.KmsMasterKeyId,
+          getQueueAttributes.Attributes.KmsMasterKeyId,
           this.keyType,
           region
         )
@@ -89,8 +91,9 @@ export default class TopicEncrypted extends AWS {
       } else {
         auditObject.state = 'FAIL'
       }
+    } else {
+      auditObject.state = 'FAIL'
     }
-
     this.audits.push(auditObject)
   }
 
@@ -104,20 +107,19 @@ export default class TopicEncrypted extends AWS {
     if (resourceId) {
       await this.audit(resourceId, region)
     } else {
-      const topics = await this.listTopics(region)
-      for (const topic of topics) {
-        assert(topic.TopicArn, 'topic does not have an arn')
-        await this.audit(topic.TopicArn, region)
+      const queues = await this.listQueues(region)
+      for (const queue of queues) {
+        await this.audit(queue, region)
       }
     }
   }
 }
 
-export interface TopicEncryptedCliInterface
-  extends TopicEncryptedInterface,
+export interface QueueEncryptedCliInterface
+  extends QueueEncryptedInterface,
     AWSScannerCliArgsInterface {}
 
-export const handler = async (args: TopicEncryptedCliInterface) => {
+export const handler = async (args: QueueEncryptedCliInterface) => {
   const scanner = new TopicEncrypted({
     region: args.region,
     profile: args.profile,

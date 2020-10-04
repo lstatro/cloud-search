@@ -1,7 +1,7 @@
 import { Argv } from 'yargs'
 
-export const command = 'sns'
-export const desc = 'Simple Notification Service (SNS)'
+export const command = 'sqs'
+export const desc = 'Simple Queuing Service (SQS)'
 
 export const builder = (yargs: Argv) => {
   return yargs
@@ -9,7 +9,7 @@ export const builder = (yargs: Argv) => {
     .demandCommand(1)
     .example([
       [
-        'sns <scan>...',
+        'sqs <scan>...',
         'have the cli show you available user scanning options',
       ],
     ])

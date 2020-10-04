@@ -8,6 +8,7 @@ import { InternetGateway, SecurityGroup, Volume } from 'aws-sdk/clients/ec2'
 import { KeyListEntry, KeyMetadata } from 'aws-sdk/clients/kms'
 import { User } from 'aws-sdk/clients/iam'
 import { Topic } from 'aws-sdk/clients/sns'
+import { QueueUrlList } from 'aws-sdk/clients/sqs'
 
 interface AWSParamsInterface {
   profile: string
@@ -432,5 +433,30 @@ export default abstract class AwsService extends Provider {
       trusted = 'FAIL'
     }
     return trusted
+  }
+
+  listQueues = async (region: string) => {
+    const options = this.getOptions()
+    options.region = region
+
+    const sqs = new this.AWS.SQS(options)
+
+    let nextToken: string | undefined
+
+    let queues: QueueUrlList = []
+
+    do {
+      const listQueues = await sqs
+        .listQueues({
+          NextToken: nextToken,
+        })
+        .promise()
+      nextToken = listQueues.NextToken
+      if (listQueues.QueueUrls) {
+        queues = queues.concat(listQueues.QueueUrls)
+      }
+    } while (nextToken)
+
+    return queues
   }
 }
