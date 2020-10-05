@@ -157,6 +157,10 @@ export default abstract class AwsService extends Provider {
     try {
       this.spinner.start()
       if (this.resourceId) {
+        assert(
+          this.region !== 'all',
+          'must provide a region for a resource specific scan'
+        )
         await this.scan({ region: this.region, resourceId: this.resourceId })
       } else {
         await this.handleRegions()

@@ -4,7 +4,7 @@ import { useFakeTimers, SinonFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
 import { handler, QueueEncryptedCliInterface } from './queueEncrypted'
 
-describe('sns topic encryption', () => {
+describe('sqs topic encryption', () => {
   const now = new Date(0)
   let clock: SinonFakeTimers
 
@@ -51,7 +51,7 @@ describe('sns topic encryption', () => {
         provider: 'aws',
         region: 'us-east-1',
         rule: 'QueueEncrypted',
-        service: 'sns',
+        service: 'sqs',
         state: 'FAIL',
         time: now.toISOString(),
       },
@@ -77,7 +77,7 @@ describe('sns topic encryption', () => {
         provider: 'aws',
         region: 'us-east-1',
         rule: 'QueueEncrypted',
-        service: 'sns',
+        service: 'sqs',
         state: 'FAIL',
         time: now.toISOString(),
       },
@@ -110,7 +110,7 @@ describe('sns topic encryption', () => {
         provider: 'aws',
         region: 'us-east-1',
         rule: 'QueueEncrypted',
-        service: 'sns',
+        service: 'sqs',
         state: 'OK',
         time: now.toISOString(),
       },
@@ -138,7 +138,7 @@ describe('sns topic encryption', () => {
         provider: 'aws',
         region: 'us-east-1',
         rule: 'QueueEncrypted',
-        service: 'sns',
+        service: 'sqs',
         state: 'FAIL',
         time: now.toISOString(),
       },
@@ -172,7 +172,7 @@ describe('sns topic encryption', () => {
         provider: 'aws',
         region: 'us-east-1',
         rule: 'QueueEncrypted',
-        service: 'sns',
+        service: 'sqs',
         state: 'OK',
         time: now.toISOString(),
       },
