@@ -38,7 +38,7 @@ export interface QueueEncryptedInterface extends AWSScannerInterface {
 
 export default class TopicEncrypted extends AWS {
   audits: AuditResultInterface[] = []
-  service = 'sns'
+  service = 'sqs'
   global = false
   keyId?: string
   keyType: 'aws' | 'cmk'

@@ -4,7 +4,7 @@ import { useFakeTimers, SinonFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
 import { handler, QueueEncryptedCliInterface } from './queueEncrypted'
 
-describe('sns topic encryption', () => {
+describe('sqs topic encryption', () => {
   const now = new Date(0)
   let clock: SinonFakeTimers
 
@@ -22,6 +22,18 @@ describe('sns topic encryption', () => {
     mock('SQS', 'listQueues', {
       QueueUrls: [],
     })
+
+    const audits = await handler({
+      region: 'us-east-1',
+      profile: 'test',
+      domain: 'pub',
+      keyType: 'aws',
+    } as QueueEncryptedCliInterface)
+    expect(audits).to.eql([])
+  })
+
+  it('should report nothing no queues are reported', async () => {
+    mock('SQS', 'listQueues', {})
 
     const audits = await handler({
       region: 'us-east-1',
@@ -51,7 +63,7 @@ describe('sns topic encryption', () => {
         provider: 'aws',
         region: 'us-east-1',
         rule: 'QueueEncrypted',
-        service: 'sns',
+        service: 'sqs',
         state: 'FAIL',
         time: now.toISOString(),
       },
@@ -77,7 +89,7 @@ describe('sns topic encryption', () => {
         provider: 'aws',
         region: 'us-east-1',
         rule: 'QueueEncrypted',
-        service: 'sns',
+        service: 'sqs',
         state: 'FAIL',
         time: now.toISOString(),
       },
@@ -110,7 +122,7 @@ describe('sns topic encryption', () => {
         provider: 'aws',
         region: 'us-east-1',
         rule: 'QueueEncrypted',
-        service: 'sns',
+        service: 'sqs',
         state: 'OK',
         time: now.toISOString(),
       },
@@ -138,7 +150,7 @@ describe('sns topic encryption', () => {
         provider: 'aws',
         region: 'us-east-1',
         rule: 'QueueEncrypted',
-        service: 'sns',
+        service: 'sqs',
         state: 'FAIL',
         time: now.toISOString(),
       },
@@ -172,7 +184,7 @@ describe('sns topic encryption', () => {
         provider: 'aws',
         region: 'us-east-1',
         rule: 'QueueEncrypted',
-        service: 'sns',
+        service: 'sqs',
         state: 'OK',
         time: now.toISOString(),
       },

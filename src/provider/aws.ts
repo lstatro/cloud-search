@@ -4,6 +4,11 @@ export const command = 'aws'
 export const desc = 'aws cloud provider'
 
 const epilogue = `
+********************************** Regions *************************************
+
+• When scanning a specific resource (-i) specify the region that resource lives
+  in.  For global services such as IAM or S3, use any valid region.
+
 ********************************** Encryption **********************************
 
 • Encryption keys in AWS comes in two general flavors, AWS managed and customer
