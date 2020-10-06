@@ -37,6 +37,26 @@ describe('iam user key age', () => {
     expect(audits[0].state).to.eql('OK')
   })
 
+  it('should report nothing if no users are reported', async () => {
+    mock('IAM', 'listUsers', {})
+    mock('IAM', 'listAccessKeys', {
+      AccessKeyMetadata: [
+        {
+          AccessKeyId: 'test',
+          CreateDate: new Date(),
+        },
+      ],
+    })
+    const audits = await handler({
+      resourceId: 'test',
+      domain: 'pub',
+      region: 'test',
+      maxAge: 30,
+    } as MaxKeyAgeCliInterface)
+
+    expect(audits).to.eql([])
+  })
+
   it('should report error', async () => {
     mock('IAM', 'listUsers', {
       Users: [

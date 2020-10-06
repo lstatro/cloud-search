@@ -32,6 +32,18 @@ describe('sqs topic encryption', () => {
     expect(audits).to.eql([])
   })
 
+  it('should report nothing no queues are reported', async () => {
+    mock('SQS', 'listQueues', {})
+
+    const audits = await handler({
+      region: 'us-east-1',
+      profile: 'test',
+      domain: 'pub',
+      keyType: 'aws',
+    } as QueueEncryptedCliInterface)
+    expect(audits).to.eql([])
+  })
+
   it('should report FAIL for queues that are not encrypted', async () => {
     mock('SQS', 'listQueues', {
       QueueUrls: ['test'],

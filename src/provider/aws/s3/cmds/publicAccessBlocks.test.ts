@@ -58,6 +58,32 @@ describe('publicAccessBlocks', () => {
       expect(audits[0].state).to.equal('OK')
     })
 
+    it('should report OK when scanning buckets with the toggles set to true', async () => {
+      mock('S3', 'getPublicAccessBlock', {
+        PublicAccessBlockConfiguration: {
+          BlockPublicAcls: true,
+          BlockPublicPolicy: true,
+          IgnorePublicAcls: true,
+          RestrictPublicBuckets: true,
+        },
+      })
+      mock('S3', 'listBuckets', {
+        Buckets: [
+          {
+            Name: 'test',
+          },
+        ],
+      })
+      const audits = await handler({
+        _: ['test'],
+        $0: 'test',
+        profile: 'test',
+        domain: 'pub',
+        region: 'us-east-1',
+      })
+      expect(audits[0].state).to.equal('OK')
+    })
+
     it('should handle failed types', async () => {
       mock('S3', 'getPublicAccessBlock', {
         PublicAccessBlockConfiguration: {

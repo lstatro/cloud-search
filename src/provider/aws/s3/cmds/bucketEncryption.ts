@@ -91,7 +91,7 @@ export default class TopicEncrypted extends AWS {
       if (rule.ApplyServerSideEncryptionByDefault?.KMSMasterKeyID) {
         isEncrypted = true
         auditObject.state = await this.isKeyTrusted(
-          rule.ApplyServerSideEncryptionByDefault?.KMSMasterKeyID,
+          rule.ApplyServerSideEncryptionByDefault.KMSMasterKeyID,
           this.keyType,
           region
         )
@@ -140,6 +140,8 @@ export default class TopicEncrypted extends AWS {
         } else {
           throw 'unsupported key type'
         }
+      } else {
+        auditObject.state = 'FAIL'
       }
     } catch (err) {
       if (err.code === 'ServerSideEncryptionConfigurationNotFoundError') {
