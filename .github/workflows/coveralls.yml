@@ -1,0 +1,25 @@
+on: ['push', 'pull_request']
+
+name: Coveralls
+
+jobs:
+  build:
+    name: Coverage
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Use Node.js 12.x
+        uses: actions/setup-node@v1
+        with:
+          node-version: 12.x
+
+      - name: install and run reporter
+        run: |
+          npm install          
+          npx nyc --reporter=lcov mocha -r ts-node/register src/**/*.test.ts
+
+      - name: Coveralls
+        uses: coverallsapp/github-action@master
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
