@@ -1,3 +1,5 @@
+[![Coverage Status](https://coveralls.io/repos/github/lstatro/cloud-search/badge.svg?branch=develop)](https://coveralls.io/github/lstatro/cloud-search?branch=develop)
+
 # Cloud-search
 
 A node based CLI that attempts to find and report on common cloud misconfigurations or insecure practices.

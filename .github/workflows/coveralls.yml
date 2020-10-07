@@ -3,7 +3,7 @@ on: ['push', 'pull_request']
 name: Coveralls
 
 jobs:
-  build:
+  Coverage:
     name: Coverage
     runs-on: ubuntu-latest
     steps:
