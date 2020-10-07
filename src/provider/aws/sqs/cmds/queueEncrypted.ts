@@ -28,7 +28,7 @@ export const desc = `SQS topics must be encrypted
   WARNING - Queue encrypted but not with the specified key type
   FAIL    - Queue is not encrypted
 
-  resourceId - Queue ARN
+  resourceId - Queue URL
 
 `
 
