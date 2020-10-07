@@ -16,8 +16,8 @@ jobs:
 
       - name: npm install, make test-coverage
         run: |
-          npm install
-          npm run coverage
+          npm install          
+          npx nyc --reporter=lcov mocha -r ts-node/register src/**/*.test.ts
 
       - name: Coveralls
         uses: coverallsapp/github-action@master
