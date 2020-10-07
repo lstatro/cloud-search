@@ -14,7 +14,7 @@ jobs:
         with:
           node-version: 12.x
 
-      - name: npm install, make test-coverage
+      - name: install and run reporter
         run: |
           npm install          
           npx nyc --reporter=lcov mocha -r ts-node/register src/**/*.test.ts
