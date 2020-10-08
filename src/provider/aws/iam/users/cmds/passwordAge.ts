@@ -11,12 +11,12 @@ export const command = `${rule} [args]`
 export const builder: CommandBuilder = {
   maxAge: {
     alias: 'm',
-    describe: 'the maximum age a key may be before it evaluates to FAIL',
+    describe: 'the maximum age a password may be before it evaluates to FAIL',
     type: 'number',
     default: 90,
   },
 }
-export const desc = `Keys may not be older then so many days
+export const desc = `Passwords may not be older then so many days
 
   OK      - Password within expiration window
   UNKNOWN - unable to determine password age
