@@ -19,7 +19,7 @@ interface AWSParamsInterface {
 }
 
 interface ScanInterface {
-  region: string
+  region?: string
   resourceId?: string
 }
 

@@ -2,7 +2,6 @@
 
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import AWS from '../../../../../lib/aws/AWS'
-import { User } from 'aws-sdk/clients/iam'
 import { CommandBuilder } from 'yargs'
 import { assert } from 'console'
 
@@ -48,13 +47,13 @@ export default class PasswordAge extends AWS {
     this.maxAge = params.maxAge
   }
 
-  async audit(user: User) {
+  async audit(userName: string) {
     const iam = new this.AWS.IAM(this.options)
     let createDate
     try {
       const getLoginProfile = await iam
         .getLoginProfile({
-          UserName: user.UserName,
+          UserName: userName,
         })
         .promise()
 
@@ -65,16 +64,16 @@ export default class PasswordAge extends AWS {
       assert(err.code === 'NoSuchEntity', err)
     }
 
-    this.validate(user, createDate)
+    this.validate(userName, createDate)
   }
 
-  validate = (user: User, createDate?: Date) => {
+  validate = (userName: string, createDate?: Date) => {
     const now = new Date()
 
     const auditObject: AuditResultInterface = {
-      name: user.UserName,
+      name: userName,
       provider: 'aws',
-      physicalId: user.UserName,
+      physicalId: userName,
       service: this.service,
       rule: this.rule,
       region: this.region,
@@ -103,11 +102,15 @@ export default class PasswordAge extends AWS {
     this.audits.push(auditObject)
   }
 
-  scan = async () => {
-    const users = await this.listUsers()
+  scan = async ({ resourceId }: { resourceId: string }) => {
+    if (resourceId) {
+      await this.audit(resourceId)
+    } else {
+      const users = await this.listUsers()
 
-    for (const user of users) {
-      await this.audit(user)
+      for (const user of users) {
+        await this.audit(user.UserName)
+      }
     }
   }
 }

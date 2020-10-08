@@ -108,6 +108,13 @@ export default class MaxKeyAge extends AWS {
     this.audits.push(auditObject)
   }
 
+  /** TODO: setup age to handle resource based requests
+   *
+   * it appears that we only need the user name, not the entire user object
+   * we should therefore be able to cut it back to just the name string
+   * (resourceId) and pass that into the audit and validate function to get
+   * this functionality
+   */
   scan = async () => {
     const users = await this.listUsers()
 

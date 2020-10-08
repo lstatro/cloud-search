@@ -35,6 +35,30 @@ describe('passwordAge', () => {
     expect(audits[0].state).to.eql('FAIL')
   })
 
+  it('should report FAIL for keys older then 90 for a specific user', async () => {
+    mock('IAM', 'listUsers', {
+      Users: [
+        {
+          UserName: 'test',
+        },
+      ],
+    })
+    mock('IAM', 'getLoginProfile', {
+      LoginProfile: {
+        CreateDate: new Date(0),
+      },
+    })
+
+    const audits = await handler({
+      resourceId: 'test',
+      domain: 'pub',
+      region: 'us-east-1',
+      maxAge: 90,
+    } as MaxKeyAgeCliInterface)
+
+    expect(audits[0].state).to.eql('FAIL')
+  })
+
   it('should report OK for keys younger then 90 days', async () => {
     mock('IAM', 'listUsers', {
       Users: [
