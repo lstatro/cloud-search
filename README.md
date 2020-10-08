@@ -1,5 +1,3 @@
-[![Coverage Status](https://coveralls.io/repos/github/lstatro/cloud-search/badge.svg?branch=develop)](https://coveralls.io/github/lstatro/cloud-search?branch=develop)
-
 # Cloud-search
 
 A node based CLI that attempts to find and report on common cloud misconfigurations or insecure practices.
@@ -23,3 +21,11 @@ Use `--help` at any CLI level, it will contain information about the control and
 - The list of services changes often, `cloud-search --help`
 - tease though the cli, it should tell you what it wants
 - Want to know what a specific compliance state means? Use the `--help` it'll have an explanation of what each state means.
+
+---
+
+<p align="center">
+  <a href="https://coveralls.io/github/lstatro/cloud-search?branch=develop">
+    <img src="https://coveralls.io/repos/github/lstatro/cloud-search/badge.svg?branch=develop"/>
+  </a>
+</p>
