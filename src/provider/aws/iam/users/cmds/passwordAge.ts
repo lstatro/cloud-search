@@ -2,10 +2,11 @@
 
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import AWS from '../../../../../lib/aws/AWS'
-import { AccessKeyMetadata, User } from 'aws-sdk/clients/iam'
+import { User } from 'aws-sdk/clients/iam'
 import { CommandBuilder } from 'yargs'
+import { assert } from 'console'
 
-const rule = 'MaxKeyAge'
+const rule = 'PasswordAge'
 
 export const command = `${rule} [args]`
 export const builder: CommandBuilder = {
@@ -18,26 +19,25 @@ export const builder: CommandBuilder = {
 }
 export const desc = `Keys may not be older then so many days
 
-  OK      - Keys are within the rotation period
-  UNKNOWN - unable to determine the key's age
-  FAIL    - they keys need rotation
+  OK      - Password within expiration window
+  UNKNOWN - unable to determine password age
+  FAIL    - Password outside of expiration window
 
   note: iam is global, passing in a region won't change results
-  note: does not support single user requests (yet!)
 
 `
 
-interface MaxKeyAgeInterface extends AWSScannerInterface {
+interface MaxPasswordAgeInterface extends AWSScannerInterface {
   maxAge: number
 }
 
-export default class MaxKeyAge extends AWS {
+export default class PasswordAge extends AWS {
   audits: AuditResultInterface[] = []
   service = 'iam'
   global = true
   maxAge: number
 
-  constructor(public params: MaxKeyAgeInterface) {
+  constructor(public params: MaxPasswordAgeInterface) {
     super({
       profile: params.profile,
       resourceId: params.resourceId,
@@ -50,36 +50,31 @@ export default class MaxKeyAge extends AWS {
 
   async audit(user: User) {
     const iam = new this.AWS.IAM(this.options)
-
-    let marker: string | undefined
-
-    do {
-      /** TODO: listAccessKeys needs to move into the AWS class */
-      const listAccessKeys = await iam
-        .listAccessKeys({
+    let createDate
+    try {
+      const getLoginProfile = await iam
+        .getLoginProfile({
           UserName: user.UserName,
-          Marker: marker,
         })
         .promise()
-      marker = listAccessKeys.Marker
 
-      if (listAccessKeys.AccessKeyMetadata) {
-        for (const keyMetaData of listAccessKeys.AccessKeyMetadata) {
-          this.validate(user, keyMetaData)
-        }
-      } else {
-        this.validate(user, {})
+      if (getLoginProfile.LoginProfile) {
+        createDate = getLoginProfile.LoginProfile.CreateDate
       }
-    } while (marker)
+    } catch (err) {
+      assert(err.code === 'NoSuchEntity', err)
+    }
+
+    this.validate(user, createDate)
   }
 
-  validate = (user: User, keyMetaData: AccessKeyMetadata) => {
-    const id = `${user.UserName}:${keyMetaData.AccessKeyId}`
+  validate = (user: User, createDate?: Date) => {
     const now = new Date()
+
     const auditObject: AuditResultInterface = {
-      name: id,
+      name: user.UserName,
       provider: 'aws',
-      physicalId: id,
+      physicalId: user.UserName,
       service: this.service,
       rule: this.rule,
       region: this.region,
@@ -88,8 +83,8 @@ export default class MaxKeyAge extends AWS {
       time: now.toISOString(),
     }
 
-    if (keyMetaData.CreateDate) {
-      const delta = now.getTime() - keyMetaData.CreateDate.getTime()
+    if (createDate) {
+      const delta = now.getTime() - createDate.getTime()
 
       const seconds = delta / 1000
       const hours = seconds / 3600
@@ -102,7 +97,7 @@ export default class MaxKeyAge extends AWS {
       }
     } else {
       auditObject.state = 'OK'
-      auditObject.comment = 'no key metadata found'
+      auditObject.comment = 'user does not have a password'
     }
 
     this.audits.push(auditObject)
@@ -119,10 +114,10 @@ export default class MaxKeyAge extends AWS {
 
 export interface MaxKeyAgeCliInterface
   extends AWSScannerInterface,
-    MaxKeyAgeInterface {}
+    MaxPasswordAgeInterface {}
 
 export const handler = async (args: MaxKeyAgeCliInterface) => {
-  const scanner = new MaxKeyAge({
+  const scanner = new PasswordAge({
     region: args.region,
     profile: args.profile,
     resourceId: args.resourceId,
