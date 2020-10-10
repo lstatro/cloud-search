@@ -8,7 +8,7 @@ If nothing else, this tool should help spark conversations that lead to better s
 
 It should go without saying, that passing scans do not mean resources are secure. This tool only takes aim at high level patterns. It's possible that a resource follows established practices, and passes all scans, but still gets breached. This is why it's important to engage in dialog with security professionals early in and often in a project.
 
-Oh, one last note, **this is a scanning and reporting tool, no write actions are taken on the target account.**
+Oh, one last note, **this is a scanning and reporting tool, no write actions are taken on target accounts.**
 
 # Install
 

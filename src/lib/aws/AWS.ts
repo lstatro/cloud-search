@@ -4,7 +4,12 @@ import Provider from '../Provider'
 
 import assert from 'assert'
 import { Bucket } from 'aws-sdk/clients/s3'
-import { InternetGateway, SecurityGroup, Volume } from 'aws-sdk/clients/ec2'
+import {
+  InternetGateway,
+  SecurityGroup,
+  Snapshot,
+  Volume,
+} from 'aws-sdk/clients/ec2'
 import { KeyListEntry, KeyMetadata } from 'aws-sdk/clients/kms'
 import { User } from 'aws-sdk/clients/iam'
 import { Topic } from 'aws-sdk/clients/sns'
@@ -462,5 +467,31 @@ export default abstract class AwsService extends Provider {
     } while (nextToken)
 
     return queues
+  }
+
+  listSnapshots = async (region: string) => {
+    const options = this.getOptions()
+    options.region = region
+
+    const ec2 = new this.AWS.EC2(options)
+
+    let nextToken: string | undefined
+
+    let snapshots: Snapshot[] = []
+
+    do {
+      const describeSnapshots = await ec2
+        .describeSnapshots({
+          NextToken: nextToken,
+          OwnerIds: ['self'],
+        })
+        .promise()
+      nextToken = describeSnapshots.NextToken
+      if (describeSnapshots.Snapshots) {
+        snapshots = snapshots.concat(describeSnapshots.Snapshots)
+      }
+    } while (nextToken)
+
+    return snapshots
   }
 }
