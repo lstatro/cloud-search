@@ -483,6 +483,7 @@ export default abstract class AwsService extends Provider {
       const describeSnapshots = await ec2
         .describeSnapshots({
           NextToken: nextToken,
+          OwnerIds: ['self'],
         })
         .promise()
       nextToken = describeSnapshots.NextToken

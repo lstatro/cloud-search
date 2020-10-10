@@ -3,6 +3,7 @@ import {
   AWSScannerInterface,
   AWSScannerCliArgsInterface,
 } from 'cloud-search'
+import assert from 'assert'
 
 import AWS from '../../../../../lib/aws/AWS'
 
@@ -36,20 +37,44 @@ export default class PublicSnapshot extends AWS {
     })
   }
 
-  async audit(queue: string, region: string) {
+  async audit(snapshotId: string, region: string) {
     const options = this.getOptions()
     options.region = region
 
+    const ec2 = new this.AWS.EC2(options)
+
     const auditObject: AuditResultInterface = {
-      name: queue,
+      name: snapshotId,
       provider: 'aws',
-      physicalId: queue,
+      physicalId: snapshotId,
       service: this.service,
       rule: this.rule,
       region: region,
       state: 'UNKNOWN',
       profile: this.profile,
       time: new Date().toISOString(),
+    }
+
+    const describe = await ec2
+      .describeSnapshotAttribute({
+        SnapshotId: snapshotId,
+        Attribute: 'createVolumePermission',
+      })
+      .promise()
+
+    let isPublic = false
+    if (describe.CreateVolumePermissions) {
+      for (const permission of describe.CreateVolumePermissions) {
+        if (permission.Group === 'all') {
+          isPublic = true
+        }
+      }
+    }
+
+    if (isPublic) {
+      auditObject.state = 'FAIL'
+    } else {
+      auditObject.state = 'OK'
     }
 
     this.audits.push(auditObject)
@@ -67,7 +92,8 @@ export default class PublicSnapshot extends AWS {
     } else {
       const snapshots = await this.listSnapshots(region)
       for (const snapshot of snapshots) {
-        await this.audit(snapshot, region)
+        assert(snapshot.SnapshotId, 'does not have an id')
+        await this.audit(snapshot.SnapshotId, region)
       }
     }
   }
