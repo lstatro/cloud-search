@@ -15,7 +15,6 @@ export const desc = `SQS topics must be encrypted
 
   OK      - Snapshot is not public
   UNKNOWN - Unable to determine if snapshot is public
-  WARNING - snapshot shared with another account
   FAIL    - Snapshot is public
 
   resourceId - snapshot id
