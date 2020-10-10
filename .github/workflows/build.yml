@@ -1,6 +1,6 @@
 on: ['push', 'pull_request']
 
-name: Coveralls
+name: Build
 
 jobs:
   Build:
@@ -14,7 +14,7 @@ jobs:
         with:
           node-version: 12.x
 
-      - name: install and run reporter
+      - name: build and version check
         run: |
           npm install
           npm run preversion
