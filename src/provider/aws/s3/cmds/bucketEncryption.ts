@@ -48,7 +48,6 @@ export default class TopicEncrypted extends AWS {
     super({
       profile: params.profile,
       resourceId: params.resourceId,
-      domain: params.domain,
       region: params.region,
       rule,
     })
@@ -180,7 +179,6 @@ export const handler = async (args: BucketEncryptedCliInterface) => {
     region: args.region,
     profile: args.profile,
     resourceId: args.resourceId,
-    domain: args.domain,
     keyType: args.keyType,
   })
 

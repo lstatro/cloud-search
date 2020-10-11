@@ -58,7 +58,6 @@ export default class VolumesEncrypted extends AWS {
     super({
       profile: params.profile,
       resourceId: params.resourceId,
-      domain: params.domain,
       region: params.region,
       rule,
     })
@@ -171,7 +170,6 @@ export const handler = async (args: VolumesEncryptedCliInterface) => {
     region: args.region,
     profile: args.profile,
     resourceId: args.resourceId,
-    domain: args.domain,
     keyArn: args.keyArn,
     keyType: args.keyType,
   })

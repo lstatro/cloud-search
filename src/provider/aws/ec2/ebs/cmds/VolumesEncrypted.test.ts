@@ -30,7 +30,6 @@ describe('ebs volume encryption', () => {
     const audits = await handler({
       region: 'all',
       profile: 'test',
-      domain: 'pub',
       keyType: 'aws',
     } as VolumesEncryptedCliInterface)
     expect(audits[0].state).to.eql('OK')
@@ -48,7 +47,6 @@ describe('ebs volume encryption', () => {
     const audits = await handler({
       region: 'all',
       profile: 'test',
-      domain: 'pub',
       keyType: 'aws',
     } as VolumesEncryptedCliInterface)
     expect(audits[0].state).to.eql('FAIL')
@@ -66,7 +64,6 @@ describe('ebs volume encryption', () => {
     const audits = await handler({
       region: 'all',
       profile: 'test',
-      domain: 'pub',
       keyType: 'aws',
       keyArn: '_test',
     } as VolumesEncryptedCliInterface)
@@ -86,7 +83,6 @@ describe('ebs volume encryption', () => {
     const audits = await handler({
       region: 'all',
       profile: 'test',
-      domain: 'pub',
       keyType: 'aws',
       keyArn: 'test',
     } as VolumesEncryptedCliInterface)
@@ -106,7 +102,6 @@ describe('ebs volume encryption', () => {
     const audits = await handler({
       region: 'all',
       profile: 'test',
-      domain: 'pub',
       keyType: 'cmk',
       keyArn: '_test',
     } as VolumesEncryptedCliInterface)
@@ -126,7 +121,6 @@ describe('ebs volume encryption', () => {
     const audits = await handler({
       region: 'all',
       profile: 'test',
-      domain: 'pub',
       keyType: 'cmk',
       keyArn: '_test',
     } as VolumesEncryptedCliInterface)
@@ -146,7 +140,6 @@ describe('ebs volume encryption', () => {
     const audits = await handler({
       region: 'all',
       profile: 'test',
-      domain: 'pub',
       keyType: 'cmk',
       keyArn: 'test',
     } as VolumesEncryptedCliInterface)
@@ -165,7 +158,6 @@ describe('ebs volume encryption', () => {
     const audits = await handler({
       region: 'all',
       profile: 'test',
-      domain: 'pub',
       keyType: 'cmk',
       keyArn: 'test',
     } as VolumesEncryptedCliInterface)
@@ -185,7 +177,6 @@ describe('ebs volume encryption', () => {
     const audits = await handler({
       region: 'all',
       profile: 'test',
-      domain: 'pub',
       keyType: 'cmk',
     } as VolumesEncryptedCliInterface)
     expect(audits[0].state).to.eql('OK')
@@ -204,7 +195,6 @@ describe('ebs volume encryption', () => {
     const audits = await handler({
       region: 'test',
       profile: 'test',
-      domain: 'pub',
       keyType: 'aws',
       resourceId: 'test',
     } as VolumesEncryptedCliInterface)
@@ -217,7 +207,6 @@ describe('ebs volume encryption', () => {
     const audits = await handler({
       region: 'test',
       profile: 'test',
-      domain: 'pub',
       keyType: 'aws',
       resourceId: 'test',
     } as VolumesEncryptedCliInterface)
@@ -230,7 +219,6 @@ describe('ebs volume encryption', () => {
     const audits = await handler({
       region: 'all',
       profile: 'test',
-      domain: 'pub',
       keyType: 'aws',
       resourceId: 'test',
     } as VolumesEncryptedCliInterface)

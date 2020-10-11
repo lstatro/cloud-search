@@ -48,7 +48,6 @@ declare module 'cloud-search' {
   export interface AWSScannerInterface {
     region: string
     profile: string
-    domain: string
     resourceId?: string
   }
 

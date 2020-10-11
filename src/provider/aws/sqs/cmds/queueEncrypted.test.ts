@@ -26,7 +26,7 @@ describe('sqs topic encryption', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      domain: 'pub',
+
       keyType: 'aws',
     } as QueueEncryptedCliInterface)
     expect(audits).to.eql([])
@@ -38,7 +38,7 @@ describe('sqs topic encryption', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      domain: 'pub',
+
       keyType: 'aws',
     } as QueueEncryptedCliInterface)
     expect(audits).to.eql([])
@@ -52,7 +52,7 @@ describe('sqs topic encryption', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      domain: 'pub',
+
       keyType: 'aws',
     } as QueueEncryptedCliInterface)
     expect(audits).to.eql([
@@ -78,7 +78,7 @@ describe('sqs topic encryption', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      domain: 'pub',
+
       keyType: 'aws',
     } as QueueEncryptedCliInterface)
     expect(audits).to.eql([
@@ -111,7 +111,7 @@ describe('sqs topic encryption', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      domain: 'pub',
+
       keyType: 'aws',
     } as QueueEncryptedCliInterface)
     expect(audits).to.eql([
@@ -139,7 +139,7 @@ describe('sqs topic encryption', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      domain: 'pub',
+
       keyType: 'aws',
     } as QueueEncryptedCliInterface)
     expect(audits).to.eql([
@@ -172,7 +172,7 @@ describe('sqs topic encryption', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      domain: 'pub',
+
       keyType: 'aws',
       resourceId: 'test',
     } as QueueEncryptedCliInterface)

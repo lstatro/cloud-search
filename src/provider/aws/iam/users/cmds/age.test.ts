@@ -29,7 +29,6 @@ describe('iam user key age', () => {
     })
     const audits = await handler({
       resourceId: 'test',
-      domain: 'pub',
       region: 'test',
       maxAge: 30,
     } as MaxKeyAgeCliInterface)
@@ -49,7 +48,6 @@ describe('iam user key age', () => {
     })
     const audits = await handler({
       resourceId: 'test',
-      domain: 'pub',
       region: 'test',
       maxAge: 30,
     } as MaxKeyAgeCliInterface)
@@ -75,7 +73,6 @@ describe('iam user key age', () => {
     })
     const audits = await handler({
       resourceId: 'test',
-      domain: 'pub',
       region: 'test',
       maxAge: 30,
     } as MaxKeyAgeCliInterface)
@@ -94,7 +91,6 @@ describe('iam user key age', () => {
     mock('IAM', 'listAccessKeys', {})
     const audits = await handler({
       resourceId: 'test',
-      domain: 'pub',
       region: 'test',
       maxAge: 30,
     } as MaxKeyAgeCliInterface)
@@ -105,7 +101,6 @@ describe('iam user key age', () => {
     mock('IAM', 'listUsers', {})
     const audits = await handler({
       resourceId: 'test',
-      domain: 'pub',
       region: 'all',
       maxAge: 30,
     } as MaxKeyAgeCliInterface)

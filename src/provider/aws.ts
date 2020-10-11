@@ -50,14 +50,6 @@ export const builder = (yargs: Argv) => {
       describe: 'resource id',
       type: 'string',
     })
-    .option('domain', {
-      alias: 'd',
-      describe: 'public or us-gov cloud',
-      type: 'string',
-      choices: ['pub', 'gov'],
-      default: 'pub',
-      demandOption: true,
-    })
     .example([
       [
         'aws s3 PublicAccessBlocks -p lolComplianceProfile',

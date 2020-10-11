@@ -52,7 +52,6 @@ describe('publicAccessBlocks', () => {
         $0: 'test',
         profile: 'test',
         resourceId: 'test',
-        domain: 'pub',
         region: 'us-east-1',
       })
       expect(audits[0].state).to.equal('OK')
@@ -78,7 +77,6 @@ describe('publicAccessBlocks', () => {
         _: ['test'],
         $0: 'test',
         profile: 'test',
-        domain: 'pub',
         region: 'us-east-1',
       })
       expect(audits[0].state).to.equal('OK')
@@ -105,7 +103,7 @@ describe('publicAccessBlocks', () => {
         $0: 'test',
         profile: 'test',
         resourceId: 'test',
-        domain: 'pub',
+
         region: 'us-east-1',
       })
       expect(audits[0].state).to.equal('FAIL')
@@ -132,7 +130,6 @@ describe('publicAccessBlocks', () => {
         $0: 'test',
         profile: 'test',
         resourceId: 'test',
-        domain: 'pub',
         region: 'us-east-1',
       })
       expect(audits[0].state).to.equal('UNKNOWN')
@@ -155,7 +152,6 @@ describe('publicAccessBlocks', () => {
         $0: 'test',
         profile: 'test',
         resourceId: 'test',
-        domain: 'pub',
         region: 'us-east-1',
       })
 
@@ -179,7 +175,6 @@ describe('publicAccessBlocks', () => {
         $0: 'test',
         profile: 'test',
         resourceId: 'test',
-        domain: 'pub',
         region: 'us-east-1',
       })
 
@@ -192,7 +187,6 @@ describe('publicAccessBlocks', () => {
         _: ['test'],
         $0: 'test',
         profile: 'test',
-        domain: 'pub',
         region: 'us-east-1',
       })
       expect(audits).to.eql([])
@@ -211,7 +205,6 @@ describe('publicAccessBlocks', () => {
         _: ['test'],
         $0: 'test',
         profile: 'test',
-        domain: 'pub',
         region: 'all',
       })
     })

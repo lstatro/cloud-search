@@ -26,7 +26,7 @@ describe('sns topic encryption', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      domain: 'pub',
+
       keyType: 'aws',
     } as TopicEncryptedCliInterface)
     expect(audits).to.eql([])
@@ -46,7 +46,7 @@ describe('sns topic encryption', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      domain: 'pub',
+
       keyType: 'aws',
     } as TopicEncryptedCliInterface)
     expect(audits).to.eql([
@@ -76,7 +76,7 @@ describe('sns topic encryption', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      domain: 'pub',
+
       keyType: 'aws',
     } as TopicEncryptedCliInterface)
     expect(audits).to.eql([
@@ -113,7 +113,7 @@ describe('sns topic encryption', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      domain: 'pub',
+
       keyType: 'aws',
     } as TopicEncryptedCliInterface)
     expect(audits).to.eql([
@@ -150,7 +150,7 @@ describe('sns topic encryption', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      domain: 'pub',
+
       resourceId: 'test',
       keyType: 'cmk',
     } as TopicEncryptedCliInterface)
@@ -188,7 +188,7 @@ describe('sns topic encryption', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      domain: 'pub',
+
       resourceId: 'test',
       keyType: 'cmk',
     } as TopicEncryptedCliInterface)
@@ -224,7 +224,7 @@ describe('sns topic encryption', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      domain: 'pub',
+
       resourceId: 'test',
       keyType: 'cmk',
     } as TopicEncryptedCliInterface)
@@ -260,7 +260,7 @@ describe('sns topic encryption', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      domain: 'pub',
+
       resourceId: 'test',
       keyType: 'cmk',
     } as TopicEncryptedCliInterface)
@@ -298,7 +298,7 @@ describe('sns topic encryption', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      domain: 'pub',
+
       resourceId: 'test',
       keyType: 'test' as 'aws',
     } as TopicEncryptedCliInterface)
@@ -310,7 +310,7 @@ describe('sns topic encryption', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      domain: 'pub',
+
       keyType: 'aws',
     } as TopicEncryptedCliInterface)
     expect(audits).to.eql([])

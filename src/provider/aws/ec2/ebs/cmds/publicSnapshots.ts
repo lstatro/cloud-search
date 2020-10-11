@@ -30,7 +30,6 @@ export default class PublicSnapshot extends AWS {
     super({
       profile: params.profile,
       resourceId: params.resourceId,
-      domain: params.domain,
       region: params.region,
       rule,
     })
@@ -103,7 +102,6 @@ export const handler = async (args: AWSScannerCliArgsInterface) => {
     region: args.region,
     profile: args.profile,
     resourceId: args.resourceId,
-    domain: args.domain,
   })
 
   await scanner.start()

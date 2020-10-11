@@ -15,7 +15,6 @@ export default class PublicAccessBlocks extends AWS {
     super({
       profile: params.profile,
       resourceId: params.resourceId,
-      domain: params.domain,
       region: params.region,
       rule: params.rule,
     })

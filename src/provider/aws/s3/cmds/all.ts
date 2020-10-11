@@ -9,7 +9,6 @@ export const handler = async (args: AWSScannerCliArgsInterface) => {
     region: args.region,
     profile: args.profile,
     resourceId: args.resourceId,
-    domain: args.domain,
     rule: 'BlockPublicAcls',
   })
   await blockPublicAcls.start()
@@ -18,7 +17,6 @@ export const handler = async (args: AWSScannerCliArgsInterface) => {
     region: args.region,
     profile: args.profile,
     resourceId: args.resourceId,
-    domain: args.domain,
     rule: 'BlockPublicPolicy',
   })
   await blockPublicPolicy.start()
@@ -27,7 +25,6 @@ export const handler = async (args: AWSScannerCliArgsInterface) => {
     region: args.region,
     profile: args.profile,
     resourceId: args.resourceId,
-    domain: args.domain,
     rule: 'IgnorePublicAcls',
   })
   await ignorePublicAcls.start()
@@ -36,7 +33,6 @@ export const handler = async (args: AWSScannerCliArgsInterface) => {
     region: args.region,
     profile: args.profile,
     resourceId: args.resourceId,
-    domain: args.domain,
     rule: 'RestrictPublicBuckets',
   })
   await restrictPublicBuckets.start()

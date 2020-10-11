@@ -18,7 +18,6 @@ export const handler = async (args: AWSScannerCliArgsInterface) => {
   const scanner = new PublicAccessBlocks({
     profile: args.profile,
     resourceId: args.resourceId,
-    domain: args.domain,
     region: args.region,
     rule,
   })
