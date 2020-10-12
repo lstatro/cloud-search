@@ -1,4 +1,4 @@
-/** TODO: this needs to support resourceId */
+/** TODO: can this be handled by iam.simulatePrincipalPolicy? */
 
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import assert from 'assert'
@@ -100,13 +100,11 @@ export default class PublicRole extends AWS {
     let isPublicArr: isPublic[] = []
 
     for (const statement of trust.Statement) {
-      if (statement.Principal) {
-        if (statement.Principal.AWS) {
-          const type = typeof statement.Principal.AWS
-          isPublicArr = isPublicArr.concat(
-            handler[type]({ principal: statement.Principal.AWS, statement })
-          )
-        }
+      if (statement.Principal.AWS) {
+        const type = typeof statement.Principal.AWS
+        isPublicArr = isPublicArr.concat(
+          handler[type]({ principal: statement.Principal.AWS, statement })
+        )
       }
     }
 
