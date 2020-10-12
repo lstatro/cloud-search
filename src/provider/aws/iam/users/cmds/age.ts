@@ -41,7 +41,6 @@ export default class MaxKeyAge extends AWS {
     super({
       profile: params.profile,
       resourceId: params.resourceId,
-      domain: params.domain,
       region: params.region,
       rule,
     })
@@ -133,7 +132,6 @@ export const handler = async (args: MaxKeyAgeCliInterface) => {
     region: args.region,
     profile: args.profile,
     resourceId: args.resourceId,
-    domain: args.domain,
     maxAge: args.maxAge,
   })
 

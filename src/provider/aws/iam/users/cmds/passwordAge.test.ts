@@ -27,7 +27,6 @@ describe('passwordAge', () => {
     })
 
     const audits = await handler({
-      domain: 'pub',
       region: 'all',
       maxAge: 90,
     } as MaxKeyAgeCliInterface)
@@ -51,7 +50,6 @@ describe('passwordAge', () => {
 
     const audits = await handler({
       resourceId: 'test',
-      domain: 'pub',
       region: 'us-east-1',
       maxAge: 90,
     } as MaxKeyAgeCliInterface)
@@ -74,7 +72,6 @@ describe('passwordAge', () => {
     })
 
     const audits = await handler({
-      domain: 'pub',
       region: 'all',
       maxAge: 90,
     } as MaxKeyAgeCliInterface)
@@ -93,7 +90,6 @@ describe('passwordAge', () => {
     mock('IAM', 'getLoginProfile', {})
 
     const audits = await handler({
-      domain: 'pub',
       region: 'all',
       maxAge: 90,
     } as MaxKeyAgeCliInterface)
@@ -114,7 +110,6 @@ describe('passwordAge', () => {
     mock('IAM', 'getLoginProfile', Promise.reject(err))
 
     const audits = await handler({
-      domain: 'pub',
       region: 'all',
       maxAge: 90,
     } as MaxKeyAgeCliInterface)

@@ -32,7 +32,7 @@ describe('iam user key age', () => {
     })
     const audits = await handler({
       resourceId: 'test',
-      domain: 'pub',
+
       region: 'test',
       keyType: 'aws',
     } as BucketEncryptedCliInterface)
@@ -67,7 +67,6 @@ describe('iam user key age', () => {
     })
     const audits = await handler({
       resourceId: 'test',
-      domain: 'pub',
       region: 'test',
       keyType: 'cmk',
     } as BucketEncryptedCliInterface)
@@ -107,7 +106,6 @@ describe('iam user key age', () => {
       },
     })
     const audits = await handler({
-      domain: 'pub',
       region: 'test',
       keyType: 'aws',
     } as BucketEncryptedCliInterface)
@@ -141,7 +139,6 @@ describe('iam user key age', () => {
       },
     })
     const audits = await handler({
-      domain: 'pub',
       region: 'test',
       keyType: 'aws',
     } as BucketEncryptedCliInterface)
@@ -179,7 +176,6 @@ describe('iam user key age', () => {
       },
     })
     const audits = await handler({
-      domain: 'pub',
       region: 'test',
       keyType: 'aws',
     } as BucketEncryptedCliInterface)
@@ -219,7 +215,6 @@ describe('iam user key age', () => {
       },
     })
     const audits = await handler({
-      domain: 'pub',
       region: 'test',
       keyType: 'aws',
     } as BucketEncryptedCliInterface)
@@ -263,7 +258,6 @@ describe('iam user key age', () => {
       KeyMetadata: { Arn: 'test', KeyManager: 'CUSTOMER' },
     })
     const audits = await handler({
-      domain: 'pub',
       region: 'test',
       keyType: 'cmk',
     } as BucketEncryptedCliInterface)
@@ -307,7 +301,6 @@ describe('iam user key age', () => {
       KeyMetadata: { Arn: 'test', KeyManager: 'CUSTOMER' },
     })
     const audits = await handler({
-      domain: 'pub',
       region: 'test',
       keyType: 'cmk',
     } as BucketEncryptedCliInterface)
@@ -344,7 +337,6 @@ describe('iam user key age', () => {
       KeyMetadata: { Arn: 'test', KeyManager: 'CUSTOMER' },
     })
     const audits = await handler({
-      domain: 'pub',
       region: 'test',
       keyType: 'cmk',
     } as BucketEncryptedCliInterface)
@@ -374,7 +366,6 @@ describe('iam user key age', () => {
     })
     mock('S3', 'getBucketEncryption', {})
     const audits = await handler({
-      domain: 'pub',
       region: 'test',
       keyType: 'cmk',
     } as BucketEncryptedCliInterface)
@@ -409,7 +400,6 @@ describe('iam user key age', () => {
     })
     mock('S3', 'getBucketEncryption', {})
     const audits = await handler({
-      domain: 'pub',
       region: 'test',
       keyType: 'test' as 'aws',
     } as BucketEncryptedCliInterface)
@@ -441,7 +431,6 @@ describe('iam user key age', () => {
     })
     mock('S3', 'getBucketEncryption', Promise.reject(err))
     const audits = await handler({
-      domain: 'pub',
       region: 'test',
       keyType: 'test' as 'aws',
     } as BucketEncryptedCliInterface)

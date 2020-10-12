@@ -37,7 +37,6 @@ describe('igw vpc attachment', () => {
       region: 'us-east-1',
       profile: 'test',
       resourceId: 'test',
-      domain: 'pub',
     } as AWSScannerCliArgsInterface)
     expect(audits).to.eql([
       {
@@ -70,7 +69,6 @@ describe('igw vpc attachment', () => {
       region: 'us-east-1',
       profile: 'test',
       resourceId: 'test',
-      domain: 'pub',
     } as AWSScannerCliArgsInterface)
 
     expect(audits).to.eql([
@@ -100,7 +98,6 @@ describe('igw vpc attachment', () => {
       region: 'us-east-1',
       profile: 'test',
       resourceId: 'test',
-      domain: 'pub',
     } as AWSScannerCliArgsInterface)
 
     expect(audits).to.eql([
@@ -130,7 +127,6 @@ describe('igw vpc attachment', () => {
       region: 'us-east-1',
       profile: 'test',
       resourceId: 'test',
-      domain: 'pub',
     } as AWSScannerCliArgsInterface)
 
     expect(audits).to.eql([
@@ -156,7 +152,6 @@ describe('igw vpc attachment', () => {
       region: 'us-east-1',
       profile: 'test',
       resourceId: 'test',
-      domain: 'pub',
     } as AWSScannerCliArgsInterface)
 
     expect(audits).to.eql([
@@ -184,7 +179,6 @@ describe('igw vpc attachment', () => {
     })
     const audits = await handler({
       region: 'all',
-      domain: 'pub',
     } as AWSScannerCliArgsInterface)
 
     expect(audits).to.eql([
@@ -206,16 +200,6 @@ describe('igw vpc attachment', () => {
     mock('EC2', 'describeInternetGateways', {})
     const audits = await handler({
       region: 'all',
-      domain: 'pub',
-    } as AWSScannerCliArgsInterface)
-    expect(audits).to.eql([])
-  })
-
-  it('should report nothing if there are not gateways in gov cloud', async () => {
-    mock('EC2', 'describeInternetGateways', {})
-    const audits = await handler({
-      region: 'all',
-      domain: 'gov',
     } as AWSScannerCliArgsInterface)
     expect(audits).to.eql([])
   })
@@ -224,7 +208,6 @@ describe('igw vpc attachment', () => {
     mock('EC2', 'describeInternetGateways', {})
     const audits = await handler({
       region: 'all',
-      domain: 'test',
     } as AWSScannerCliArgsInterface)
     expect(audits).to.eql([])
   })
@@ -233,16 +216,6 @@ describe('igw vpc attachment', () => {
     mock('EC2', 'describeInternetGateways', {})
     const audits = await handler({
       region: 'us-east-1',
-      domain: 'pub',
-    } as AWSScannerCliArgsInterface)
-    expect(audits).to.eql([])
-  })
-
-  it('should report nothing if there are no gateways but in a single gov region', async () => {
-    mock('EC2', 'describeInternetGateways', {})
-    const audits = await handler({
-      region: 'us-gov-west-1',
-      domain: 'gov',
     } as AWSScannerCliArgsInterface)
     expect(audits).to.eql([])
   })

@@ -11,7 +11,7 @@ import {
   Volume,
 } from 'aws-sdk/clients/ec2'
 import { KeyListEntry, KeyMetadata } from 'aws-sdk/clients/kms'
-import { User } from 'aws-sdk/clients/iam'
+import { Role, User } from 'aws-sdk/clients/iam'
 import { Topic } from 'aws-sdk/clients/sns'
 import { QueueUrlList } from 'aws-sdk/clients/sqs'
 
@@ -19,7 +19,6 @@ interface AWSParamsInterface {
   profile: string
   rule: string
   resourceId?: string
-  domain: string
   region: string
 }
 
@@ -37,7 +36,6 @@ export default abstract class AwsService extends Provider {
 
   options: AWSClientOptionsInterface
 
-  domain: string
   region: string
   regions: string[] = []
   global = false
@@ -49,7 +47,6 @@ export default abstract class AwsService extends Provider {
   constructor(params: AWSParamsInterface) {
     super(params.rule)
 
-    this.domain = params.domain
     this.region = params.region
     this.profile = params.profile
     this.resourceId = params.resourceId
@@ -104,48 +101,23 @@ export default abstract class AwsService extends Provider {
   }
 
   getRegions = async () => {
-    /** is this pub or gov clouds? */
-
-    if (this.domain === 'pub') {
-      /** are we set to do all regions? */
-      if (this.region === 'all') {
-        /** if this is not a global rule we need to get all regions, if it is, then we default o just one */
-        if (this.global === false) {
-          /** welp, lets start with by setting us-east-1 and getting a list of all regions */
-          const regions = await this.describeRegions()
-          this.regions = this.regions.concat(regions)
-        } else {
-          this.regions.push('us-east-1')
-        }
+    /** are we set to do all regions? */
+    if (this.region === 'all') {
+      /** if this is not a global rule we need to get all regions, if it is, then we default o just one */
+      if (this.global === false) {
+        /** welp, lets start with by setting us-east-1 and getting a list of all regions */
+        const regions = await this.describeRegions()
+        this.regions = this.regions.concat(regions)
       } else {
-        /**
-         * looks like this is a single resource request, that resource must
-         * live in a specific region and the user should have provided
-         * that region.  If t hey didn't then the calling service should fail
-         */
-        this.regions.push(this.region)
+        this.regions.push('us-east-1')
       }
-
-      /** go read the comments for pub cloud and repeat for gov cloud :P */
-    } else if (this.domain === 'gov') {
-      if (this.region === 'all') {
-        /** if this is not a global rule we need to get all regions, if it is, then we default o just one */
-        if (this.global === false) {
-          this.options.region = 'us-gov-west-1'
-          const describeRegions = await new this.AWS.EC2(this.options)
-            .describeRegions()
-            .promise()
-          assert(describeRegions.Regions, 'unable to describe regions')
-          for (const region of describeRegions.Regions) {
-            assert(region.RegionName, 'region does not have a name')
-            this.regions.push(region.RegionName)
-          }
-        } else {
-          this.regions.push('us-gov-west-1')
-        }
-      } else {
-        this.regions.push(this.region)
-      }
+    } else {
+      /**
+       * looks like this is a single resource request, that resource must
+       * live in a specific region and the user should have provided
+       * that region.  If t hey didn't then the calling service should fail
+       */
+      this.regions.push(this.region)
     }
   }
 
@@ -493,5 +465,30 @@ export default abstract class AwsService extends Provider {
     } while (nextToken)
 
     return snapshots
+  }
+
+  listRoles = async () => {
+    /** no need to set a region iam is global */
+    const iam = new this.AWS.IAM(this.options)
+
+    let roles: Role[] = []
+
+    let marker: string | undefined
+
+    do {
+      const listRoles = await iam
+        .listRoles({
+          Marker: marker,
+        })
+        .promise()
+
+      marker = listRoles.Marker
+
+      if (listRoles.Roles) {
+        roles = roles.concat(listRoles.Roles)
+      }
+    } while (marker)
+
+    return roles
   }
 }

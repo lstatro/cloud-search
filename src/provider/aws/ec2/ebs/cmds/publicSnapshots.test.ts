@@ -25,14 +25,12 @@ describe('sns topic encryption', () => {
     let audits
     audits = await handler({
       profile: 'test',
-      domain: 'pub',
     } as AWSScannerCliArgsInterface)
 
     expect(audits).to.eql([])
 
     audits = await handler({
       profile: 'test',
-      domain: 'pub',
     } as AWSScannerCliArgsInterface)
 
     expect(audits).to.eql([])
@@ -42,7 +40,6 @@ describe('sns topic encryption', () => {
     mock('EC2', 'describeSnapshotAttribute', { CreateVolumePermissions: [] })
     const audits = await handler({
       profile: 'test',
-      domain: 'pub',
       region: 'test',
       resourceId: 'test',
     } as AWSScannerCliArgsInterface)
@@ -67,7 +64,6 @@ describe('sns topic encryption', () => {
     mock('EC2', 'describeSnapshotAttribute', { CreateVolumePermissions: [] })
     const audits = await handler({
       profile: 'test',
-      domain: 'pub',
       region: 'all',
     } as AWSScannerCliArgsInterface)
 
@@ -91,7 +87,6 @@ describe('sns topic encryption', () => {
 
     const audits = await handler({
       profile: 'test',
-      domain: 'pub',
       region: 'test',
       resourceId: 'test',
     } as AWSScannerCliArgsInterface)
@@ -118,7 +113,6 @@ describe('sns topic encryption', () => {
 
     const audits = await handler({
       profile: 'test',
-      domain: 'pub',
       region: 'test',
       resourceId: 'test',
     } as AWSScannerCliArgsInterface)
@@ -145,7 +139,6 @@ describe('sns topic encryption', () => {
 
     const audits = await handler({
       profile: 'test',
-      domain: 'pub',
       region: 'test',
       resourceId: 'test',
     } as AWSScannerCliArgsInterface)
