@@ -11,7 +11,7 @@ import {
   Volume,
 } from 'aws-sdk/clients/ec2'
 import { KeyListEntry, KeyMetadata } from 'aws-sdk/clients/kms'
-import { User } from 'aws-sdk/clients/iam'
+import { Role, User } from 'aws-sdk/clients/iam'
 import { Topic } from 'aws-sdk/clients/sns'
 import { QueueUrlList } from 'aws-sdk/clients/sqs'
 
@@ -467,7 +467,28 @@ export default abstract class AwsService extends Provider {
     return snapshots
   }
 
-  // listRoles = async () => {
-  //   const iam = new this.AWS.IAM(this.options)
-  // }
+  listRoles = async () => {
+    /** no need to set a region iam is global */
+    const iam = new this.AWS.IAM(this.options)
+
+    let roles: Role[] = []
+
+    let marker: string | undefined
+
+    do {
+      const listRoles = await iam
+        .listRoles({
+          Marker: marker,
+        })
+        .promise()
+
+      marker = listRoles.Marker
+
+      if (listRoles.Roles) {
+        roles = roles.concat(listRoles.Roles)
+      }
+    } while (marker)
+
+    return roles
+  }
 }
