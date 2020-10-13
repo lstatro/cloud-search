@@ -46,13 +46,13 @@ export default class PasswordAge extends AWS {
     this.maxAge = params.maxAge
   }
 
-  async audit(userName: string) {
+  async audit({ resourceId }: { resourceId: string }) {
     const iam = new this.AWS.IAM(this.options)
     let createDate
     try {
       const getLoginProfile = await iam
         .getLoginProfile({
-          UserName: userName,
+          UserName: resourceId,
         })
         .promise()
 
@@ -63,7 +63,7 @@ export default class PasswordAge extends AWS {
       assert(err.code === 'NoSuchEntity', err)
     }
 
-    this.validate(userName, createDate)
+    this.validate(resourceId, createDate)
   }
 
   validate = (userName: string, createDate?: Date) => {
@@ -103,12 +103,12 @@ export default class PasswordAge extends AWS {
 
   scan = async ({ resourceId }: { resourceId: string }) => {
     if (resourceId) {
-      await this.audit(resourceId)
+      await this.audit({ resourceId })
     } else {
       const users = await this.listUsers()
 
       for (const user of users) {
-        await this.audit(user.UserName)
+        await this.audit({ resourceId: user.UserName })
       }
     }
   }

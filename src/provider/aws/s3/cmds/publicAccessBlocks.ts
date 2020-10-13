@@ -20,21 +20,21 @@ export default class PublicAccessBlocks extends AWS {
     })
   }
 
-  async audit(bucketName: string) {
+  async audit({ resourceId }: { resourceId: string }) {
     const s3 = new this.AWS.S3(this.options)
     try {
       const getPublicAccessBlock = await s3
-        .getPublicAccessBlock({ Bucket: bucketName })
+        .getPublicAccessBlock({ Bucket: resourceId })
         .promise()
       assert(getPublicAccessBlock, 'unable to locate bucket')
-      this.validate(getPublicAccessBlock, bucketName)
+      this.validate(getPublicAccessBlock, resourceId)
     } catch (err) {
       console.error(err.message)
       const auditObject: AuditResultInterface = {
-        name: bucketName,
+        name: resourceId,
         comment: err.code,
         provider: 'aws',
-        physicalId: bucketName,
+        physicalId: resourceId,
         service: this.service,
         rule: this.rule,
         region: this.region,
@@ -79,14 +79,14 @@ export default class PublicAccessBlocks extends AWS {
     this.audits.push(auditObject)
   }
 
-  scan = async () => {
-    if (this.resourceId) {
-      await this.audit(this.resourceId)
+  scan = async ({ resourceId }: { resourceId: string }) => {
+    if (resourceId) {
+      await this.audit({ resourceId })
     } else {
       const buckets = await this.listBuckets()
       for (const bucket of buckets) {
         assert(bucket.Name, 'bucket does not have a name')
-        await this.audit(bucket.Name)
+        await this.audit({ resourceId: bucket.Name })
       }
     }
   }

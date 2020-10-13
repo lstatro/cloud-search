@@ -53,20 +53,20 @@ export default class TopicEncrypted extends AWS {
     this.keyType = params.keyType
   }
 
-  async audit(queue: string, region: string) {
+  async audit({ resourceId, region }: { resourceId: string; region: string }) {
     const options = this.getOptions()
     options.region = region
     const sqs = new this.AWS.SQS(options)
     const getQueueAttributes = await sqs
       .getQueueAttributes({
-        QueueUrl: queue,
+        QueueUrl: resourceId,
         AttributeNames: ['KmsMasterKeyId'],
       })
       .promise()
     const auditObject: AuditResultInterface = {
-      name: queue,
+      name: resourceId,
       provider: 'aws',
-      physicalId: queue,
+      physicalId: resourceId,
       service: this.service,
       rule: this.rule,
       region: region,
@@ -104,11 +104,11 @@ export default class TopicEncrypted extends AWS {
     resourceId: string
   }) => {
     if (resourceId) {
-      await this.audit(resourceId, region)
+      await this.audit({ resourceId, region })
     } else {
       const queues = await this.listQueues(region)
       for (const queue of queues) {
-        await this.audit(queue, region)
+        await this.audit({ resourceId: queue, region })
       }
     }
   }

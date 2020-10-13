@@ -101,14 +101,14 @@ export default class TopicEncrypted extends AWS {
     }
   }
 
-  async audit(bucketName: string, region: string) {
+  async audit({ resourceId, region }: { resourceId: string; region: string }) {
     const options = this.getOptions()
     const s3 = new this.AWS.S3(options)
 
     const auditObject: AuditResultInterface = {
-      name: bucketName,
+      name: resourceId,
       provider: 'aws',
-      physicalId: bucketName,
+      physicalId: resourceId,
       service: this.service,
       rule: this.rule,
       region: region,
@@ -120,7 +120,7 @@ export default class TopicEncrypted extends AWS {
     try {
       const getBucket = await s3
         .getBucketEncryption({
-          Bucket: bucketName,
+          Bucket: resourceId,
         })
         .promise()
 
@@ -159,12 +159,12 @@ export default class TopicEncrypted extends AWS {
     resourceId: string
   }) => {
     if (resourceId) {
-      await this.audit(resourceId, region)
+      await this.audit({ resourceId, region })
     } else {
       const buckets = await this.listBuckets()
       for (const bucket of buckets) {
         assert(bucket.Name, 'bucket must have a name')
-        await this.audit(bucket.Name, region)
+        await this.audit({ resourceId: bucket.Name, region })
       }
     }
   }

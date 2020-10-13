@@ -34,11 +34,17 @@ export default class IgwAttachedToVpc extends AWS {
     })
   }
 
-  async audit(igw: InternetGateway, region: string) {
+  async audit({
+    resourceId,
+    region,
+  }: {
+    resourceId: InternetGateway
+    region: string
+  }) {
     let suspect = false
 
-    if (igw.Attachments) {
-      for (const attachment of igw.Attachments) {
+    if (resourceId.Attachments) {
+      for (const attachment of resourceId.Attachments) {
         if (attachment.State) {
           const states = ['available', 'attaching', 'attached', 'detaching']
           if (states.includes(attachment.State)) {
@@ -49,9 +55,9 @@ export default class IgwAttachedToVpc extends AWS {
     }
 
     this.audits.push({
-      name: igw.InternetGatewayId,
+      name: resourceId.InternetGatewayId,
       provider: 'aws',
-      physicalId: igw.InternetGatewayId,
+      physicalId: resourceId.InternetGatewayId,
       service: this.service,
       rule,
       region: region,
@@ -70,7 +76,7 @@ export default class IgwAttachedToVpc extends AWS {
   }) => {
     const igws = await this.describeInternetGateways(region, resourceId)
     for (const igw of igws) {
-      this.audit(igw, region)
+      this.audit({ resourceId: igw, region })
     }
   }
 }

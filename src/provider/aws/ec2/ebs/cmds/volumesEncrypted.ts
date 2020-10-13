@@ -94,10 +94,10 @@ export default class VolumesEncrypted extends AWS {
     }
   }
 
-  async audit(volume: Volume, region: string) {
+  async audit({ resourceId, region }: { resourceId: Volume; region: string }) {
     const audit: AuditResultInterface = {
       provider: 'aws',
-      physicalId: volume.VolumeId,
+      physicalId: resourceId.VolumeId,
       service: this.service,
       rule,
       region: region,
@@ -110,7 +110,7 @@ export default class VolumesEncrypted extends AWS {
       aws: this.handleAwsType,
       cmk: this.handleCmkType,
     }
-    types[this.keyType](volume, audit)
+    types[this.keyType](resourceId, audit)
     this.audits.push(audit)
   }
 
@@ -156,7 +156,7 @@ export default class VolumesEncrypted extends AWS {
     const volumes = await this.describeVolumes(region, resourceId)
 
     for (const volume of volumes) {
-      this.audit(volume, region)
+      this.audit({ resourceId: volume, region })
     }
   }
 }
