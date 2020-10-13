@@ -47,7 +47,7 @@ export default class MaxKeyAge extends AWS {
     this.maxAge = params.maxAge
   }
 
-  async audit(user: User) {
+  async audit({ resourceId }: { resourceId: User }) {
     const iam = new this.AWS.IAM(this.options)
 
     let marker: string | undefined
@@ -56,7 +56,7 @@ export default class MaxKeyAge extends AWS {
       /** TODO: listAccessKeys needs to move into the AWS class */
       const listAccessKeys = await iam
         .listAccessKeys({
-          UserName: user.UserName,
+          UserName: resourceId.UserName,
           Marker: marker,
         })
         .promise()
@@ -64,10 +64,10 @@ export default class MaxKeyAge extends AWS {
 
       if (listAccessKeys.AccessKeyMetadata) {
         for (const keyMetaData of listAccessKeys.AccessKeyMetadata) {
-          this.validate(user, keyMetaData)
+          this.validate(resourceId, keyMetaData)
         }
       } else {
-        this.validate(user, {})
+        this.validate(resourceId, {})
       }
     } while (marker)
   }
@@ -118,7 +118,7 @@ export default class MaxKeyAge extends AWS {
     const users = await this.listUsers()
 
     for (const user of users) {
-      await this.audit(user)
+      await this.audit({ resourceId: user })
     }
   }
 }

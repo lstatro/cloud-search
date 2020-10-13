@@ -35,16 +35,16 @@ export default class PublicSnapshot extends AWS {
     })
   }
 
-  async audit(snapshotId: string, region: string) {
+  async audit({ resourceId, region }: { resourceId: string; region: string }) {
     const options = this.getOptions()
     options.region = region
 
     const ec2 = new this.AWS.EC2(options)
 
     const auditObject: AuditResultInterface = {
-      name: snapshotId,
+      name: resourceId,
       provider: 'aws',
-      physicalId: snapshotId,
+      physicalId: resourceId,
       service: this.service,
       rule: this.rule,
       region: region,
@@ -55,7 +55,7 @@ export default class PublicSnapshot extends AWS {
 
     const describe = await ec2
       .describeSnapshotAttribute({
-        SnapshotId: snapshotId,
+        SnapshotId: resourceId,
         Attribute: 'createVolumePermission',
       })
       .promise()
@@ -86,12 +86,12 @@ export default class PublicSnapshot extends AWS {
     resourceId: string
   }) => {
     if (resourceId) {
-      await this.audit(resourceId, region)
+      await this.audit({ resourceId, region })
     } else {
       const snapshots = await this.listSnapshots(region)
       for (const snapshot of snapshots) {
         assert(snapshot.SnapshotId, 'does not have an id')
-        await this.audit(snapshot.SnapshotId, region)
+        await this.audit({ resourceId: snapshot.SnapshotId, region })
       }
     }
   }

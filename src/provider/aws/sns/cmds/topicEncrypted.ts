@@ -53,7 +53,7 @@ export default class TopicEncrypted extends AWS {
     this.keyType = params.keyType
   }
 
-  async audit(topicArn: string, region: string) {
+  async audit({ resourceId, region }: { resourceId: string; region: string }) {
     const options = this.getOptions()
     options.region = region
 
@@ -61,14 +61,14 @@ export default class TopicEncrypted extends AWS {
 
     const getTopicAttributes = await sns
       .getTopicAttributes({
-        TopicArn: topicArn,
+        TopicArn: resourceId,
       })
       .promise()
 
     const auditObject: AuditResultInterface = {
-      name: topicArn,
+      name: resourceId,
       provider: 'aws',
-      physicalId: topicArn,
+      physicalId: resourceId,
       service: this.service,
       rule: this.rule,
       region: region,
@@ -101,12 +101,12 @@ export default class TopicEncrypted extends AWS {
     resourceId: string
   }) => {
     if (resourceId) {
-      await this.audit(resourceId, region)
+      await this.audit({ resourceId, region })
     } else {
       const topics = await this.listTopics(region)
       for (const topic of topics) {
         assert(topic.TopicArn, 'topic does not have an arn')
-        await this.audit(topic.TopicArn, region)
+        await this.audit({ resourceId: topic.TopicArn, region })
       }
     }
   }

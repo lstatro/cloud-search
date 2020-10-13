@@ -14,6 +14,7 @@ import { KeyListEntry, KeyMetadata } from 'aws-sdk/clients/kms'
 import { Role, User } from 'aws-sdk/clients/iam'
 import { Topic } from 'aws-sdk/clients/sns'
 import { QueueUrlList } from 'aws-sdk/clients/sqs'
+import { DBInstance } from 'aws-sdk/clients/rds'
 
 interface AWSParamsInterface {
   profile: string
@@ -29,6 +30,12 @@ interface ScanInterface {
 
 interface KeyCacheInterface extends KeyMetadata {
   givenKeyId?: string
+}
+
+interface AuditInterface {
+  [key: string]: unknown
+  resourceId: unknown
+  region?: string
 }
 
 export default abstract class AwsService extends Provider {
@@ -60,7 +67,7 @@ export default abstract class AwsService extends Provider {
 
   abstract async scan(params: ScanInterface): Promise<void>
 
-  abstract audit(resource: unknown, region: string): Promise<void>
+  abstract audit(params: AuditInterface): Promise<void>
 
   getOptions = () => {
     let options: AWSClientOptionsInterface
@@ -490,5 +497,31 @@ export default abstract class AwsService extends Provider {
     } while (marker)
 
     return roles
+  }
+
+  listDBInstances = async (region: string, dBInstanceIdentifier?: string) => {
+    const options = this.getOptions()
+    options.region = region
+
+    const rds = new this.AWS.RDS(options)
+
+    let marker: string | undefined
+
+    let dbInstances: DBInstance[] = []
+
+    do {
+      const describeDBInstances = await rds
+        .describeDBInstances({
+          DBInstanceIdentifier: dBInstanceIdentifier,
+          Marker: marker,
+        })
+        .promise()
+      marker = describeDBInstances.Marker
+      if (describeDBInstances.DBInstances) {
+        dbInstances = dbInstances.concat(describeDBInstances.DBInstances)
+      }
+    } while (marker)
+
+    return dbInstances
   }
 }
