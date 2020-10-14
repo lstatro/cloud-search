@@ -14,7 +14,7 @@ import { KeyListEntry, KeyMetadata } from 'aws-sdk/clients/kms'
 import { Role, User } from 'aws-sdk/clients/iam'
 import { Topic } from 'aws-sdk/clients/sns'
 import { QueueUrlList } from 'aws-sdk/clients/sqs'
-import { DBInstance } from 'aws-sdk/clients/rds'
+import { DBCluster, DBInstance } from 'aws-sdk/clients/rds'
 
 interface AWSParamsInterface {
   profile: string
@@ -523,5 +523,31 @@ export default abstract class AwsService extends Provider {
     } while (marker)
 
     return dbInstances
+  }
+
+  listDBClusters = async (region: string, dbClusterIdentifier?: string) => {
+    const options = this.getOptions()
+    options.region = region
+
+    const rds = new this.AWS.RDS(options)
+
+    let marker: string | undefined
+
+    let dbClusters: DBCluster[] = []
+
+    do {
+      const describeDBClusters = await rds
+        .describeDBClusters({
+          DBClusterIdentifier: dbClusterIdentifier,
+          Marker: marker,
+        })
+        .promise()
+      marker = describeDBClusters.Marker
+      if (describeDBClusters.DBClusters) {
+        dbClusters = dbClusters.concat(describeDBClusters.DBClusters)
+      }
+    } while (marker)
+
+    return dbClusters
   }
 }

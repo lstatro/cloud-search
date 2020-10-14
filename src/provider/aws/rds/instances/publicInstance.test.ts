@@ -3,7 +3,6 @@ import { useFakeTimers, SinonFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
 import { handler } from './publicInstance'
 import { expect } from 'chai'
-import { AWSScannerInterface } from 'cloud-search'
 
 describe('rds public instance', () => {
   const now = new Date(0)
@@ -29,7 +28,7 @@ describe('rds public instance', () => {
     audits = await handler({
       region: 'all',
       profile: 'test',
-    } as AWSScannerInterface)
+    })
     expect(audits).to.eql([])
 
     restore()
@@ -39,7 +38,7 @@ describe('rds public instance', () => {
     audits = await handler({
       region: 'all',
       profile: 'test',
-    } as AWSScannerInterface)
+    })
     expect(audits).to.eql([])
   })
 
@@ -49,7 +48,7 @@ describe('rds public instance', () => {
     const audits = await handler({
       region: 'all',
       profile: 'test',
-    } as AWSScannerInterface)
+    })
     expect(audits).to.eql([])
   })
 
@@ -66,7 +65,7 @@ describe('rds public instance', () => {
     const audits = await handler({
       region: 'all',
       profile: 'test',
-    } as AWSScannerInterface)
+    })
     expect(audits).to.eql([
       {
         physicalId: 'test',
@@ -95,7 +94,7 @@ describe('rds public instance', () => {
       region: 'us-east-1',
       resourceId: 'test',
       profile: 'test',
-    } as AWSScannerInterface)
+    })
     expect(audits).to.eql([
       {
         physicalId: 'test',
@@ -123,7 +122,7 @@ describe('rds public instance', () => {
       region: 'us-east-1',
       resourceId: 'test',
       profile: 'test',
-    } as AWSScannerInterface)
+    })
     expect(audits).to.eql([
       {
         physicalId: 'test',
