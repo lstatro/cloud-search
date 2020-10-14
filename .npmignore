@@ -3,6 +3,7 @@
 .gitattributes
 .prettierignore
 types.d.ts
+*.test.js
 *.tgz
 tsconfig.json
 .nyc_output

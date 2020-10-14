@@ -3,9 +3,8 @@ import { expect } from 'chai'
 import { useFakeTimers, SinonFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
 import { handler } from './publicRole'
-import { AWSScannerInterface } from 'cloud-search'
 
-describe('sqs topic encryption', () => {
+describe('iam public role tests', () => {
   const now = new Date(0)
   let clock: SinonFakeTimers
 
@@ -28,7 +27,8 @@ describe('sqs topic encryption', () => {
 
     audits = await handler({
       profile: 'test',
-    } as AWSScannerInterface)
+      region: 'all',
+    })
     expect(audits).to.eql([])
 
     restore()
@@ -38,7 +38,8 @@ describe('sqs topic encryption', () => {
 
     audits = await handler({
       profile: 'test',
-    } as AWSScannerInterface)
+      region: 'all',
+    })
     expect(audits).to.eql([])
   })
 
@@ -62,7 +63,8 @@ describe('sqs topic encryption', () => {
     const audits = await handler({
       profile: 'test',
       resourceId: 'test',
-    } as AWSScannerInterface)
+      region: 'test',
+    })
     expect(audits).to.eql([
       {
         physicalId: 'test',
@@ -99,7 +101,8 @@ describe('sqs topic encryption', () => {
 
     const audits = await handler({
       profile: 'test',
-    } as AWSScannerInterface)
+      region: 'all',
+    })
     expect(audits).to.eql([
       {
         physicalId: 'test',
@@ -136,7 +139,8 @@ describe('sqs topic encryption', () => {
 
     const audits = await handler({
       profile: 'test',
-    } as AWSScannerInterface)
+      region: 'all',
+    })
     expect(audits).to.eql([
       {
         physicalId: 'test',
@@ -173,7 +177,8 @@ describe('sqs topic encryption', () => {
 
     const audits = await handler({
       profile: 'test',
-    } as AWSScannerInterface)
+      region: 'all',
+    })
     expect(audits).to.eql([
       {
         physicalId: 'test',
@@ -211,7 +216,8 @@ describe('sqs topic encryption', () => {
 
     const audits = await handler({
       profile: 'test',
-    } as AWSScannerInterface)
+      region: 'all',
+    })
     expect(audits).to.eql([
       {
         physicalId: 'test',
@@ -249,7 +255,8 @@ describe('sqs topic encryption', () => {
 
     const audits = await handler({
       profile: 'test',
-    } as AWSScannerInterface)
+      region: 'all',
+    })
     expect(audits).to.eql([
       {
         physicalId: 'test',

@@ -1,7 +1,8 @@
 import 'mocha'
 import { mock, restore } from 'aws-sdk-mock'
-import { handler, MaxKeyAgeCliInterface } from './age'
+import { handler } from './age'
 import { expect } from 'chai'
+
 describe('iam user key age', () => {
   beforeEach(() => {
     mock('EC2', 'describeRegions', { Regions: [{ RegionName: 'us-east-1' }] })
@@ -31,7 +32,8 @@ describe('iam user key age', () => {
       resourceId: 'test',
       region: 'test',
       maxAge: 30,
-    } as MaxKeyAgeCliInterface)
+      profile: 'test',
+    })
 
     expect(audits[0].state).to.eql('OK')
   })
@@ -50,7 +52,8 @@ describe('iam user key age', () => {
       resourceId: 'test',
       region: 'test',
       maxAge: 30,
-    } as MaxKeyAgeCliInterface)
+      profile: 'test',
+    })
 
     expect(audits).to.eql([])
   })
@@ -75,7 +78,8 @@ describe('iam user key age', () => {
       resourceId: 'test',
       region: 'test',
       maxAge: 30,
-    } as MaxKeyAgeCliInterface)
+      profile: 'test',
+    })
 
     expect(audits[0].state).to.eql('FAIL')
   })
@@ -93,7 +97,8 @@ describe('iam user key age', () => {
       resourceId: 'test',
       region: 'test',
       maxAge: 30,
-    } as MaxKeyAgeCliInterface)
+      profile: 'test',
+    })
     expect(audits[0].state).to.eql('OK')
   })
 
@@ -103,7 +108,8 @@ describe('iam user key age', () => {
       resourceId: 'test',
       region: 'all',
       maxAge: 30,
-    } as MaxKeyAgeCliInterface)
+      profile: 'test',
+    })
     expect(audits).to.eql([])
   })
 })
