@@ -21,7 +21,14 @@ const epilogue = `
 
 • All keys in all regions regardless of the requested region have metadata read
   into the system.  This is because keys may encrypt resources in any region
-  regardless of the region the key resides.
+  regardless of the region the key resides. (Deprecated, and out right wrong!)
+
+• If a key used to encrypt an object no longer exists it is possible that the
+  resource is encrypted, but scans will still report FAIL.  This is because the
+  scan is attempting to link the key with something known.  This happens when
+  the key used to encrypt the object is shared from another account, and that
+  source account has removed access to the target account.  This also
+  effectively breaks the resource making it unusable.
 
 ********************************************************************************
 `
