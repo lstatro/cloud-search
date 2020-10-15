@@ -1,6 +1,6 @@
 import 'mocha'
 import { mock, restore } from 'aws-sdk-mock'
-import { handler, MaxKeyAgeCliInterface } from './passwordAge'
+import { handler } from './passwordAge'
 import { expect } from 'chai'
 import { AWSError } from 'aws-sdk'
 describe('passwordAge', () => {
@@ -29,7 +29,8 @@ describe('passwordAge', () => {
     const audits = await handler({
       region: 'all',
       maxAge: 90,
-    } as MaxKeyAgeCliInterface)
+      profile: 'test',
+    })
 
     expect(audits[0].state).to.eql('FAIL')
   })
@@ -52,7 +53,8 @@ describe('passwordAge', () => {
       resourceId: 'test',
       region: 'us-east-1',
       maxAge: 90,
-    } as MaxKeyAgeCliInterface)
+      profile: 'test',
+    })
 
     expect(audits[0].state).to.eql('FAIL')
   })
@@ -74,7 +76,8 @@ describe('passwordAge', () => {
     const audits = await handler({
       region: 'all',
       maxAge: 90,
-    } as MaxKeyAgeCliInterface)
+      profile: 'test',
+    })
 
     expect(audits[0].state).to.eql('OK')
   })
@@ -92,7 +95,8 @@ describe('passwordAge', () => {
     const audits = await handler({
       region: 'all',
       maxAge: 90,
-    } as MaxKeyAgeCliInterface)
+      profile: 'test',
+    })
 
     expect(audits[0].state).to.eql('OK')
   })
@@ -112,7 +116,8 @@ describe('passwordAge', () => {
     const audits = await handler({
       region: 'all',
       maxAge: 90,
-    } as MaxKeyAgeCliInterface)
+      profile: 'test',
+    })
 
     expect(audits[0].state).to.eql('OK')
   })
