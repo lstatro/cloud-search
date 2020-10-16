@@ -10,11 +10,6 @@ import AWS from '../../../../../lib/aws/AWS'
 
 const rule = 'VolumesEncrypted'
 
-type VolumeHandlerFunctions = (
-  volume: Volume,
-  audit: AuditResultInterface
-) => void
-
 export const command = `${rule} [args]`
 export const builder: CommandBuilder = {
   keyType: {
@@ -50,9 +45,8 @@ export interface VolumesEncryptedInterface extends AWSScannerInterface {
 export default class VolumesEncrypted extends AWS {
   audits: AuditResultInterface[] = []
   service = 'ebs'
-  cmks: string[] = []
   keyArn?: string
-  keyType: string
+  keyType: 'aws' | 'cmk'
 
   constructor(public params: VolumesEncryptedInterface) {
     super({
@@ -64,35 +58,6 @@ export default class VolumesEncrypted extends AWS {
     })
     this.keyArn = params.keyArn
     this.keyType = params.keyType
-  }
-
-  handleCmkType = (volume: Volume, audit: AuditResultInterface) => {
-    if (volume.Encrypted) {
-      audit.state = 'WARNING'
-      audit.comment = 'encrypted but with an unknown key'
-      if (volume.KmsKeyId) {
-        if (this.cmks.includes(volume.KmsKeyId)) {
-          audit.state = 'OK'
-          audit.comment = 'encrypted with a known key'
-        }
-      }
-    } else {
-      audit.state = 'FAIL'
-    }
-  }
-
-  handleAwsType = (volume: Volume, audit: AuditResultInterface) => {
-    if (volume.Encrypted === true) {
-      audit.state = 'OK'
-      audit.comment = 'encrypted with aws account ebs key'
-      if (this.keyArn) {
-        if (this.keyArn !== volume.KmsKeyId) {
-          audit.state = 'WARNING'
-        }
-      }
-    } else {
-      audit.state = 'FAIL'
-    }
   }
 
   async audit({ resource, region }: { resource: Volume; region: string }) {
@@ -108,39 +73,21 @@ export default class VolumesEncrypted extends AWS {
       time: new Date().toISOString(),
     }
 
-    const types: { [key: string]: VolumeHandlerFunctions } = {
-      aws: this.handleAwsType,
-      cmk: this.handleCmkType,
-    }
-    types[this.keyType](resource, audit)
-    this.audits.push(audit)
-  }
-
-  getCustomerMangedKeys = async (region: string) => {
-    if (typeof this.keyArn === 'string') {
-      this.cmks.push(this.keyArn)
+    if (resource.KmsKeyId) {
+      assert(
+        resource.Encrypted === true,
+        'key detected, but volume reports as not encrypted'
+      )
+      audit.state = await this.isKeyTrusted(
+        resource.KmsKeyId,
+        this.keyType,
+        region
+      )
     } else {
-      const options = this.getOptions()
-      options.region = region
-
-      const kms = new this.AWS.KMS(options)
-
-      const keys = await this.listKeys(region)
-
-      for (const key of keys) {
-        assert(key.KeyId, 'key has no id')
-        assert(key.KeyArn, 'key has no ARN')
-        const describeKey = await kms
-          .describeKey({
-            KeyId: key.KeyId,
-          })
-          .promise()
-        assert(describeKey.KeyMetadata, 'key missing metadata')
-        if (describeKey.KeyMetadata.KeyManager === 'CUSTOMER') {
-          this.cmks.push(key.KeyArn)
-        }
-      }
+      audit.state = 'FAIL'
     }
+
+    this.audits.push(audit)
   }
 
   scan = async ({
@@ -152,8 +99,6 @@ export default class VolumesEncrypted extends AWS {
   }) => {
     const options = this.getOptions()
     options.region = region
-
-    await this.getCustomerMangedKeys(region)
 
     const volumes = await this.describeVolumes(region, resource)
 
@@ -167,7 +112,7 @@ export interface VolumesEncryptedCliInterface
   extends VolumesEncryptedInterface,
     AWSScannerCliArgsInterface {}
 
-export const handler = async (args: VolumesEncryptedCliInterface) => {
+export const handler = async (args: VolumesEncryptedInterface) => {
   const scanner = await new VolumesEncrypted({
     region: args.region,
     profile: args.profile,
