@@ -25,6 +25,7 @@ describe('security group with a public permission', () => {
     mock('EC2', 'describeSecurityGroups', {
       SecurityGroups: [
         {
+          GroupId: 'test',
           IpPermissions: [
             {
               IpRanges: [
@@ -46,7 +47,7 @@ describe('security group with a public permission', () => {
       {
         name: undefined,
         provider: 'aws',
-        physicalId: undefined,
+        physicalId: 'test',
         service: 'ec2',
         rule: 'PublicPermission',
         region: 'us-east-1',
@@ -61,6 +62,7 @@ describe('security group with a public permission', () => {
     mock('EC2', 'describeSecurityGroups', {
       SecurityGroups: [
         {
+          GroupId: 'test',
           IpPermissions: [
             {
               IpRanges: [
@@ -82,7 +84,7 @@ describe('security group with a public permission', () => {
       {
         name: undefined,
         provider: 'aws',
-        physicalId: undefined,
+        physicalId: 'test',
         service: 'ec2',
         rule: 'PublicPermission',
         region: 'us-east-1',
@@ -97,6 +99,7 @@ describe('security group with a public permission', () => {
     mock('EC2', 'describeSecurityGroups', {
       SecurityGroups: [
         {
+          GroupId: 'test',
           IpPermissions: [
             {
               IpRanges: [
@@ -117,7 +120,7 @@ describe('security group with a public permission', () => {
       {
         name: undefined,
         provider: 'aws',
-        physicalId: undefined,
+        physicalId: 'test',
         service: 'ec2',
         rule: 'PublicPermission',
         region: 'us-east-1',
@@ -132,6 +135,7 @@ describe('security group with a public permission', () => {
     mock('EC2', 'describeSecurityGroups', {
       SecurityGroups: [
         {
+          GroupId: 'test',
           IpPermissions: [{}],
         },
       ],
@@ -145,7 +149,7 @@ describe('security group with a public permission', () => {
       {
         name: undefined,
         provider: 'aws',
-        physicalId: undefined,
+        physicalId: 'test',
         service: 'ec2',
         rule: 'PublicPermission',
         region: 'us-east-1',
@@ -158,7 +162,11 @@ describe('security group with a public permission', () => {
 
   it('should report OK if there are no IpPermissions', async () => {
     mock('EC2', 'describeSecurityGroups', {
-      SecurityGroups: [{}],
+      SecurityGroups: [
+        {
+          GroupId: 'test',
+        },
+      ],
     })
     const audits = await handler({
       region: 'us-east-1',
@@ -169,7 +177,7 @@ describe('security group with a public permission', () => {
       {
         name: undefined,
         provider: 'aws',
-        physicalId: undefined,
+        physicalId: 'test',
         service: 'ec2',
         rule: 'PublicPermission',
         region: 'us-east-1',
@@ -184,6 +192,7 @@ describe('security group with a public permission', () => {
     mock('EC2', 'describeSecurityGroups', {
       SecurityGroups: [
         {
+          GroupId: 'test',
           IpPermissions: [
             {
               Ipv6Ranges: [
@@ -205,7 +214,7 @@ describe('security group with a public permission', () => {
       {
         name: undefined,
         provider: 'aws',
-        physicalId: undefined,
+        physicalId: 'test',
         service: 'ec2',
         rule: 'PublicPermission',
         region: 'us-east-1',
@@ -220,6 +229,7 @@ describe('security group with a public permission', () => {
     mock('EC2', 'describeSecurityGroups', {
       SecurityGroups: [
         {
+          GroupId: 'test',
           IpPermissions: [
             {
               Ipv6Ranges: [
@@ -241,7 +251,7 @@ describe('security group with a public permission', () => {
       {
         name: undefined,
         provider: 'aws',
-        physicalId: undefined,
+        physicalId: 'test',
         service: 'ec2',
         rule: 'PublicPermission',
         region: 'us-east-1',

@@ -29,7 +29,7 @@ declare module 'cloud-search' {
     name?: ResourceFriendlyNameType
     provider: CloudProviderNameType
     comment?: string
-    physicalId?: PhysicalIdType
+    physicalId: PhysicalIdType
     region: string
     service: CloudServiceType
     time: ScanTimeType

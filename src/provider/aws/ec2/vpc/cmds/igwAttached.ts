@@ -5,6 +5,7 @@ import {
 } from 'cloud-search'
 import { InternetGateway } from 'aws-sdk/clients/ec2'
 import AWS from '../../../../../lib/aws/AWS'
+import assert from 'assert'
 
 const rule = 'IgwAttachedToVpc'
 
@@ -42,6 +43,7 @@ export default class IgwAttachedToVpc extends AWS {
     resource: InternetGateway
     region: string
   }) {
+    assert(resource.InternetGatewayId, 'gateway does not have an IGW id')
     let suspect = false
 
     if (resource.Attachments) {
@@ -56,7 +58,6 @@ export default class IgwAttachedToVpc extends AWS {
     }
 
     this.audits.push({
-      name: resource.InternetGatewayId,
       provider: 'aws',
       physicalId: resource.InternetGatewayId,
       service: this.service,

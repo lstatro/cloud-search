@@ -59,6 +59,7 @@ export default class ClusterEncrypted extends AWS {
   }
 
   async audit({ resource, region }: { resource: DBCluster; region: string }) {
+    assert(resource.DBClusterArn, 'cluster does not have a cluster ARN')
     const auditObject: AuditResultInterface = {
       provider: 'aws',
       physicalId: resource.DBClusterArn,

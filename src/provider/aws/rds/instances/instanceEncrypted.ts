@@ -52,6 +52,7 @@ export default class PublicInstance extends AWS {
   }
 
   async audit({ resource, region }: { resource: DBInstance; region: string }) {
+    assert(resource.DBInstanceArn, 'instance does not have an instance ARN')
     const auditObject: AuditResultInterface = {
       provider: 'aws',
       physicalId: resource.DBInstanceArn,

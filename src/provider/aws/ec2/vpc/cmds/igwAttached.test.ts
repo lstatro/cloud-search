@@ -21,10 +21,11 @@ describe('igw vpc attachment', () => {
     restore()
   })
 
-  it('should report FAIL if the gateway is attched', async () => {
+  it('should report FAIL if the gateway is attached', async () => {
     mock('EC2', 'describeInternetGateways', {
       InternetGateways: [
         {
+          InternetGatewayId: 'test',
           Attachments: [
             {
               State: 'available',
@@ -40,9 +41,8 @@ describe('igw vpc attachment', () => {
     } as AWSScannerCliArgsInterface)
     expect(audits).to.eql([
       {
-        name: undefined,
         provider: 'aws',
-        physicalId: undefined,
+        physicalId: 'test',
         service: 'ec2',
         rule: 'IgwAttachedToVpc',
         region: 'us-east-1',
@@ -57,6 +57,7 @@ describe('igw vpc attachment', () => {
     mock('EC2', 'describeInternetGateways', {
       InternetGateways: [
         {
+          InternetGatewayId: 'test',
           Attachments: [
             {
               State: 'test',
@@ -73,9 +74,8 @@ describe('igw vpc attachment', () => {
 
     expect(audits).to.eql([
       {
-        name: undefined,
         provider: 'aws',
-        physicalId: undefined,
+        physicalId: 'test',
         service: 'ec2',
         rule: 'IgwAttachedToVpc',
         region: 'us-east-1',
@@ -90,6 +90,7 @@ describe('igw vpc attachment', () => {
     mock('EC2', 'describeInternetGateways', {
       InternetGateways: [
         {
+          InternetGatewayId: 'test',
           Attachments: [{}],
         },
       ],
@@ -102,9 +103,8 @@ describe('igw vpc attachment', () => {
 
     expect(audits).to.eql([
       {
-        name: undefined,
         provider: 'aws',
-        physicalId: undefined,
+        physicalId: 'test',
         service: 'ec2',
         rule: 'IgwAttachedToVpc',
         region: 'us-east-1',
@@ -119,6 +119,7 @@ describe('igw vpc attachment', () => {
     mock('EC2', 'describeInternetGateways', {
       InternetGateways: [
         {
+          InternetGatewayId: 'test',
           Attachments: [],
         },
       ],
@@ -131,9 +132,8 @@ describe('igw vpc attachment', () => {
 
     expect(audits).to.eql([
       {
-        name: undefined,
         provider: 'aws',
-        physicalId: undefined,
+        physicalId: 'test',
         service: 'ec2',
         rule: 'IgwAttachedToVpc',
         region: 'us-east-1',
@@ -146,7 +146,11 @@ describe('igw vpc attachment', () => {
 
   it('should report OK if there are no internet gateways', async () => {
     mock('EC2', 'describeInternetGateways', {
-      InternetGateways: [{}],
+      InternetGateways: [
+        {
+          InternetGatewayId: 'test',
+        },
+      ],
     })
     const audits = await handler({
       region: 'us-east-1',
@@ -156,9 +160,8 @@ describe('igw vpc attachment', () => {
 
     expect(audits).to.eql([
       {
-        name: undefined,
         provider: 'aws',
-        physicalId: undefined,
+        physicalId: 'test',
         service: 'ec2',
         rule: 'IgwAttachedToVpc',
         region: 'us-east-1',
@@ -173,6 +176,7 @@ describe('igw vpc attachment', () => {
     mock('EC2', 'describeInternetGateways', {
       InternetGateways: [
         {
+          InternetGatewayId: 'test',
           Attachments: [],
         },
       ],
@@ -183,9 +187,8 @@ describe('igw vpc attachment', () => {
 
     expect(audits).to.eql([
       {
-        name: undefined,
         provider: 'aws',
-        physicalId: undefined,
+        physicalId: 'test',
         service: 'ec2',
         rule: 'IgwAttachedToVpc',
         region: 'us-east-1',

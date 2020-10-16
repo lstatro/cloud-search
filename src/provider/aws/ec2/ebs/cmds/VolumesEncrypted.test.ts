@@ -23,6 +23,7 @@ describe('ebs volume encryption', () => {
     mock('EC2', 'describeVolumes', {
       Volumes: [
         {
+          VolumeId: 'test',
           Encrypted: true,
         },
       ],
@@ -40,6 +41,7 @@ describe('ebs volume encryption', () => {
     mock('EC2', 'describeVolumes', {
       Volumes: [
         {
+          VolumeId: 'test',
           Encrypted: false,
         },
       ],
@@ -57,6 +59,7 @@ describe('ebs volume encryption', () => {
     mock('EC2', 'describeVolumes', {
       Volumes: [
         {
+          VolumeId: 'test',
           Encrypted: true,
         },
       ],
@@ -75,6 +78,7 @@ describe('ebs volume encryption', () => {
     mock('EC2', 'describeVolumes', {
       Volumes: [
         {
+          VolumeId: 'test',
           Encrypted: true,
           KmsKeyId: 'test',
         },
@@ -94,6 +98,7 @@ describe('ebs volume encryption', () => {
     mock('EC2', 'describeVolumes', {
       Volumes: [
         {
+          VolumeId: 'test',
           Encrypted: true,
           KmsKeyId: 'test',
         },
@@ -113,6 +118,7 @@ describe('ebs volume encryption', () => {
     mock('EC2', 'describeVolumes', {
       Volumes: [
         {
+          VolumeId: 'test',
           Encrypted: false,
           KmsKeyId: 'test',
         },
@@ -132,6 +138,7 @@ describe('ebs volume encryption', () => {
     mock('EC2', 'describeVolumes', {
       Volumes: [
         {
+          VolumeId: 'test',
           Encrypted: true,
           KmsKeyId: 'test',
         },
@@ -151,6 +158,7 @@ describe('ebs volume encryption', () => {
     mock('EC2', 'describeVolumes', {
       Volumes: [
         {
+          VolumeId: 'test',
           Encrypted: true,
         },
       ],
@@ -169,6 +177,7 @@ describe('ebs volume encryption', () => {
     mock('EC2', 'describeVolumes', {
       Volumes: [
         {
+          VolumeId: 'test',
           Encrypted: true,
           KmsKeyId: 'test',
         },
@@ -187,6 +196,7 @@ describe('ebs volume encryption', () => {
     mock('EC2', 'describeVolumes', {
       Volumes: [
         {
+          VolumeId: 'test',
           Encrypted: true,
           KmsKeyId: 'test',
         },

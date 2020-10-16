@@ -5,6 +5,7 @@ import {
 } from 'cloud-search'
 import { SecurityGroup } from 'aws-sdk/clients/ec2'
 import AWS from '../../../../../lib/aws/AWS'
+import assert from 'assert'
 
 const rule = 'PublicPermission'
 
@@ -40,6 +41,7 @@ export default class PublicPermission extends AWS {
     resource: SecurityGroup
     region: string
   }) => {
+    assert(resource.GroupId, 'security group does nto have a group id')
     let suspect
     /** does the security group have any inbound permissions? */
     if (resource.IpPermissions) {
@@ -76,11 +78,6 @@ export default class PublicPermission extends AWS {
       service: this.service,
       rule,
       region: region,
-      /**
-       * ew ternary- did we find something sketchy when reviewing the group?
-       * - yea? FAIL!  this is crap, we should seek out an adult
-       * - nah bro (or broette), we OK
-       */
       state: suspect ? 'FAIL' : 'OK',
       profile: this.profile,
       time: new Date().toISOString(),
