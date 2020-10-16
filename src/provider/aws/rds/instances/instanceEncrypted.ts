@@ -51,16 +51,10 @@ export default class PublicInstance extends AWS {
     this.keyType = params.keyType
   }
 
-  async audit({
-    resourceId,
-    region,
-  }: {
-    resourceId: DBInstance
-    region: string
-  }) {
+  async audit({ resource, region }: { resource: DBInstance; region: string }) {
     const auditObject: AuditResultInterface = {
       provider: 'aws',
-      physicalId: resourceId.DBInstanceArn,
+      physicalId: resource.DBInstanceArn,
       service: this.service,
       rule: this.rule,
       region: region,
@@ -69,14 +63,14 @@ export default class PublicInstance extends AWS {
       time: new Date().toISOString(),
     }
 
-    if (typeof resourceId.KmsKeyId === 'string') {
+    if (typeof resource.KmsKeyId === 'string') {
       /** if there is a key it should be encrypted, if not, something unexpected is going on */
       assert(
-        resourceId.StorageEncrypted === true,
+        resource.StorageEncrypted === true,
         'key found, but rds instance is not encrypted'
       )
       auditObject.state = await this.isKeyTrusted(
-        resourceId.KmsKeyId,
+        resource.KmsKeyId,
         this.keyType,
         region
       )
@@ -87,16 +81,10 @@ export default class PublicInstance extends AWS {
     this.audits.push(auditObject)
   }
 
-  scan = async ({
-    resourceId,
-    region,
-  }: {
-    resourceId: string
-    region: string
-  }) => {
+  scan = async ({ resource, region }: { resource: string; region: string }) => {
     let instances
-    if (resourceId) {
-      instances = await this.listDBInstances(region, resourceId)
+    if (resource) {
+      instances = await this.listDBInstances(region, resource)
     } else {
       instances = await this.listDBInstances(region)
     }
@@ -104,7 +92,7 @@ export default class PublicInstance extends AWS {
     for (const instance of instances) {
       assert(instance.DBInstanceArn, 'instances must have a ARN')
       await this.audit({
-        resourceId: instance,
+        resource: instance,
         region,
       })
     }

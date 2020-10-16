@@ -1,4 +1,4 @@
-/** TODO: this needs to support resourceId */
+/** TODO: this needs to support resource */
 
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import AWS from '../../../../../lib/aws/AWS'
@@ -48,7 +48,7 @@ export default class MaxKeyAge extends AWS {
     this.maxAge = params.maxAge
   }
 
-  async audit({ resourceId }: { resourceId: User }) {
+  async audit({ resource }: { resource: User }) {
     const iam = new this.AWS.IAM(this.options)
 
     let marker: string | undefined
@@ -57,7 +57,7 @@ export default class MaxKeyAge extends AWS {
       /** TODO: listAccessKeys needs to move into the AWS class */
       const listAccessKeys = await iam
         .listAccessKeys({
-          UserName: resourceId.UserName,
+          UserName: resource.UserName,
           Marker: marker,
         })
         .promise()
@@ -65,10 +65,10 @@ export default class MaxKeyAge extends AWS {
 
       if (listAccessKeys.AccessKeyMetadata) {
         for (const keyMetaData of listAccessKeys.AccessKeyMetadata) {
-          this.validate(resourceId, keyMetaData)
+          this.validate(resource, keyMetaData)
         }
       } else {
-        this.validate(resourceId, {})
+        this.validate(resource, {})
       }
     } while (marker)
   }
@@ -112,14 +112,14 @@ export default class MaxKeyAge extends AWS {
    *
    * it appears that we only need the user name, not the entire user object
    * we should therefore be able to cut it back to just the name string
-   * (resourceId) and pass that into the audit and validate function to get
+   * (resource) and pass that into the audit and validate function to get
    * this functionality
    */
   scan = async () => {
     const users = await this.listUsers()
 
     for (const user of users) {
-      await this.audit({ resourceId: user })
+      await this.audit({ resource: user })
     }
   }
 }
