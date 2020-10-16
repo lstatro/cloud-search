@@ -59,6 +59,7 @@ export default class VolumesEncrypted extends AWS {
       profile: params.profile,
       resourceId: params.resourceId,
       region: params.region,
+      verbosity: params.verbosity,
       rule,
     })
     this.keyArn = params.keyArn
@@ -172,6 +173,7 @@ export const handler = async (args: VolumesEncryptedCliInterface) => {
     resourceId: args.resourceId,
     keyArn: args.keyArn,
     keyType: args.keyType,
+    verbosity: args.verbosity,
   })
   await scanner.start()
   scanner.output()

@@ -1,4 +1,4 @@
-import { AWSClientOptionsInterface } from 'cloud-search'
+import { AWSClientOptionsInterface, VerbosityType } from 'cloud-search'
 import _AWS from 'aws-sdk'
 import Provider from '../Provider'
 
@@ -21,6 +21,7 @@ interface AWSParamsInterface {
   rule: string
   resourceId?: string
   region: string
+  verbosity?: VerbosityType
 }
 
 interface ScanInterface {
@@ -52,7 +53,7 @@ export default abstract class AwsService extends Provider {
   resourceId?: string
 
   constructor(params: AWSParamsInterface) {
-    super(params.rule)
+    super(params.rule, params.verbosity)
 
     this.region = params.region
     this.profile = params.profile
@@ -132,14 +133,14 @@ export default abstract class AwsService extends Provider {
     await this.getRegions()
 
     for (const region of this.regions) {
-      this.spinner.text = region
+      this.handleSpinnerText({ message: region })
       await this.scan({ region })
     }
   }
 
   start = async () => {
     try {
-      this.spinner.start()
+      this.handleSpinnerStatus({ method: 'start' })
       if (this.resourceId) {
         assert(
           this.region !== 'all',
@@ -149,9 +150,9 @@ export default abstract class AwsService extends Provider {
       } else {
         await this.handleRegions()
       }
-      this.spinner.succeed()
+      this.handleSpinnerStatus({ method: 'succeed' })
     } catch (err) {
-      this.spinner.fail(err.message)
+      this.handleSpinnerStatus({ method: 'fail', message: err.message })
     }
   }
 

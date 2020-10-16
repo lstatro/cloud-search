@@ -19,6 +19,9 @@ declare module 'cloud-search' {
   /** the name of the rule that scanned the resource */
   export type RuleNameType = string
 
+  /** controls how much data is dumped to terminal, silent for testing */
+  export type VerbosityType = 'silent' | 'normal'
+
   export type AuditStateType = 'OK' | 'FAIL' | 'UNKNOWN' | 'WARNING'
 
   /** The compliance data about the resource */
@@ -49,6 +52,7 @@ declare module 'cloud-search' {
     region: string
     profile: string
     resourceId?: string
+    verbosity?: VerbosityType
   }
 
   interface AWSScannerCliArgsInterface extends AWSScannerInterface, Arguments {}

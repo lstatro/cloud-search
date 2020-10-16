@@ -17,6 +17,7 @@ export default class PublicAccessBlocks extends AWS {
       resourceId: params.resourceId,
       region: params.region,
       rule: params.rule,
+      verbosity: params.verbosity,
     })
   }
 
@@ -29,7 +30,6 @@ export default class PublicAccessBlocks extends AWS {
       assert(getPublicAccessBlock, 'unable to locate bucket')
       this.validate(getPublicAccessBlock, resourceId)
     } catch (err) {
-      console.error(err.message)
       const auditObject: AuditResultInterface = {
         name: resourceId,
         comment: err.code,

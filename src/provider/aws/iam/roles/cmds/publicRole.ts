@@ -41,6 +41,7 @@ export default class PublicRole extends AWS {
       profile: params.profile,
       resourceId: params.resourceId,
       region: params.region,
+      verbosity: params.verbosity,
       rule,
     })
   }
@@ -160,6 +161,7 @@ export const handler = async (args: AWSScannerInterface) => {
     region: args.region,
     profile: args.profile,
     resourceId: args.resourceId,
+    verbosity: args.verbosity,
   })
 
   await scanner.start()
