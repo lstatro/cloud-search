@@ -29,14 +29,18 @@ const epilogue = `
 ********************************************************************************
 `
 
+const opts = {
+  exclude: /.*.test.js/,
+}
+
 export const builder = (yargs: Argv) => {
   return yargs
-    .commandDir('./aws/ec2')
-    .commandDir('./aws/s3')
-    .commandDir('./aws/iam')
-    .commandDir('./aws/sns')
-    .commandDir('./aws/sqs')
-    .commandDir('./aws/rds')
+    .commandDir('./aws/ec2', opts)
+    .commandDir('./aws/s3', opts)
+    .commandDir('./aws/iam', opts)
+    .commandDir('./aws/sns', opts)
+    .commandDir('./aws/sqs', opts)
+    .commandDir('./aws/rds', opts)
     .demandCommand(1)
     .option('region', {
       alias: 'r',

@@ -1,9 +1,5 @@
 import { CommandBuilder } from 'yargs'
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-  AWSScannerCliArgsInterface,
-} from 'cloud-search'
+import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import assert from 'assert'
 import AWS from '../../../../lib/aws/AWS'
 
@@ -112,11 +108,7 @@ export default class TopicEncrypted extends AWS {
   }
 }
 
-export interface TopicEncryptedCliInterface
-  extends TopicEncryptedInterface,
-    AWSScannerCliArgsInterface {}
-
-export const handler = async (args: TopicEncryptedCliInterface) => {
+export const handler = async (args: TopicEncryptedInterface) => {
   const scanner = new TopicEncrypted({
     region: args.region,
     profile: args.profile,

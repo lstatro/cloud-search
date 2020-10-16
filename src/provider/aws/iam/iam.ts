@@ -3,10 +3,14 @@ import { Argv } from 'yargs'
 export const command = 'iam'
 export const desc = 'Identity and Access Management (IAM)'
 
+const opts = {
+  exclude: /.*.test.js/,
+}
+
 export const builder = (yargs: Argv) => {
   return yargs
-    .commandDir('users')
-    .commandDir('roles')
+    .commandDir('users', opts)
+    .commandDir('roles', opts)
     .demandCommand(1)
     .example([
       [
