@@ -34,6 +34,7 @@ describe('rds public instance', () => {
     restore()
 
     mock('RDS', 'describeDBInstances', {})
+    mock('EC2', 'describeRegions', { Regions: [{ RegionName: 'us-east-1' }] })
 
     audits = await handler({
       region: 'all',

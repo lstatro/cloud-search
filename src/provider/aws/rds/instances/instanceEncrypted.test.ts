@@ -1,10 +1,10 @@
 import 'mocha'
 import { useFakeTimers, SinonFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { handler, ClusterEncryptedCliInterface } from './clusterEncrypted'
+import { handler } from './instanceEncrypted'
 import { expect } from 'chai'
 
-describe('rds cluster storage is encrypted at rest', () => {
+describe('rds public instance', () => {
   const now = new Date(0)
   let clock: SinonFakeTimers
 
@@ -18,38 +18,49 @@ describe('rds cluster storage is encrypted at rest', () => {
     restore()
   })
 
-  it('should report nothing if no clusters are found', async () => {
-    mock('RDS', 'describeDBClusters', {
-      DBClusters: [],
+  it('should report nothing if no rds instances are found', async () => {
+    mock('RDS', 'describeDBInstances', {
+      DBInstances: [],
     })
 
     let audits
 
     audits = await handler({
-      region: 'test',
+      region: 'all',
       profile: 'test',
       keyType: 'aws',
-    } as ClusterEncryptedCliInterface)
+    })
     expect(audits).to.eql([])
 
     restore()
-    mock('EC2', 'describeRegions', { Regions: [{ RegionName: 'us-east-1' }] })
 
-    mock('RDS', 'describeDBClusters', {})
+    mock('EC2', 'describeRegions', { Regions: [{ RegionName: 'us-east-1' }] })
+    mock('RDS', 'describeDBInstances', {})
 
     audits = await handler({
       region: 'all',
       profile: 'test',
       keyType: 'cmk',
-    } as ClusterEncryptedCliInterface)
+    })
     expect(audits).to.eql([])
   })
 
-  it('should report OK when looking for aws key types', async () => {
-    mock('RDS', 'describeDBClusters', {
-      DBClusters: [
+  it('should report nothing if no rds instances are reported', async () => {
+    mock('RDS', 'describeDBInstances', {})
+
+    const audits = await handler({
+      region: 'all',
+      profile: 'test',
+      keyType: 'aws',
+    })
+    expect(audits).to.eql([])
+  })
+
+  it('should report OK if the instance is encrypted with any key', async () => {
+    mock('RDS', 'describeDBInstances', {
+      DBInstances: [
         {
-          DBClusterArn: 'test',
+          DBInstanceArn: 'test',
           KmsKeyId: 'test',
           StorageEncrypted: true,
         },
@@ -64,14 +75,14 @@ describe('rds cluster storage is encrypted at rest', () => {
       region: 'test',
       profile: 'test',
       keyType: 'aws',
-    } as ClusterEncryptedCliInterface)
+    })
     expect(audits).to.eql([
       {
         physicalId: 'test',
         profile: 'test',
         provider: 'aws',
         region: 'test',
-        rule: 'ClusterEncrypted',
+        rule: 'InstanceEncrypted',
         service: 'rds',
         state: 'OK',
         time: '1970-01-01T00:00:00.000Z',
@@ -80,30 +91,26 @@ describe('rds cluster storage is encrypted at rest', () => {
   })
 
   it('should report FAIL for un-encrypted clusters', async () => {
-    mock('RDS', 'describeDBClusters', {
-      DBClusters: [
+    mock('RDS', 'describeDBInstances', {
+      DBInstances: [
         {
-          DBClusterArn: 'test',
+          DBInstanceArn: 'test',
         },
       ],
-    })
-
-    mock('KMS', 'describeKey', {
-      KeyMetadata: { Arn: 'test', KeyManager: 'AWS' },
     })
 
     const audits = await handler({
       region: 'test',
       profile: 'test',
       keyType: 'aws',
-    } as ClusterEncryptedCliInterface)
+    })
     expect(audits).to.eql([
       {
         physicalId: 'test',
         profile: 'test',
         provider: 'aws',
         region: 'test',
-        rule: 'ClusterEncrypted',
+        rule: 'InstanceEncrypted',
         service: 'rds',
         state: 'FAIL',
         time: '1970-01-01T00:00:00.000Z',
@@ -111,11 +118,11 @@ describe('rds cluster storage is encrypted at rest', () => {
     ])
   })
 
-  it('should report OK for cmk encrypted clusters snapshots', async () => {
-    mock('RDS', 'describeDBClusters', {
-      DBClusters: [
+  it('should report OK when looking for cmk encrypted instances', async () => {
+    mock('RDS', 'describeDBInstances', {
+      DBInstances: [
         {
-          DBClusterArn: 'test',
+          DBInstanceArn: 'test',
           KmsKeyId: 'test',
           StorageEncrypted: true,
         },
@@ -131,14 +138,15 @@ describe('rds cluster storage is encrypted at rest', () => {
       resourceId: 'test',
       profile: 'test',
       keyType: 'cmk',
-    } as ClusterEncryptedCliInterface)
+    })
+
     expect(audits).to.eql([
       {
         physicalId: 'test',
         profile: 'test',
         provider: 'aws',
         region: 'test',
-        rule: 'ClusterEncrypted',
+        rule: 'InstanceEncrypted',
         service: 'rds',
         state: 'OK',
         time: '1970-01-01T00:00:00.000Z',
@@ -146,11 +154,11 @@ describe('rds cluster storage is encrypted at rest', () => {
     ])
   })
 
-  it('should report WARNING for clusters encrypted with an AWS key when looking for cmk types', async () => {
-    mock('RDS', 'describeDBClusters', {
-      DBClusters: [
+  it('should report WARNING for instances encrypted with an AWS key when looking for cmk types', async () => {
+    mock('RDS', 'describeDBInstances', {
+      DBInstances: [
         {
-          DBClusterArn: 'test',
+          DBInstanceArn: 'test',
           KmsKeyId: 'test',
           StorageEncrypted: true,
         },
@@ -166,14 +174,14 @@ describe('rds cluster storage is encrypted at rest', () => {
       resourceId: 'test',
       profile: 'test',
       keyType: 'cmk',
-    } as ClusterEncryptedCliInterface)
+    })
     expect(audits).to.eql([
       {
         physicalId: 'test',
         profile: 'test',
         provider: 'aws',
         region: 'test',
-        rule: 'ClusterEncrypted',
+        rule: 'InstanceEncrypted',
         service: 'rds',
         state: 'WARNING',
         time: '1970-01-01T00:00:00.000Z',
