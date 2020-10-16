@@ -85,7 +85,7 @@ export default class PublicRole extends AWS {
     policyDocument: string
     resource: string
   }) {
-    const auditObject: AuditResultInterface = {
+    const audit: AuditResultInterface = {
       provider: 'aws',
       physicalId: resource,
       service: this.service,
@@ -115,14 +115,14 @@ export default class PublicRole extends AWS {
     }
 
     if (isPublicArr.includes(true)) {
-      auditObject.state = 'FAIL'
+      audit.state = 'FAIL'
     } else if (isPublicArr.includes('WARNING')) {
-      auditObject.state = 'WARNING'
+      audit.state = 'WARNING'
     } else {
-      auditObject.state = 'OK'
+      audit.state = 'OK'
     }
 
-    this.audits.push(auditObject)
+    this.audits.push(audit)
   }
 
   scan = async ({ resource }: { resource: string }) => {

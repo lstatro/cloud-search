@@ -44,7 +44,7 @@ export default class PublicInstance extends AWS {
     resource: string
     region: string
   }) {
-    const auditObject: AuditResultInterface = {
+    const audit: AuditResultInterface = {
       provider: 'aws',
       physicalId: resource,
       service: this.service,
@@ -55,11 +55,11 @@ export default class PublicInstance extends AWS {
       time: new Date().toISOString(),
     }
     if (publiclyAccessible === true) {
-      auditObject.state = 'FAIL'
+      audit.state = 'FAIL'
     } else if (publiclyAccessible === false) {
-      auditObject.state = 'OK'
+      audit.state = 'OK'
     }
-    this.audits.push(auditObject)
+    this.audits.push(audit)
   }
 
   scan = async ({

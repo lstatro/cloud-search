@@ -42,7 +42,7 @@ export default class PublicSnapshot extends AWS {
 
     const ec2 = new this.AWS.EC2(options)
 
-    const auditObject: AuditResultInterface = {
+    const audit: AuditResultInterface = {
       name: resource,
       provider: 'aws',
       physicalId: resource,
@@ -71,12 +71,12 @@ export default class PublicSnapshot extends AWS {
     }
 
     if (isPublic) {
-      auditObject.state = 'FAIL'
+      audit.state = 'FAIL'
     } else {
-      auditObject.state = 'OK'
+      audit.state = 'OK'
     }
 
-    this.audits.push(auditObject)
+    this.audits.push(audit)
   }
 
   scan = async ({ region, resource }: { region: string; resource: string }) => {

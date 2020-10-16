@@ -53,7 +53,7 @@ export default class PublicInstance extends AWS {
 
   async audit({ resource, region }: { resource: DBInstance; region: string }) {
     assert(resource.DBInstanceArn, 'instance does not have an instance ARN')
-    const auditObject: AuditResultInterface = {
+    const audit: AuditResultInterface = {
       provider: 'aws',
       physicalId: resource.DBInstanceArn,
       service: this.service,
@@ -70,16 +70,16 @@ export default class PublicInstance extends AWS {
         resource.StorageEncrypted === true,
         'key found, but rds instance is not encrypted'
       )
-      auditObject.state = await this.isKeyTrusted(
+      audit.state = await this.isKeyTrusted(
         resource.KmsKeyId,
         this.keyType,
         region
       )
     } else {
-      auditObject.state = 'FAIL'
+      audit.state = 'FAIL'
     }
 
-    this.audits.push(auditObject)
+    this.audits.push(audit)
   }
 
   scan = async ({ resource, region }: { resource: string; region: string }) => {

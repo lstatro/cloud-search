@@ -64,7 +64,7 @@ export default class TopicEncrypted extends AWS {
         AttributeNames: ['KmsMasterKeyId'],
       })
       .promise()
-    const auditObject: AuditResultInterface = {
+    const audit: AuditResultInterface = {
       name: resource,
       provider: 'aws',
       physicalId: resource,
@@ -87,14 +87,14 @@ export default class TopicEncrypted extends AWS {
           this.keyType,
           region
         )
-        auditObject.state = isTrusted
+        audit.state = isTrusted
       } else {
-        auditObject.state = 'FAIL'
+        audit.state = 'FAIL'
       }
     } else {
-      auditObject.state = 'FAIL'
+      audit.state = 'FAIL'
     }
-    this.audits.push(auditObject)
+    this.audits.push(audit)
   }
 
   scan = async ({ region, resource }: { region: string; resource: string }) => {

@@ -76,7 +76,7 @@ export default class MaxKeyAge extends AWS {
   validate = (user: User, keyMetaData: AccessKeyMetadata) => {
     const id = `${user.UserName}:${keyMetaData.AccessKeyId}`
     const now = new Date()
-    const auditObject: AuditResultInterface = {
+    const audit: AuditResultInterface = {
       name: id,
       provider: 'aws',
       physicalId: id,
@@ -96,16 +96,16 @@ export default class MaxKeyAge extends AWS {
       const days = hours / 24
 
       if (days >= this.maxAge) {
-        auditObject.state = 'FAIL'
+        audit.state = 'FAIL'
       } else {
-        auditObject.state = 'OK'
+        audit.state = 'OK'
       }
     } else {
-      auditObject.state = 'OK'
-      auditObject.comment = 'no key metadata found'
+      audit.state = 'OK'
+      audit.comment = 'no key metadata found'
     }
 
-    this.audits.push(auditObject)
+    this.audits.push(audit)
   }
 
   /** TODO: setup age to handle resource based requests

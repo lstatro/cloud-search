@@ -70,7 +70,7 @@ export default class PasswordAge extends AWS {
   validate = (userName: string, createDate?: Date) => {
     const now = new Date()
 
-    const auditObject: AuditResultInterface = {
+    const audit: AuditResultInterface = {
       name: userName,
       provider: 'aws',
       physicalId: userName,
@@ -90,16 +90,16 @@ export default class PasswordAge extends AWS {
       const days = hours / 24
 
       if (days >= this.maxAge) {
-        auditObject.state = 'FAIL'
+        audit.state = 'FAIL'
       } else {
-        auditObject.state = 'OK'
+        audit.state = 'OK'
       }
     } else {
-      auditObject.state = 'OK'
-      auditObject.comment = 'user does not have a password'
+      audit.state = 'OK'
+      audit.comment = 'user does not have a password'
     }
 
-    this.audits.push(auditObject)
+    this.audits.push(audit)
   }
 
   scan = async ({ resource }: { resource: string }) => {

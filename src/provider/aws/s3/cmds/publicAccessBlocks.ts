@@ -30,7 +30,7 @@ export default class PublicAccessBlocks extends AWS {
       assert(getPublicAccessBlock, 'unable to locate bucket')
       this.validate(getPublicAccessBlock, resource)
     } catch (err) {
-      const auditObject: AuditResultInterface = {
+      const audit: AuditResultInterface = {
         name: resource,
         comment: err.code,
         provider: 'aws',
@@ -43,10 +43,10 @@ export default class PublicAccessBlocks extends AWS {
         time: new Date().toISOString(),
       }
       if (err.code === 'NoSuchPublicAccessBlockConfiguration') {
-        auditObject.state = 'FAIL'
-        auditObject.comment = err.code
+        audit.state = 'FAIL'
+        audit.comment = err.code
       }
-      this.audits.push(auditObject)
+      this.audits.push(audit)
     }
   }
 
@@ -57,7 +57,7 @@ export default class PublicAccessBlocks extends AWS {
     const config = getPublicAccessBlock.PublicAccessBlockConfiguration as {
       [key: string]: boolean
     }
-    const auditObject: AuditResultInterface = {
+    const audit: AuditResultInterface = {
       name: bucketName,
       provider: 'aws',
       physicalId: bucketName,
@@ -69,14 +69,14 @@ export default class PublicAccessBlocks extends AWS {
       time: new Date().toISOString(),
     }
     if (config[this.rule] === true) {
-      auditObject.state = 'OK'
+      audit.state = 'OK'
     } else if (config[this.rule] === false) {
-      auditObject.state = 'FAIL'
-      auditObject.comment = `${this.rule} explicitly disabled`
+      audit.state = 'FAIL'
+      audit.comment = `${this.rule} explicitly disabled`
     } else {
-      auditObject.comment = `${this.rule} unknown state`
+      audit.comment = `${this.rule} unknown state`
     }
-    this.audits.push(auditObject)
+    this.audits.push(audit)
   }
 
   scan = async ({ resource }: { resource: string }) => {

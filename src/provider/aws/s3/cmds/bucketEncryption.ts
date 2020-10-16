@@ -57,7 +57,7 @@ export default class TopicEncrypted extends AWS {
 
   handleAwsKeyType = (
     config: ServerSideEncryptionConfiguration,
-    auditObject: AuditResultInterface
+    audit: AuditResultInterface
   ) => {
     let isEncryptedWithAes = false
 
@@ -71,26 +71,26 @@ export default class TopicEncrypted extends AWS {
     }
 
     if (isEncryptedWithAes) {
-      auditObject.state = 'OK'
+      audit.state = 'OK'
     } else {
-      auditObject.state = 'FAIL'
+      audit.state = 'FAIL'
     }
   }
 
   handleCmkKeyType = async (
     config: ServerSideEncryptionConfiguration,
-    auditObject: AuditResultInterface,
+    audit: AuditResultInterface,
     region: string
   ) => {
     let isEncrypted = false
     for (const rule of config.Rules) {
       if (rule.ApplyServerSideEncryptionByDefault?.SSEAlgorithm === 'AES256') {
         isEncrypted = true
-        auditObject.state = 'WARNING'
+        audit.state = 'WARNING'
       }
       if (rule.ApplyServerSideEncryptionByDefault?.KMSMasterKeyID) {
         isEncrypted = true
-        auditObject.state = await this.isKeyTrusted(
+        audit.state = await this.isKeyTrusted(
           rule.ApplyServerSideEncryptionByDefault.KMSMasterKeyID,
           this.keyType,
           region
@@ -98,7 +98,7 @@ export default class TopicEncrypted extends AWS {
       }
     }
     if (isEncrypted === false) {
-      auditObject.state = 'FAIL'
+      audit.state = 'FAIL'
     }
   }
 
@@ -106,7 +106,7 @@ export default class TopicEncrypted extends AWS {
     const options = this.getOptions()
     const s3 = new this.AWS.S3(options)
 
-    const auditObject: AuditResultInterface = {
+    const audit: AuditResultInterface = {
       name: resource,
       provider: 'aws',
       physicalId: resource,
@@ -129,27 +129,27 @@ export default class TopicEncrypted extends AWS {
         if (this.keyType === 'aws') {
           this.handleAwsKeyType(
             getBucket.ServerSideEncryptionConfiguration,
-            auditObject
+            audit
           )
         } else if (this.keyType === 'cmk') {
           await this.handleCmkKeyType(
             getBucket.ServerSideEncryptionConfiguration,
-            auditObject,
+            audit,
             region
           )
         } else {
           throw 'unsupported key type'
         }
       } else {
-        auditObject.state = 'FAIL'
+        audit.state = 'FAIL'
       }
     } catch (err) {
       if (err.code === 'ServerSideEncryptionConfigurationNotFoundError') {
-        auditObject.state = 'FAIL'
+        audit.state = 'FAIL'
       }
     }
 
-    this.audits.push(auditObject)
+    this.audits.push(audit)
   }
 
   scan = async ({ region, resource }: { region: string; resource: string }) => {
