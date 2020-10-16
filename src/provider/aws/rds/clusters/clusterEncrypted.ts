@@ -52,6 +52,7 @@ export default class ClusterEncrypted extends AWS {
       profile: params.profile,
       resourceId: params.resourceId,
       region: params.region,
+      verbosity: params.verbosity,
       rule,
     })
     this.keyType = params.keyType
@@ -122,6 +123,7 @@ export const handler = async (args: ClusterEncryptedCliInterface) => {
     profile: args.profile,
     resourceId: args.resourceId,
     keyType: args.keyType,
+    verbosity: args.verbosity,
   })
 
   await scanner.start()

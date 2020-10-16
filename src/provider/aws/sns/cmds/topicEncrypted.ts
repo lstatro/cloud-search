@@ -44,6 +44,7 @@ export default class TopicEncrypted extends AWS {
       profile: params.profile,
       resourceId: params.resourceId,
       region: params.region,
+      verbosity: params.verbosity,
       rule,
     })
     this.keyType = params.keyType
@@ -114,6 +115,7 @@ export const handler = async (args: TopicEncryptedInterface) => {
     profile: args.profile,
     resourceId: args.resourceId,
     keyType: args.keyType,
+    verbosity: args.verbosity,
   })
 
   await scanner.start()

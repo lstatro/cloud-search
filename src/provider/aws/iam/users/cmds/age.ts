@@ -42,6 +42,7 @@ export default class MaxKeyAge extends AWS {
       profile: params.profile,
       resourceId: params.resourceId,
       region: params.region,
+      verbosity: params.verbosity,
       rule,
     })
     this.maxAge = params.maxAge
@@ -133,6 +134,7 @@ export const handler = async (args: MaxKeyAgeCliInterface) => {
     profile: args.profile,
     resourceId: args.resourceId,
     maxAge: args.maxAge,
+    verbosity: args.verbosity,
   })
 
   await scanner.start()
