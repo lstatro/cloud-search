@@ -10,7 +10,7 @@ import {
   Snapshot,
   Volume,
 } from 'aws-sdk/clients/ec2'
-import { KeyMetadata } from 'aws-sdk/clients/kms'
+import { KeyMetadata, KeyListEntry } from 'aws-sdk/clients/kms'
 import { Role, User } from 'aws-sdk/clients/iam'
 import { Topic } from 'aws-sdk/clients/sns'
 import { QueueUrlList } from 'aws-sdk/clients/sqs'
@@ -153,6 +153,8 @@ export default abstract class AwsService extends Provider {
       this.handleSpinnerStatus({ method: 'succeed' })
     } catch (err) {
       this.handleSpinnerStatus({ method: 'fail', message: err.message })
+      /** we want to rethrow this so that tests outright fail and the user can see the reason why */
+      throw err
     }
   }
 
@@ -252,31 +254,30 @@ export default abstract class AwsService extends Provider {
     return volumes
   }
 
-  /** commented out till we create a control for kms keys */
-  // listKeys = async (region: string) => {
-  //   const options = this.getOptions()
-  //   options.region = region
+  listKeys = async (region: string) => {
+    const options = this.getOptions()
+    options.region = region
 
-  //   const kms = new this.AWS.KMS(options)
+    const kms = new this.AWS.KMS(options)
 
-  //   let marker: string | undefined
+    let marker: string | undefined
 
-  //   let keys: KeyListEntry[] = []
+    let keys: KeyListEntry[] = []
 
-  //   do {
-  //     const listKeys = await kms
-  //       .listKeys({
-  //         Marker: marker,
-  //       })
-  //       .promise()
-  //     marker = listKeys.NextMarker
-  //     if (listKeys.Keys) {
-  //       keys = keys.concat(listKeys.Keys)
-  //     }
-  //   } while (marker)
+    do {
+      const listKeys = await kms
+        .listKeys({
+          Marker: marker,
+        })
+        .promise()
+      marker = listKeys.NextMarker
+      if (listKeys.Keys) {
+        keys = keys.concat(listKeys.Keys)
+      }
+    } while (marker)
 
-  //   return keys
-  // }
+    return keys
+  }
 
   listUsers = async () => {
     /** no need to set a region iam is global */

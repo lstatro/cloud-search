@@ -276,7 +276,7 @@ describe('security group with a public permission', () => {
     class Err extends Error {
       code = 'potato'
     }
-    const myErr = new Err('lol')
+    const myErr = new Err('test error')
     mock('EC2', 'describeSecurityGroups', Promise.reject(myErr))
     const audits = await handler({
       region: 'us-east-1',
