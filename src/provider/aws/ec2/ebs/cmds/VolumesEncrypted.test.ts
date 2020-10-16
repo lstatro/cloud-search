@@ -1,7 +1,7 @@
 import 'mocha'
 import { mock, restore } from 'aws-sdk-mock'
 import { SinonFakeTimers, useFakeTimers } from 'sinon'
-import { handler, VolumesEncryptedCliInterface } from './volumesEncrypted'
+import { handler } from './volumesEncrypted'
 import { expect } from 'chai'
 
 describe('ebs volume encryption', () => {
@@ -25,15 +25,27 @@ describe('ebs volume encryption', () => {
         {
           VolumeId: 'test',
           Encrypted: true,
+          KmsKeyId: 'test',
         },
       ],
     })
     const audits = await handler({
-      region: 'all',
+      region: 'test',
       profile: 'test',
       keyType: 'aws',
-    } as VolumesEncryptedCliInterface)
-    expect(audits[0].state).to.eql('OK')
+    })
+    expect(audits).to.eql([
+      {
+        provider: 'aws',
+        physicalId: 'test',
+        service: 'ebs',
+        rule: 'VolumesEncrypted',
+        region: 'test',
+        state: 'OK',
+        profile: 'test',
+        time: '1970-01-01T00:00:00.000Z',
+      },
+    ])
   })
 
   it('should return FAIL for un-encrypted volumes', async () => {
@@ -50,30 +62,22 @@ describe('ebs volume encryption', () => {
       region: 'all',
       profile: 'test',
       keyType: 'aws',
-    } as VolumesEncryptedCliInterface)
-    expect(audits[0].state).to.eql('FAIL')
-  })
-
-  it('should return WARNING for encrypted volumes using the wrong key (type AWS)', async () => {
-    mock('KMS', 'describeKey', { KeyMetadata: { KeyManager: 'AWS' } })
-    mock('EC2', 'describeVolumes', {
-      Volumes: [
-        {
-          VolumeId: 'test',
-          Encrypted: true,
-        },
-      ],
     })
-    const audits = await handler({
-      region: 'all',
-      profile: 'test',
-      keyType: 'aws',
-      keyArn: '_test',
-    } as VolumesEncryptedCliInterface)
-    expect(audits[0].state).to.eql('WARNING')
+    expect(audits).to.eql([
+      {
+        provider: 'aws',
+        physicalId: 'test',
+        service: 'ebs',
+        rule: 'VolumesEncrypted',
+        region: 'us-east-1',
+        state: 'FAIL',
+        profile: 'test',
+        time: '1970-01-01T00:00:00.000Z',
+      },
+    ])
   })
 
-  it('should return OK for encrypted volumes using the correct key (type AWS)', async () => {
+  it('should return OK for aws key encrypted volumes using the aws key type', async () => {
     mock('KMS', 'describeKey', { KeyMetadata: { KeyManager: 'AWS' } })
     mock('EC2', 'describeVolumes', {
       Volumes: [
@@ -84,131 +88,57 @@ describe('ebs volume encryption', () => {
         },
       ],
     })
-    const audits = await handler({
-      region: 'all',
-      profile: 'test',
-      keyType: 'aws',
-      keyArn: 'test',
-    } as VolumesEncryptedCliInterface)
-    expect(audits[0].state).to.eql('OK')
-  })
 
-  it('should return WARNING for encrypted volumes using the wrong cmk key (type CMK)', async () => {
-    mock('KMS', 'describeKey', { KeyMetadata: { KeyManager: 'AWS' } })
-    mock('EC2', 'describeVolumes', {
-      Volumes: [
-        {
-          VolumeId: 'test',
-          Encrypted: true,
-          KmsKeyId: 'test',
-        },
-      ],
-    })
-    const audits = await handler({
-      region: 'all',
-      profile: 'test',
-      keyType: 'cmk',
-      keyArn: '_test',
-    } as VolumesEncryptedCliInterface)
-    expect(audits[0].state).to.eql('WARNING')
-  })
-
-  it('should return FAIL for un-encrypted volumes using the wrong cmk key (type CMK)', async () => {
-    mock('KMS', 'describeKey', { KeyMetadata: { KeyManager: 'AWS' } })
-    mock('EC2', 'describeVolumes', {
-      Volumes: [
-        {
-          VolumeId: 'test',
-          Encrypted: false,
-          KmsKeyId: 'test',
-        },
-      ],
-    })
-    const audits = await handler({
-      region: 'all',
-      profile: 'test',
-      keyType: 'cmk',
-      keyArn: '_test',
-    } as VolumesEncryptedCliInterface)
-    expect(audits[0].state).to.eql('FAIL')
-  })
-
-  it('should return OK for encrypted volumes using the wrong cmk key (type CMK)', async () => {
-    mock('KMS', 'describeKey', { KeyMetadata: { KeyManager: 'AWS' } })
-    mock('EC2', 'describeVolumes', {
-      Volumes: [
-        {
-          VolumeId: 'test',
-          Encrypted: true,
-          KmsKeyId: 'test',
-        },
-      ],
-    })
-    const audits = await handler({
-      region: 'all',
-      profile: 'test',
-      keyType: 'cmk',
-      keyArn: 'test',
-    } as VolumesEncryptedCliInterface)
-    expect(audits[0].state).to.eql('OK')
-  })
-
-  it('should return WARNING for encrypted volumes with an unknown or undefined key (type CMK)', async () => {
-    mock('KMS', 'describeKey', { KeyMetadata: { KeyManager: 'AWS' } })
-    mock('EC2', 'describeVolumes', {
-      Volumes: [
-        {
-          VolumeId: 'test',
-          Encrypted: true,
-        },
-      ],
-    })
-    const audits = await handler({
-      region: 'all',
-      profile: 'test',
-      keyType: 'cmk',
-      keyArn: 'test',
-    } as VolumesEncryptedCliInterface)
-    expect(audits[0].state).to.eql('WARNING')
-  })
-
-  it('should return OK for encrypted volumes with a known cmk kms key', async () => {
-    mock('KMS', 'describeKey', { KeyMetadata: { KeyManager: 'CUSTOMER' } })
-    mock('EC2', 'describeVolumes', {
-      Volumes: [
-        {
-          VolumeId: 'test',
-          Encrypted: true,
-          KmsKeyId: 'test',
-        },
-      ],
-    })
-    const audits = await handler({
-      region: 'all',
-      profile: 'test',
-      keyType: 'cmk',
-    } as VolumesEncryptedCliInterface)
-    expect(audits[0].state).to.eql('OK')
-  })
-
-  it('should return OK for encrypted volumes with a resourceId', async () => {
-    mock('KMS', 'describeKey', { KeyMetadata: { KeyManager: 'AWS' } })
-    mock('EC2', 'describeVolumes', {
-      Volumes: [
-        {
-          VolumeId: 'test',
-          Encrypted: true,
-          KmsKeyId: 'test',
-        },
-      ],
-    })
     const audits = await handler({
       region: 'test',
       profile: 'test',
       keyType: 'aws',
-      resourceId: 'test',
-    } as VolumesEncryptedCliInterface)
-    expect(audits[0].state).to.eql('OK')
+    })
+
+    expect(audits).to.eql([
+      {
+        provider: 'aws',
+        physicalId: 'test',
+        service: 'ebs',
+        rule: 'VolumesEncrypted',
+        region: 'test',
+        state: 'OK',
+        profile: 'test',
+        time: '1970-01-01T00:00:00.000Z',
+      },
+    ])
+  })
+
+  it('should return WARNING for aws key encrypted volumes using the cmk key type', async () => {
+    mock('KMS', 'describeKey', { KeyMetadata: { KeyManager: 'AWS' } })
+    mock('EC2', 'describeVolumes', {
+      Volumes: [
+        {
+          VolumeId: 'test',
+          Encrypted: true,
+          KmsKeyId: 'test',
+        },
+      ],
+    })
+
+    const audits = await handler({
+      region: 'test',
+      profile: 'test',
+      keyType: 'cmk',
+    })
+
+    expect(audits).to.eql([
+      {
+        provider: 'aws',
+        physicalId: 'test',
+        service: 'ebs',
+        rule: 'VolumesEncrypted',
+        region: 'test',
+        state: 'WARNING',
+        profile: 'test',
+        time: '1970-01-01T00:00:00.000Z',
+      },
+    ])
   })
 
   it('should do nothing if there are no volumes', async () => {
@@ -219,7 +149,7 @@ describe('ebs volume encryption', () => {
       profile: 'test',
       keyType: 'aws',
       resourceId: 'test',
-    } as VolumesEncryptedCliInterface)
+    })
     expect(audits).to.eql([])
   })
 
@@ -231,7 +161,7 @@ describe('ebs volume encryption', () => {
       profile: 'test',
       keyType: 'aws',
       resourceId: 'test',
-    } as VolumesEncryptedCliInterface)
+    })
     expect(audits).to.eql([])
   })
 })
