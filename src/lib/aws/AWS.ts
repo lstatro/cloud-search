@@ -26,7 +26,7 @@ interface AWSParamsInterface {
 
 interface ScanInterface {
   region?: string
-  resourceId?: string
+  resource?: unknown
 }
 
 interface KeyCacheInterface extends KeyMetadata {
@@ -35,7 +35,7 @@ interface KeyCacheInterface extends KeyMetadata {
 
 interface AuditInterface {
   [key: string]: unknown
-  resourceId: unknown
+  resource: unknown
   region?: string
 }
 
@@ -146,7 +146,7 @@ export default abstract class AwsService extends Provider {
           this.region !== 'all',
           'must provide a region for a resource specific scan'
         )
-        await this.scan({ region: this.region, resourceId: this.resourceId })
+        await this.scan({ region: this.region, resource: this.resourceId })
       } else {
         await this.handleRegions()
       }

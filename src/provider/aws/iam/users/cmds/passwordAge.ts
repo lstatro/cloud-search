@@ -1,4 +1,4 @@
-/** TODO: this needs to support resourceId */
+/** TODO: this needs to support resource */
 
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import AWS from '../../../../../lib/aws/AWS'
@@ -47,13 +47,13 @@ export default class PasswordAge extends AWS {
     this.maxAge = params.maxAge
   }
 
-  async audit({ resourceId }: { resourceId: string }) {
+  async audit({ resource }: { resource: string }) {
     const iam = new this.AWS.IAM(this.options)
     let createDate
     try {
       const getLoginProfile = await iam
         .getLoginProfile({
-          UserName: resourceId,
+          UserName: resource,
         })
         .promise()
 
@@ -64,7 +64,7 @@ export default class PasswordAge extends AWS {
       assert(err.code === 'NoSuchEntity', err)
     }
 
-    this.validate(resourceId, createDate)
+    this.validate(resource, createDate)
   }
 
   validate = (userName: string, createDate?: Date) => {
@@ -102,14 +102,14 @@ export default class PasswordAge extends AWS {
     this.audits.push(auditObject)
   }
 
-  scan = async ({ resourceId }: { resourceId: string }) => {
-    if (resourceId) {
-      await this.audit({ resourceId })
+  scan = async ({ resource }: { resource: string }) => {
+    if (resource) {
+      await this.audit({ resource })
     } else {
       const users = await this.listUsers()
 
       for (const user of users) {
-        await this.audit({ resourceId: user.UserName })
+        await this.audit({ resource: user.UserName })
       }
     }
   }

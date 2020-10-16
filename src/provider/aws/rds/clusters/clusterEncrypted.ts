@@ -26,7 +26,7 @@ export const desc = `RDS clusters must have their stroage at rest encrypted
   WARNING - RDS cluster storage is encrypted but not with the specified key type
   FAIL    - RDS cluster storage is not encrypted at rest
 
-  resourceId: RDS clusters ARN
+  resource: RDS clusters ARN
 
   note: this rule targets DB Clusters not DB Instances' (MySQL, PostgreSQL, Oracle, MariaDB, MSSQL).
 
@@ -58,16 +58,10 @@ export default class ClusterEncrypted extends AWS {
     this.keyType = params.keyType
   }
 
-  async audit({
-    resourceId,
-    region,
-  }: {
-    resourceId: DBCluster
-    region: string
-  }) {
+  async audit({ resource, region }: { resource: DBCluster; region: string }) {
     const auditObject: AuditResultInterface = {
       provider: 'aws',
-      physicalId: resourceId.DBClusterArn,
+      physicalId: resource.DBClusterArn,
       service: this.service,
       rule: this.rule,
       region: region,
@@ -76,14 +70,14 @@ export default class ClusterEncrypted extends AWS {
       time: new Date().toISOString(),
     }
 
-    if (typeof resourceId.KmsKeyId === 'string') {
+    if (typeof resource.KmsKeyId === 'string') {
       /** if there is a key it should be encrypted, if not, something unexpected is going on */
       assert(
-        resourceId.StorageEncrypted === true,
+        resource.StorageEncrypted === true,
         'key found, but rds instance is not encrypted'
       )
       auditObject.state = await this.isKeyTrusted(
-        resourceId.KmsKeyId,
+        resource.KmsKeyId,
         this.keyType,
         region
       )
@@ -93,16 +87,10 @@ export default class ClusterEncrypted extends AWS {
     this.audits.push(auditObject)
   }
 
-  scan = async ({
-    resourceId,
-    region,
-  }: {
-    resourceId: string
-    region: string
-  }) => {
+  scan = async ({ resource, region }: { resource: string; region: string }) => {
     let clusters
-    if (resourceId) {
-      clusters = await this.listDBClusters(region, resourceId)
+    if (resource) {
+      clusters = await this.listDBClusters(region, resource)
     } else {
       clusters = await this.listDBClusters(region)
     }
@@ -110,7 +98,7 @@ export default class ClusterEncrypted extends AWS {
     for (const cluster of clusters) {
       assert(cluster.DBClusterArn, 'a cluster must have a ARN')
       await this.audit({
-        resourceId: cluster,
+        resource: cluster,
         region,
       })
     }

@@ -34,17 +34,17 @@ export default class PublicPermission extends AWS {
   }
 
   audit = async ({
-    resourceId,
+    resource,
     region,
   }: {
-    resourceId: SecurityGroup
+    resource: SecurityGroup
     region: string
   }) => {
     let suspect
     /** does the security group have any inbound permissions? */
-    if (resourceId.IpPermissions) {
+    if (resource.IpPermissions) {
       /** for each permission in the group lets look for something bad */
-      for (const permission of resourceId.IpPermissions) {
+      for (const permission of resource.IpPermissions) {
         /** are there any ranges */
         if (permission.IpRanges) {
           /** we need to inspect each range in the group */
@@ -70,9 +70,9 @@ export default class PublicPermission extends AWS {
       }
     }
     this.audits.push({
-      name: resourceId.GroupName,
+      name: resource.GroupName,
       provider: 'aws',
-      physicalId: resourceId.GroupId,
+      physicalId: resource.GroupId,
       service: this.service,
       rule,
       region: region,
@@ -89,14 +89,14 @@ export default class PublicPermission extends AWS {
 
   scan = async ({
     region,
-    resourceId,
+    resource,
   }: {
     region: string
-    resourceId?: string
+    resource?: string
   }) => {
-    const groups = await this.describeSecurityGroups(region, resourceId)
+    const groups = await this.describeSecurityGroups(region, resource)
     for (const group of groups) {
-      await this.audit({ resourceId: group, region })
+      await this.audit({ resource: group, region })
     }
   }
 }

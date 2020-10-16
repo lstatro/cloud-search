@@ -37,16 +37,16 @@ export default class PublicInstance extends AWS {
 
   async audit({
     publiclyAccessible,
-    resourceId,
+    resource,
     region,
   }: {
     publiclyAccessible: boolean | undefined
-    resourceId: string
+    resource: string
     region: string
   }) {
     const auditObject: AuditResultInterface = {
       provider: 'aws',
-      physicalId: resourceId,
+      physicalId: resource,
       service: this.service,
       rule: this.rule,
       region: region,
@@ -80,7 +80,7 @@ export default class PublicInstance extends AWS {
       assert(instance.DBInstanceArn, 'instances must have a ARN')
       await this.audit({
         publiclyAccessible: instance.PubliclyAccessible,
-        resourceId: instance.DBInstanceArn,
+        resource: instance.DBInstanceArn,
         region,
       })
     }
