@@ -342,37 +342,8 @@ export default abstract class AwsService extends Provider {
       }
       return
     } catch (err) {
-      /** do nothing, just move on to checking all regions for the key */
+      /** do nothing, eat the error and move on */
     }
-
-    const regions = await this.describeRegions()
-
-    for (const _region of regions) {
-      try {
-        this.spinner.text = `${_region} - key inventory`
-
-        options.region = _region
-
-        const kms = new this.AWS.KMS(options)
-        const describeKey = await kms
-          .describeKey({
-            KeyId: keyId,
-          })
-          .promise()
-        if (describeKey.KeyMetadata) {
-          const keyMetaData = { ...describeKey.KeyMetadata, givenKeyId: keyId }
-          this.keyMetaData = this.keyMetaData.concat(keyMetaData)
-        }
-        return
-      } catch (err) {
-        /** do nothing, just keep checking the next region */
-      }
-    }
-
-    /**
-     * if we make it out of the region loop w/o finding the key it doesn't
-     * exist
-     */
   }
 
   findKey = async (keyId: string, region: string) => {

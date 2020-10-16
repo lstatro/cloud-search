@@ -15,13 +15,9 @@ const epilogue = `
   managed (CMK).  We view CMK's as "more secure" then AWS managed keys as they
   support more levels of rotation.  
 
-• Scans looking for CMK as the source key type will report resources  using AWS 
+• Scans looking for CMK as the source key type will report resources using AWS 
   managed keys for encryption as 'WARNING' instead of 'FAIL'.  This was done 
   intentionally as some level of encryption is better then no encryption.
-
-• All keys in all regions regardless of the requested region have metadata read
-  into the system.  This is because keys may encrypt resources in any region
-  regardless of the region the key resides. (Deprecated, and out right wrong!)
 
 • If a key used to encrypt an object no longer exists it is possible that the
   resource is encrypted, but scans will still report FAIL.  This is because the
@@ -33,14 +29,18 @@ const epilogue = `
 ********************************************************************************
 `
 
+const opts = {
+  exclude: /.*.test.js/,
+}
+
 export const builder = (yargs: Argv) => {
   return yargs
-    .commandDir('./aws/ec2')
-    .commandDir('./aws/s3')
-    .commandDir('./aws/iam')
-    .commandDir('./aws/sns')
-    .commandDir('./aws/sqs')
-    .commandDir('./aws/rds')
+    .commandDir('./aws/ec2', opts)
+    .commandDir('./aws/s3', opts)
+    .commandDir('./aws/iam', opts)
+    .commandDir('./aws/sns', opts)
+    .commandDir('./aws/sqs', opts)
+    .commandDir('./aws/rds', opts)
     .demandCommand(1)
     .option('region', {
       alias: 'r',

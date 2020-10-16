@@ -1,7 +1,7 @@
 import 'mocha'
 import { useFakeTimers, SinonFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { handler, TopicEncryptedCliInterface } from './topicEncrypted'
+import { handler } from './topicEncrypted'
 import { expect } from 'chai'
 
 describe('sns topic encryption', () => {
@@ -27,7 +27,7 @@ describe('sns topic encryption', () => {
       region: 'us-east-1',
       profile: 'test',
       keyType: 'aws',
-    } as TopicEncryptedCliInterface)
+    })
     expect(audits).to.eql([])
   })
 
@@ -46,7 +46,7 @@ describe('sns topic encryption', () => {
       region: 'us-east-1',
       profile: 'test',
       keyType: 'aws',
-    } as TopicEncryptedCliInterface)
+    })
     expect(audits).to.eql([
       {
         name: 'test',
@@ -75,7 +75,7 @@ describe('sns topic encryption', () => {
       region: 'us-east-1',
       profile: 'test',
       keyType: 'aws',
-    } as TopicEncryptedCliInterface)
+    })
     expect(audits).to.eql([
       {
         name: 'test',
@@ -111,7 +111,7 @@ describe('sns topic encryption', () => {
       region: 'us-east-1',
       profile: 'test',
       keyType: 'aws',
-    } as TopicEncryptedCliInterface)
+    })
     expect(audits).to.eql([
       {
         name: 'test',
@@ -148,7 +148,7 @@ describe('sns topic encryption', () => {
       profile: 'test',
       resourceId: 'test',
       keyType: 'cmk',
-    } as TopicEncryptedCliInterface)
+    })
     expect(audits).to.eql([
       {
         name: 'test',
@@ -185,7 +185,7 @@ describe('sns topic encryption', () => {
       profile: 'test',
       resourceId: 'test',
       keyType: 'cmk',
-    } as TopicEncryptedCliInterface)
+    })
     expect(audits).to.eql([
       {
         name: 'test',
@@ -220,7 +220,7 @@ describe('sns topic encryption', () => {
       profile: 'test',
       resourceId: 'test',
       keyType: 'cmk',
-    } as TopicEncryptedCliInterface)
+    })
     expect(audits).to.eql([
       {
         name: 'test',
@@ -255,7 +255,7 @@ describe('sns topic encryption', () => {
       profile: 'test',
       resourceId: 'test',
       keyType: 'cmk',
-    } as TopicEncryptedCliInterface)
+    })
     expect(audits).to.eql([
       {
         name: 'test',
@@ -292,7 +292,7 @@ describe('sns topic encryption', () => {
       profile: 'test',
       resourceId: 'test',
       keyType: 'test' as 'aws',
-    } as TopicEncryptedCliInterface)
+    })
     expect(audits).to.eql([])
   })
 
@@ -302,7 +302,7 @@ describe('sns topic encryption', () => {
       region: 'us-east-1',
       profile: 'test',
       keyType: 'aws',
-    } as TopicEncryptedCliInterface)
+    })
     expect(audits).to.eql([])
   })
 })

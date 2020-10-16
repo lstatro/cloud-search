@@ -3,9 +3,13 @@ import { Argv } from 'yargs'
 export const command = 'users'
 export const desc = 'IAM user rules'
 
+const opts = {
+  exclude: /.*.test.js/,
+}
+
 export const builder = (yargs: Argv) => {
   return yargs
-    .commandDir('cmds')
+    .commandDir('cmds', opts)
     .demandCommand(1)
     .example([
       [
