@@ -88,10 +88,16 @@ export default class ClusterEncrypted extends AWS {
     this.audits.push(audit)
   }
 
-  scan = async ({ resource, region }: { resource: string; region: string }) => {
+  scan = async ({
+    resourceId,
+    region,
+  }: {
+    resourceId: string
+    region: string
+  }) => {
     let clusters
-    if (resource) {
-      clusters = await this.listDBClusters(region, resource)
+    if (resourceId) {
+      clusters = await this.listDBClusters(region, resourceId)
     } else {
       clusters = await this.listDBClusters(region)
     }

@@ -71,12 +71,12 @@ export default class IgwAttachedToVpc extends AWS {
 
   scan = async ({
     region,
-    resource,
+    resourceId,
   }: {
     region: string
-    resource?: string
+    resourceId?: string
   }) => {
-    const igws = await this.describeInternetGateways(region, resource)
+    const igws = await this.describeInternetGateways(region, resourceId)
     for (const igw of igws) {
       this.audit({ resource: igw, region })
     }

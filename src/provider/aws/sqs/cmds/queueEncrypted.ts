@@ -97,9 +97,15 @@ export default class TopicEncrypted extends AWS {
     this.audits.push(audit)
   }
 
-  scan = async ({ region, resource }: { region: string; resource: string }) => {
-    if (resource) {
-      await this.audit({ resource, region })
+  scan = async ({
+    resourceId,
+    region,
+  }: {
+    resourceId: string
+    region: string
+  }) => {
+    if (resourceId) {
+      await this.audit({ resource: resourceId, region })
     } else {
       const queues = await this.listQueues(region)
       for (const queue of queues) {

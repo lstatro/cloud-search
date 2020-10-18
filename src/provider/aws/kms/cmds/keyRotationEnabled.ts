@@ -71,9 +71,15 @@ export default class KeyRotationEnabled extends AWS {
     }
   }
 
-  scan = async ({ resource, region }: { resource: string; region: string }) => {
-    if (resource) {
-      await this.audit({ resource, region })
+  scan = async ({
+    resourceId,
+    region,
+  }: {
+    resourceId: string
+    region: string
+  }) => {
+    if (resourceId) {
+      await this.audit({ resource: resourceId, region })
     } else {
       const keys = await this.listKeys(region)
       for (const key of keys) {

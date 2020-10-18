@@ -105,7 +105,6 @@ describe('iam user key age', () => {
   it('should handle no users', async () => {
     mock('IAM', 'listUsers', {})
     const audits = await handler({
-      resourceId: 'test',
       region: 'all',
       maxAge: 30,
       profile: 'test',

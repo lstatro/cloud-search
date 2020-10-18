@@ -82,10 +82,16 @@ export default class PublicInstance extends AWS {
     this.audits.push(audit)
   }
 
-  scan = async ({ resource, region }: { resource: string; region: string }) => {
+  scan = async ({
+    resourceId,
+    region,
+  }: {
+    resourceId: string
+    region: string
+  }) => {
     let instances
-    if (resource) {
-      instances = await this.listDBInstances(region, resource)
+    if (resourceId) {
+      instances = await this.listDBInstances(region, resourceId)
     } else {
       instances = await this.listDBInstances(region)
     }

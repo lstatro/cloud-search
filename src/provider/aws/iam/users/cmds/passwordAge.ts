@@ -102,9 +102,9 @@ export default class PasswordAge extends AWS {
     this.audits.push(audit)
   }
 
-  scan = async ({ resource }: { resource: string }) => {
-    if (resource) {
-      await this.audit({ resource })
+  scan = async ({ resourceId }: { resourceId: string }) => {
+    if (resourceId) {
+      await this.audit({ resource: resourceId })
     } else {
       const users = await this.listUsers()
 

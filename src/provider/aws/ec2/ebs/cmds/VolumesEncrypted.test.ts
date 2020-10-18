@@ -157,7 +157,7 @@ describe('ebs volume encryption', () => {
     mock('KMS', 'describeKey', { KeyMetadata: { KeyManager: 'AWS' } })
     mock('EC2', 'describeVolumes', {})
     const audits = await handler({
-      region: 'all',
+      region: 'us-east-1',
       profile: 'test',
       keyType: 'aws',
       resourceId: 'test',

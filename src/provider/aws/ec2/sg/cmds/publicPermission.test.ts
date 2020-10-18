@@ -278,11 +278,17 @@ describe('security group with a public permission', () => {
     }
     const myErr = new Err('test error')
     mock('EC2', 'describeSecurityGroups', Promise.reject(myErr))
-    const audits = await handler({
-      region: 'us-east-1',
-      profile: 'test',
-      resourceId: 'test',
-    } as AWSScannerCliArgsInterface)
-    expect(audits).to.eql([])
+    let audits
+    try {
+      audits = await handler({
+        region: 'us-east-1',
+        profile: 'test',
+        resourceId: 'test',
+      } as AWSScannerCliArgsInterface)
+    } catch (err) {
+      audits = err
+    }
+
+    expect(audits instanceof Error).to.be.true
   })
 })

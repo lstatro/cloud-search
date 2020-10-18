@@ -92,15 +92,15 @@ export default class VolumesEncrypted extends AWS {
 
   scan = async ({
     region,
-    resource,
+    resourceId,
   }: {
     region: string
-    resource?: string
+    resourceId?: string
   }) => {
     const options = this.getOptions()
     options.region = region
 
-    const volumes = await this.describeVolumes(region, resource)
+    const volumes = await this.describeVolumes(region, resourceId)
 
     for (const volume of volumes) {
       this.audit({ resource: volume, region })

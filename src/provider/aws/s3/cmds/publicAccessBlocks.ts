@@ -79,9 +79,9 @@ export default class PublicAccessBlocks extends AWS {
     this.audits.push(audit)
   }
 
-  scan = async ({ resource }: { resource: string }) => {
-    if (resource) {
-      await this.audit({ resource })
+  scan = async ({ resourceId }: { resourceId: string }) => {
+    if (resourceId) {
+      await this.audit({ resource: resourceId })
     } else {
       const buckets = await this.listBuckets()
       for (const bucket of buckets) {

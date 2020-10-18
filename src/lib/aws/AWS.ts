@@ -1,4 +1,4 @@
-import { AWSClientOptionsInterface, VerbosityType } from 'cloud-search'
+import { AWSClientOptionsInterface, AWSParamsInterface } from 'cloud-search'
 import _AWS from 'aws-sdk'
 import Provider from '../Provider'
 
@@ -16,17 +16,9 @@ import { Topic } from 'aws-sdk/clients/sns'
 import { QueueUrlList } from 'aws-sdk/clients/sqs'
 import { DBCluster, DBInstance } from 'aws-sdk/clients/rds'
 
-interface AWSParamsInterface {
-  profile: string
-  rule: string
-  resourceId?: string
-  region: string
-  verbosity?: VerbosityType
-}
-
 interface ScanInterface {
   region?: string
-  resource?: unknown
+  resourceId?: unknown
 }
 
 interface KeyCacheInterface extends KeyMetadata {
@@ -146,7 +138,7 @@ export default abstract class AwsService extends Provider {
           this.region !== 'all',
           'must provide a region for a resource specific scan'
         )
-        await this.scan({ region: this.region, resource: this.resourceId })
+        await this.scan({ region: this.region, resourceId: this.resourceId })
       } else {
         await this.handleRegions()
       }

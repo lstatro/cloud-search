@@ -86,12 +86,12 @@ export default class PublicPermission extends AWS {
 
   scan = async ({
     region,
-    resource,
+    resourceId,
   }: {
     region: string
-    resource?: string
+    resourceId?: string
   }) => {
-    const groups = await this.describeSecurityGroups(region, resource)
+    const groups = await this.describeSecurityGroups(region, resourceId)
     for (const group of groups) {
       await this.audit({ resource: group, region })
     }

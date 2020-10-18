@@ -125,12 +125,12 @@ export default class PublicRole extends AWS {
     this.audits.push(audit)
   }
 
-  scan = async ({ resource }: { resource: string }) => {
-    if (resource) {
+  scan = async ({ resourceId }: { resourceId: string }) => {
+    if (resourceId) {
       const iam = new this.AWS.IAM(this.options)
       const getRole = await iam
         .getRole({
-          RoleName: resource,
+          RoleName: resourceId,
         })
         .promise()
       assert(getRole.Role, 'unable to find role')
@@ -139,7 +139,7 @@ export default class PublicRole extends AWS {
         'unable to find trust document'
       )
       await this.audit({
-        resource,
+        resource: resourceId,
         policyDocument: getRole.Role.AssumeRolePolicyDocument,
       })
     } else {

@@ -1,8 +1,4 @@
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-  AWSScannerCliArgsInterface,
-} from 'cloud-search'
+import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import assert from 'assert'
 
 import AWS from '../../../../../lib/aws/AWS'
@@ -79,9 +75,15 @@ export default class PublicSnapshot extends AWS {
     this.audits.push(audit)
   }
 
-  scan = async ({ region, resource }: { region: string; resource: string }) => {
-    if (resource) {
-      await this.audit({ resource, region })
+  scan = async ({
+    region,
+    resourceId,
+  }: {
+    region: string
+    resourceId: string
+  }) => {
+    if (resourceId) {
+      await this.audit({ resource: resourceId, region })
     } else {
       const snapshots = await this.listSnapshots(region)
       for (const snapshot of snapshots) {
@@ -92,7 +94,7 @@ export default class PublicSnapshot extends AWS {
   }
 }
 
-export const handler = async (args: AWSScannerCliArgsInterface) => {
+export const handler = async (args: AWSScannerInterface) => {
   const scanner = new PublicSnapshot({
     region: args.region,
     profile: args.profile,
