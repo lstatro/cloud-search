@@ -1,7 +1,7 @@
 import 'mocha'
 import { useFakeTimers, SinonFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { handler, ClusterEncryptedCliInterface } from './clusterEncrypted'
+import { handler } from './clusterEncrypted'
 import { expect } from 'chai'
 
 describe('rds cluster storage is encrypted at rest', () => {
@@ -29,7 +29,7 @@ describe('rds cluster storage is encrypted at rest', () => {
       region: 'test',
       profile: 'test',
       keyType: 'aws',
-    } as ClusterEncryptedCliInterface)
+    })
     expect(audits).to.eql([])
 
     restore()
@@ -41,7 +41,7 @@ describe('rds cluster storage is encrypted at rest', () => {
       region: 'all',
       profile: 'test',
       keyType: 'cmk',
-    } as ClusterEncryptedCliInterface)
+    })
     expect(audits).to.eql([])
   })
 
@@ -64,7 +64,7 @@ describe('rds cluster storage is encrypted at rest', () => {
       region: 'test',
       profile: 'test',
       keyType: 'aws',
-    } as ClusterEncryptedCliInterface)
+    })
     expect(audits).to.eql([
       {
         physicalId: 'test',
@@ -96,7 +96,7 @@ describe('rds cluster storage is encrypted at rest', () => {
       region: 'test',
       profile: 'test',
       keyType: 'aws',
-    } as ClusterEncryptedCliInterface)
+    })
     expect(audits).to.eql([
       {
         physicalId: 'test',
@@ -131,7 +131,7 @@ describe('rds cluster storage is encrypted at rest', () => {
       resourceId: 'test',
       profile: 'test',
       keyType: 'cmk',
-    } as ClusterEncryptedCliInterface)
+    })
     expect(audits).to.eql([
       {
         physicalId: 'test',
@@ -166,7 +166,7 @@ describe('rds cluster storage is encrypted at rest', () => {
       resourceId: 'test',
       profile: 'test',
       keyType: 'cmk',
-    } as ClusterEncryptedCliInterface)
+    })
     expect(audits).to.eql([
       {
         physicalId: 'test',

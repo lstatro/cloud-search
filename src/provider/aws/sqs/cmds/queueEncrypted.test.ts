@@ -2,7 +2,7 @@ import 'mocha'
 import { expect } from 'chai'
 import { useFakeTimers, SinonFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { handler, QueueEncryptedCliInterface } from './queueEncrypted'
+import { handler } from './queueEncrypted'
 
 describe('sqs topic encryption', () => {
   const now = new Date(0)
@@ -28,7 +28,7 @@ describe('sqs topic encryption', () => {
       profile: 'test',
 
       keyType: 'aws',
-    } as QueueEncryptedCliInterface)
+    })
     expect(audits).to.eql([])
   })
 
@@ -40,7 +40,7 @@ describe('sqs topic encryption', () => {
       profile: 'test',
 
       keyType: 'aws',
-    } as QueueEncryptedCliInterface)
+    })
     expect(audits).to.eql([])
   })
 
@@ -54,7 +54,7 @@ describe('sqs topic encryption', () => {
       profile: 'test',
 
       keyType: 'aws',
-    } as QueueEncryptedCliInterface)
+    })
     expect(audits).to.eql([
       {
         name: 'test',
@@ -80,7 +80,7 @@ describe('sqs topic encryption', () => {
       profile: 'test',
 
       keyType: 'aws',
-    } as QueueEncryptedCliInterface)
+    })
     expect(audits).to.eql([
       {
         name: 'test',
@@ -113,7 +113,7 @@ describe('sqs topic encryption', () => {
       profile: 'test',
 
       keyType: 'aws',
-    } as QueueEncryptedCliInterface)
+    })
     expect(audits).to.eql([
       {
         name: 'test',
@@ -141,7 +141,7 @@ describe('sqs topic encryption', () => {
       profile: 'test',
 
       keyType: 'aws',
-    } as QueueEncryptedCliInterface)
+    })
     expect(audits).to.eql([
       {
         name: 'test',
@@ -175,7 +175,7 @@ describe('sqs topic encryption', () => {
 
       keyType: 'aws',
       resourceId: 'test',
-    } as QueueEncryptedCliInterface)
+    })
     expect(audits).to.eql([
       {
         name: 'test',

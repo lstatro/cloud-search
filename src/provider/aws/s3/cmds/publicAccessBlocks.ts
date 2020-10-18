@@ -1,7 +1,7 @@
 import { GetPublicAccessBlockOutput } from 'aws-sdk/clients/s3'
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import assert from 'assert'
-import AWS from '../../../../lib/aws/AWS'
+import { AWS } from '../../../../lib/aws/AWS'
 
 interface PublicAccessBlocksInterface extends AWSScannerInterface {
   rule: string
@@ -17,24 +17,24 @@ export default class PublicAccessBlocks extends AWS {
       resourceId: params.resourceId,
       region: params.region,
       rule: params.rule,
+      verbosity: params.verbosity,
     })
   }
 
-  async audit({ resourceId }: { resourceId: string }) {
+  async audit({ resource }: { resource: string }) {
     const s3 = new this.AWS.S3(this.options)
     try {
       const getPublicAccessBlock = await s3
-        .getPublicAccessBlock({ Bucket: resourceId })
+        .getPublicAccessBlock({ Bucket: resource })
         .promise()
       assert(getPublicAccessBlock, 'unable to locate bucket')
-      this.validate(getPublicAccessBlock, resourceId)
+      this.validate(getPublicAccessBlock, resource)
     } catch (err) {
-      console.error(err.message)
-      const auditObject: AuditResultInterface = {
-        name: resourceId,
+      const audit: AuditResultInterface = {
+        name: resource,
         comment: err.code,
         provider: 'aws',
-        physicalId: resourceId,
+        physicalId: resource,
         service: this.service,
         rule: this.rule,
         region: this.region,
@@ -43,10 +43,10 @@ export default class PublicAccessBlocks extends AWS {
         time: new Date().toISOString(),
       }
       if (err.code === 'NoSuchPublicAccessBlockConfiguration') {
-        auditObject.state = 'FAIL'
-        auditObject.comment = err.code
+        audit.state = 'FAIL'
+        audit.comment = err.code
       }
-      this.audits.push(auditObject)
+      this.audits.push(audit)
     }
   }
 
@@ -57,7 +57,7 @@ export default class PublicAccessBlocks extends AWS {
     const config = getPublicAccessBlock.PublicAccessBlockConfiguration as {
       [key: string]: boolean
     }
-    const auditObject: AuditResultInterface = {
+    const audit: AuditResultInterface = {
       name: bucketName,
       provider: 'aws',
       physicalId: bucketName,
@@ -69,24 +69,24 @@ export default class PublicAccessBlocks extends AWS {
       time: new Date().toISOString(),
     }
     if (config[this.rule] === true) {
-      auditObject.state = 'OK'
+      audit.state = 'OK'
     } else if (config[this.rule] === false) {
-      auditObject.state = 'FAIL'
-      auditObject.comment = `${this.rule} explicitly disabled`
+      audit.state = 'FAIL'
+      audit.comment = `${this.rule} explicitly disabled`
     } else {
-      auditObject.comment = `${this.rule} unknown state`
+      audit.comment = `${this.rule} unknown state`
     }
-    this.audits.push(auditObject)
+    this.audits.push(audit)
   }
 
   scan = async ({ resourceId }: { resourceId: string }) => {
     if (resourceId) {
-      await this.audit({ resourceId })
+      await this.audit({ resource: resourceId })
     } else {
       const buckets = await this.listBuckets()
       for (const bucket of buckets) {
         assert(bucket.Name, 'bucket does not have a name')
-        await this.audit({ resourceId: bucket.Name })
+        await this.audit({ resource: bucket.Name })
       }
     }
   }

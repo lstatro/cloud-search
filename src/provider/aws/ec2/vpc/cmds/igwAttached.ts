@@ -1,10 +1,7 @@
-import {
-  AuditResultInterface,
-  AWSScannerCliArgsInterface,
-  AWSScannerInterface,
-} from 'cloud-search'
+import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import { InternetGateway } from 'aws-sdk/clients/ec2'
-import AWS from '../../../../../lib/aws/AWS'
+import { AWS } from '../../../../../lib/aws/AWS'
+import assert from 'assert'
 
 const rule = 'IgwAttachedToVpc'
 
@@ -30,21 +27,23 @@ export default class IgwAttachedToVpc extends AWS {
       profile: params.profile,
       resourceId: params.resourceId,
       region: params.region,
+      verbosity: params.verbosity,
       rule,
     })
   }
 
   async audit({
-    resourceId,
+    resource,
     region,
   }: {
-    resourceId: InternetGateway
+    resource: InternetGateway
     region: string
   }) {
+    assert(resource.InternetGatewayId, 'gateway does not have an IGW id')
     let suspect = false
 
-    if (resourceId.Attachments) {
-      for (const attachment of resourceId.Attachments) {
+    if (resource.Attachments) {
+      for (const attachment of resource.Attachments) {
         if (attachment.State) {
           const states = ['available', 'attaching', 'attached', 'detaching']
           if (states.includes(attachment.State)) {
@@ -55,9 +54,8 @@ export default class IgwAttachedToVpc extends AWS {
     }
 
     this.audits.push({
-      name: resourceId.InternetGatewayId,
       provider: 'aws',
-      physicalId: resourceId.InternetGatewayId,
+      physicalId: resource.InternetGatewayId,
       service: this.service,
       rule,
       region: region,
@@ -76,16 +74,17 @@ export default class IgwAttachedToVpc extends AWS {
   }) => {
     const igws = await this.describeInternetGateways(region, resourceId)
     for (const igw of igws) {
-      this.audit({ resourceId: igw, region })
+      this.audit({ resource: igw, region })
     }
   }
 }
 
-export const handler = async (args: AWSScannerCliArgsInterface) => {
+export const handler = async (args: AWSScannerInterface) => {
   const scanner = await new IgwAttachedToVpc({
     region: args.region,
     profile: args.profile,
     resourceId: args.resourceId,
+    verbosity: args.verbosity,
   })
   await scanner.start()
   scanner.output()

@@ -1,11 +1,7 @@
 import { CommandBuilder } from 'yargs'
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-  AWSScannerCliArgsInterface,
-} from 'cloud-search'
+import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 
-import AWS from '../../../../lib/aws/AWS'
+import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
 import assert from 'assert'
 import { ServerSideEncryptionConfiguration } from 'aws-sdk/clients/s3'
 
@@ -14,13 +10,7 @@ const rule = 'BucketEncryption'
 export const command = `${rule} [args]`
 
 export const builder: CommandBuilder = {
-  keyType: {
-    alias: 't',
-    describe: 'the AWS key type',
-    type: 'string',
-    default: 'aws',
-    choices: ['aws', 'cmk'],
-  },
+  ...keyTypeArg,
 }
 
 export const desc = `SQS topics must be encrypted
@@ -34,21 +24,17 @@ export const desc = `SQS topics must be encrypted
 
 `
 
-export interface BucketEncryptedInterface extends AWSScannerInterface {
-  keyType: 'aws' | 'cmk'
-}
-
 export default class TopicEncrypted extends AWS {
   audits: AuditResultInterface[] = []
   service = 's3'
   global = true
-  keyType: 'aws' | 'cmk'
 
-  constructor(public params: BucketEncryptedInterface) {
+  constructor(public params: AWSScannerInterface) {
     super({
       profile: params.profile,
       resourceId: params.resourceId,
       region: params.region,
+      verbosity: params.verbosity,
       rule,
     })
     this.keyType = params.keyType
@@ -56,7 +42,7 @@ export default class TopicEncrypted extends AWS {
 
   handleAwsKeyType = (
     config: ServerSideEncryptionConfiguration,
-    auditObject: AuditResultInterface
+    audit: AuditResultInterface
   ) => {
     let isEncryptedWithAes = false
 
@@ -70,26 +56,27 @@ export default class TopicEncrypted extends AWS {
     }
 
     if (isEncryptedWithAes) {
-      auditObject.state = 'OK'
+      audit.state = 'OK'
     } else {
-      auditObject.state = 'FAIL'
+      audit.state = 'FAIL'
     }
   }
 
   handleCmkKeyType = async (
     config: ServerSideEncryptionConfiguration,
-    auditObject: AuditResultInterface,
+    audit: AuditResultInterface,
     region: string
   ) => {
     let isEncrypted = false
     for (const rule of config.Rules) {
       if (rule.ApplyServerSideEncryptionByDefault?.SSEAlgorithm === 'AES256') {
         isEncrypted = true
-        auditObject.state = 'WARNING'
+        audit.state = 'WARNING'
       }
       if (rule.ApplyServerSideEncryptionByDefault?.KMSMasterKeyID) {
         isEncrypted = true
-        auditObject.state = await this.isKeyTrusted(
+        assert(this.keyType, 'key type is required')
+        audit.state = await this.isKeyTrusted(
           rule.ApplyServerSideEncryptionByDefault.KMSMasterKeyID,
           this.keyType,
           region
@@ -97,18 +84,18 @@ export default class TopicEncrypted extends AWS {
       }
     }
     if (isEncrypted === false) {
-      auditObject.state = 'FAIL'
+      audit.state = 'FAIL'
     }
   }
 
-  async audit({ resourceId, region }: { resourceId: string; region: string }) {
+  async audit({ resource, region }: { resource: string; region: string }) {
     const options = this.getOptions()
     const s3 = new this.AWS.S3(options)
 
-    const auditObject: AuditResultInterface = {
-      name: resourceId,
+    const audit: AuditResultInterface = {
+      name: resource,
       provider: 'aws',
-      physicalId: resourceId,
+      physicalId: resource,
       service: this.service,
       rule: this.rule,
       region: region,
@@ -120,7 +107,7 @@ export default class TopicEncrypted extends AWS {
     try {
       const getBucket = await s3
         .getBucketEncryption({
-          Bucket: resourceId,
+          Bucket: resource,
         })
         .promise()
 
@@ -128,58 +115,55 @@ export default class TopicEncrypted extends AWS {
         if (this.keyType === 'aws') {
           this.handleAwsKeyType(
             getBucket.ServerSideEncryptionConfiguration,
-            auditObject
+            audit
           )
         } else if (this.keyType === 'cmk') {
           await this.handleCmkKeyType(
             getBucket.ServerSideEncryptionConfiguration,
-            auditObject,
+            audit,
             region
           )
         } else {
           throw 'unsupported key type'
         }
       } else {
-        auditObject.state = 'FAIL'
+        audit.state = 'FAIL'
       }
     } catch (err) {
       if (err.code === 'ServerSideEncryptionConfigurationNotFoundError') {
-        auditObject.state = 'FAIL'
+        audit.state = 'FAIL'
       }
     }
 
-    this.audits.push(auditObject)
+    this.audits.push(audit)
   }
 
   scan = async ({
-    region,
     resourceId,
+    region,
   }: {
-    region: string
     resourceId: string
+    region: string
   }) => {
     if (resourceId) {
-      await this.audit({ resourceId, region })
+      await this.audit({ resource: resourceId, region })
     } else {
       const buckets = await this.listBuckets()
       for (const bucket of buckets) {
         assert(bucket.Name, 'bucket must have a name')
-        await this.audit({ resourceId: bucket.Name, region })
+        await this.audit({ resource: bucket.Name, region })
       }
     }
   }
 }
 
-export interface BucketEncryptedCliInterface
-  extends BucketEncryptedInterface,
-    AWSScannerCliArgsInterface {}
-
-export const handler = async (args: BucketEncryptedCliInterface) => {
+export const handler = async (args: AWSScannerInterface) => {
   const scanner = new TopicEncrypted({
     region: args.region,
     profile: args.profile,
     resourceId: args.resourceId,
     keyType: args.keyType,
+    verbosity: args.verbosity,
   })
 
   await scanner.start()

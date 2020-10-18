@@ -2,7 +2,7 @@
 
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import assert from 'assert'
-import AWS from '../../../../../lib/aws/AWS'
+import { AWS } from '../../../../../lib/aws/AWS'
 
 const rule = 'PublicRole'
 
@@ -41,6 +41,7 @@ export default class PublicRole extends AWS {
       profile: params.profile,
       resourceId: params.resourceId,
       region: params.region,
+      verbosity: params.verbosity,
       rule,
     })
   }
@@ -79,14 +80,14 @@ export default class PublicRole extends AWS {
 
   async audit({
     policyDocument,
-    resourceId,
+    resource,
   }: {
     policyDocument: string
-    resourceId: string
+    resource: string
   }) {
-    const auditObject: AuditResultInterface = {
+    const audit: AuditResultInterface = {
       provider: 'aws',
-      physicalId: resourceId,
+      physicalId: resource,
       service: this.service,
       rule: this.rule,
       region: 'global',
@@ -114,14 +115,14 @@ export default class PublicRole extends AWS {
     }
 
     if (isPublicArr.includes(true)) {
-      auditObject.state = 'FAIL'
+      audit.state = 'FAIL'
     } else if (isPublicArr.includes('WARNING')) {
-      auditObject.state = 'WARNING'
+      audit.state = 'WARNING'
     } else {
-      auditObject.state = 'OK'
+      audit.state = 'OK'
     }
 
-    this.audits.push(auditObject)
+    this.audits.push(audit)
   }
 
   scan = async ({ resourceId }: { resourceId: string }) => {
@@ -138,7 +139,7 @@ export default class PublicRole extends AWS {
         'unable to find trust document'
       )
       await this.audit({
-        resourceId,
+        resource: resourceId,
         policyDocument: getRole.Role.AssumeRolePolicyDocument,
       })
     } else {
@@ -147,7 +148,7 @@ export default class PublicRole extends AWS {
       for (const role of roles) {
         assert(role.AssumeRolePolicyDocument, 'no trust doc found')
         await this.audit({
-          resourceId: role.RoleName,
+          resource: role.RoleName,
           policyDocument: role.AssumeRolePolicyDocument,
         })
       }
@@ -160,6 +161,7 @@ export const handler = async (args: AWSScannerInterface) => {
     region: args.region,
     profile: args.profile,
     resourceId: args.resourceId,
+    verbosity: args.verbosity,
   })
 
   await scanner.start()

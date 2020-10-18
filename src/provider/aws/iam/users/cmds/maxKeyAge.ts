@@ -1,7 +1,7 @@
-/** TODO: this needs to support resourceId */
+/** TODO: this needs to support resource */
 
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
-import AWS from '../../../../../lib/aws/AWS'
+import { AWS } from '../../../../../lib/aws/AWS'
 import { AccessKeyMetadata, User } from 'aws-sdk/clients/iam'
 import { CommandBuilder } from 'yargs'
 
@@ -42,12 +42,13 @@ export default class MaxKeyAge extends AWS {
       profile: params.profile,
       resourceId: params.resourceId,
       region: params.region,
+      verbosity: params.verbosity,
       rule,
     })
     this.maxAge = params.maxAge
   }
 
-  async audit({ resourceId }: { resourceId: User }) {
+  async audit({ resource }: { resource: User }) {
     const iam = new this.AWS.IAM(this.options)
 
     let marker: string | undefined
@@ -56,7 +57,7 @@ export default class MaxKeyAge extends AWS {
       /** TODO: listAccessKeys needs to move into the AWS class */
       const listAccessKeys = await iam
         .listAccessKeys({
-          UserName: resourceId.UserName,
+          UserName: resource.UserName,
           Marker: marker,
         })
         .promise()
@@ -64,10 +65,10 @@ export default class MaxKeyAge extends AWS {
 
       if (listAccessKeys.AccessKeyMetadata) {
         for (const keyMetaData of listAccessKeys.AccessKeyMetadata) {
-          this.validate(resourceId, keyMetaData)
+          this.validate(resource, keyMetaData)
         }
       } else {
-        this.validate(resourceId, {})
+        this.validate(resource, {})
       }
     } while (marker)
   }
@@ -75,7 +76,7 @@ export default class MaxKeyAge extends AWS {
   validate = (user: User, keyMetaData: AccessKeyMetadata) => {
     const id = `${user.UserName}:${keyMetaData.AccessKeyId}`
     const now = new Date()
-    const auditObject: AuditResultInterface = {
+    const audit: AuditResultInterface = {
       name: id,
       provider: 'aws',
       physicalId: id,
@@ -95,30 +96,30 @@ export default class MaxKeyAge extends AWS {
       const days = hours / 24
 
       if (days >= this.maxAge) {
-        auditObject.state = 'FAIL'
+        audit.state = 'FAIL'
       } else {
-        auditObject.state = 'OK'
+        audit.state = 'OK'
       }
     } else {
-      auditObject.state = 'OK'
-      auditObject.comment = 'no key metadata found'
+      audit.state = 'OK'
+      audit.comment = 'no key metadata found'
     }
 
-    this.audits.push(auditObject)
+    this.audits.push(audit)
   }
 
   /** TODO: setup age to handle resource based requests
    *
    * it appears that we only need the user name, not the entire user object
    * we should therefore be able to cut it back to just the name string
-   * (resourceId) and pass that into the audit and validate function to get
+   * (resource) and pass that into the audit and validate function to get
    * this functionality
    */
   scan = async () => {
     const users = await this.listUsers()
 
     for (const user of users) {
-      await this.audit({ resourceId: user })
+      await this.audit({ resource: user })
     }
   }
 }
@@ -133,6 +134,7 @@ export const handler = async (args: MaxKeyAgeCliInterface) => {
     profile: args.profile,
     resourceId: args.resourceId,
     maxAge: args.maxAge,
+    verbosity: args.verbosity,
   })
 
   await scanner.start()

@@ -1,24 +1,14 @@
 import { CommandBuilder } from 'yargs'
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-  AWSScannerCliArgsInterface,
-} from 'cloud-search'
-
-import AWS from '../../../../lib/aws/AWS'
+import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
+import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
+import assert from 'assert'
 
 const rule = 'QueueEncrypted'
 
 export const command = `${rule} [args]`
 
 export const builder: CommandBuilder = {
-  keyType: {
-    alias: 't',
-    describe: 'the AWS key type',
-    type: 'string',
-    default: 'aws',
-    choices: ['aws', 'cmk'],
-  },
+  ...keyTypeArg,
 }
 
 export const desc = `SQS topics must be encrypted
@@ -32,41 +22,37 @@ export const desc = `SQS topics must be encrypted
 
 `
 
-export interface QueueEncryptedInterface extends AWSScannerInterface {
-  keyType: 'aws' | 'cmk'
-}
-
 export default class TopicEncrypted extends AWS {
   audits: AuditResultInterface[] = []
   service = 'sqs'
   global = false
   keyId?: string
-  keyType: 'aws' | 'cmk'
 
-  constructor(public params: QueueEncryptedInterface) {
+  constructor(public params: AWSScannerInterface) {
     super({
       profile: params.profile,
       resourceId: params.resourceId,
       region: params.region,
+      verbosity: params.verbosity,
       rule,
     })
     this.keyType = params.keyType
   }
 
-  async audit({ resourceId, region }: { resourceId: string; region: string }) {
+  async audit({ resource, region }: { resource: string; region: string }) {
     const options = this.getOptions()
     options.region = region
     const sqs = new this.AWS.SQS(options)
     const getQueueAttributes = await sqs
       .getQueueAttributes({
-        QueueUrl: resourceId,
+        QueueUrl: resource,
         AttributeNames: ['KmsMasterKeyId'],
       })
       .promise()
-    const auditObject: AuditResultInterface = {
-      name: resourceId,
+    const audit: AuditResultInterface = {
+      name: resource,
       provider: 'aws',
-      physicalId: resourceId,
+      physicalId: resource,
       service: this.service,
       rule: this.rule,
       region: region,
@@ -81,49 +67,47 @@ export default class TopicEncrypted extends AWS {
      */
     if (getQueueAttributes.Attributes) {
       if (getQueueAttributes.Attributes.KmsMasterKeyId) {
+        assert(this.keyType, 'key type is required')
         const isTrusted = await this.isKeyTrusted(
           getQueueAttributes.Attributes.KmsMasterKeyId,
           this.keyType,
           region
         )
-        auditObject.state = isTrusted
+        audit.state = isTrusted
       } else {
-        auditObject.state = 'FAIL'
+        audit.state = 'FAIL'
       }
     } else {
-      auditObject.state = 'FAIL'
+      audit.state = 'FAIL'
     }
-    this.audits.push(auditObject)
+    this.audits.push(audit)
   }
 
   scan = async ({
-    region,
     resourceId,
+    region,
   }: {
-    region: string
     resourceId: string
+    region: string
   }) => {
     if (resourceId) {
-      await this.audit({ resourceId, region })
+      await this.audit({ resource: resourceId, region })
     } else {
       const queues = await this.listQueues(region)
       for (const queue of queues) {
-        await this.audit({ resourceId: queue, region })
+        await this.audit({ resource: queue, region })
       }
     }
   }
 }
 
-export interface QueueEncryptedCliInterface
-  extends QueueEncryptedInterface,
-    AWSScannerCliArgsInterface {}
-
-export const handler = async (args: QueueEncryptedCliInterface) => {
+export const handler = async (args: AWSScannerInterface) => {
   const scanner = new TopicEncrypted({
     region: args.region,
     profile: args.profile,
     resourceId: args.resourceId,
     keyType: args.keyType,
+    verbosity: args.verbosity,
   })
 
   await scanner.start()

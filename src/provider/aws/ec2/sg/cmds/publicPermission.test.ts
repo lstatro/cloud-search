@@ -3,7 +3,6 @@ import 'chai'
 import { useFakeTimers, SinonFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
 import { handler } from './publicPermission'
-import { AWSScannerCliArgsInterface } from 'cloud-search'
 import { expect } from 'chai'
 
 /** none of these tests should throw */
@@ -25,6 +24,7 @@ describe('security group with a public permission', () => {
     mock('EC2', 'describeSecurityGroups', {
       SecurityGroups: [
         {
+          GroupId: 'test',
           IpPermissions: [
             {
               IpRanges: [
@@ -41,12 +41,12 @@ describe('security group with a public permission', () => {
       region: 'us-east-1',
       profile: 'test',
       resourceId: 'test',
-    } as AWSScannerCliArgsInterface)
+    })
     expect(audits).to.eql([
       {
         name: undefined,
         provider: 'aws',
-        physicalId: undefined,
+        physicalId: 'test',
         service: 'ec2',
         rule: 'PublicPermission',
         region: 'us-east-1',
@@ -61,6 +61,7 @@ describe('security group with a public permission', () => {
     mock('EC2', 'describeSecurityGroups', {
       SecurityGroups: [
         {
+          GroupId: 'test',
           IpPermissions: [
             {
               IpRanges: [
@@ -77,12 +78,12 @@ describe('security group with a public permission', () => {
       region: 'us-east-1',
       profile: 'test',
       resourceId: 'test',
-    } as AWSScannerCliArgsInterface)
+    })
     expect(audits).to.eql([
       {
         name: undefined,
         provider: 'aws',
-        physicalId: undefined,
+        physicalId: 'test',
         service: 'ec2',
         rule: 'PublicPermission',
         region: 'us-east-1',
@@ -97,6 +98,7 @@ describe('security group with a public permission', () => {
     mock('EC2', 'describeSecurityGroups', {
       SecurityGroups: [
         {
+          GroupId: 'test',
           IpPermissions: [
             {
               IpRanges: [
@@ -112,12 +114,12 @@ describe('security group with a public permission', () => {
     const audits = await handler({
       profile: 'test',
       region: 'all',
-    } as AWSScannerCliArgsInterface)
+    })
     expect(audits).to.eql([
       {
         name: undefined,
         provider: 'aws',
-        physicalId: undefined,
+        physicalId: 'test',
         service: 'ec2',
         rule: 'PublicPermission',
         region: 'us-east-1',
@@ -132,6 +134,7 @@ describe('security group with a public permission', () => {
     mock('EC2', 'describeSecurityGroups', {
       SecurityGroups: [
         {
+          GroupId: 'test',
           IpPermissions: [{}],
         },
       ],
@@ -140,12 +143,12 @@ describe('security group with a public permission', () => {
       region: 'us-east-1',
       profile: 'test',
       resourceId: 'test',
-    } as AWSScannerCliArgsInterface)
+    })
     expect(audits).to.eql([
       {
         name: undefined,
         provider: 'aws',
-        physicalId: undefined,
+        physicalId: 'test',
         service: 'ec2',
         rule: 'PublicPermission',
         region: 'us-east-1',
@@ -158,18 +161,22 @@ describe('security group with a public permission', () => {
 
   it('should report OK if there are no IpPermissions', async () => {
     mock('EC2', 'describeSecurityGroups', {
-      SecurityGroups: [{}],
+      SecurityGroups: [
+        {
+          GroupId: 'test',
+        },
+      ],
     })
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
       resourceId: 'test',
-    } as AWSScannerCliArgsInterface)
+    })
     expect(audits).to.eql([
       {
         name: undefined,
         provider: 'aws',
-        physicalId: undefined,
+        physicalId: 'test',
         service: 'ec2',
         rule: 'PublicPermission',
         region: 'us-east-1',
@@ -184,6 +191,7 @@ describe('security group with a public permission', () => {
     mock('EC2', 'describeSecurityGroups', {
       SecurityGroups: [
         {
+          GroupId: 'test',
           IpPermissions: [
             {
               Ipv6Ranges: [
@@ -200,12 +208,12 @@ describe('security group with a public permission', () => {
       region: 'us-east-1',
       profile: 'test',
       resourceId: 'test',
-    } as AWSScannerCliArgsInterface)
+    })
     expect(audits).to.eql([
       {
         name: undefined,
         provider: 'aws',
-        physicalId: undefined,
+        physicalId: 'test',
         service: 'ec2',
         rule: 'PublicPermission',
         region: 'us-east-1',
@@ -220,6 +228,7 @@ describe('security group with a public permission', () => {
     mock('EC2', 'describeSecurityGroups', {
       SecurityGroups: [
         {
+          GroupId: 'test',
           IpPermissions: [
             {
               Ipv6Ranges: [
@@ -236,12 +245,12 @@ describe('security group with a public permission', () => {
       region: 'us-east-1',
       profile: 'test',
       resourceId: 'test',
-    } as AWSScannerCliArgsInterface)
+    })
     expect(audits).to.eql([
       {
         name: undefined,
         provider: 'aws',
-        physicalId: undefined,
+        physicalId: 'test',
         service: 'ec2',
         rule: 'PublicPermission',
         region: 'us-east-1',
@@ -258,7 +267,7 @@ describe('security group with a public permission', () => {
       region: 'us-east-1',
       profile: 'test',
       resourceId: 'test',
-    } as AWSScannerCliArgsInterface)
+    })
     expect(audits).to.eql([])
   })
 
@@ -266,13 +275,19 @@ describe('security group with a public permission', () => {
     class Err extends Error {
       code = 'potato'
     }
-    const myErr = new Err('lol')
+    const myErr = new Err('test error')
     mock('EC2', 'describeSecurityGroups', Promise.reject(myErr))
-    const audits = await handler({
-      region: 'us-east-1',
-      profile: 'test',
-      resourceId: 'test',
-    } as AWSScannerCliArgsInterface)
-    expect(audits).to.eql([])
+    let audits
+    try {
+      audits = await handler({
+        region: 'us-east-1',
+        profile: 'test',
+        resourceId: 'test',
+      })
+    } catch (err) {
+      audits = err
+    }
+
+    expect(audits instanceof Error).to.be.true
   })
 })

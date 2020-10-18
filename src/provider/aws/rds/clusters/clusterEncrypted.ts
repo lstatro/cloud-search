@@ -1,20 +1,12 @@
-import { CommandBuilder } from 'yargs'
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import assert from 'assert'
-import AWS from '../../../../lib/aws/AWS'
+import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
 import { DBCluster } from 'aws-sdk/clients/rds'
-import { AWSScannerCliArgsInterface } from 'cloud-search'
 
 const rule = 'ClusterEncrypted'
 
-export const builder: CommandBuilder = {
-  keyType: {
-    alias: 't',
-    describe: 'the AWS key type',
-    type: 'string',
-    default: 'aws',
-    choices: ['aws', 'cmk'],
-  },
+export const builder = {
+  ...keyTypeArg,
 }
 
 export const command = `${rule} [args]`
@@ -26,7 +18,7 @@ export const desc = `RDS clusters must have their stroage at rest encrypted
   WARNING - RDS cluster storage is encrypted but not with the specified key type
   FAIL    - RDS cluster storage is not encrypted at rest
 
-  resourceId: RDS clusters ARN
+  resource: RDS clusters ARN
 
   note: this rule targets DB Clusters not DB Instances' (MySQL, PostgreSQL, Oracle, MariaDB, MSSQL).
 
@@ -35,10 +27,6 @@ export const desc = `RDS clusters must have their stroage at rest encrypted
 export interface ClusterEncryptedInterface extends AWSScannerInterface {
   keyType: 'aws' | 'cmk'
 }
-
-export interface ClusterEncryptedCliInterface
-  extends ClusterEncryptedInterface,
-    AWSScannerCliArgsInterface {}
 
 export default class ClusterEncrypted extends AWS {
   audits: AuditResultInterface[] = []
@@ -52,21 +40,17 @@ export default class ClusterEncrypted extends AWS {
       profile: params.profile,
       resourceId: params.resourceId,
       region: params.region,
+      verbosity: params.verbosity,
       rule,
     })
     this.keyType = params.keyType
   }
 
-  async audit({
-    resourceId,
-    region,
-  }: {
-    resourceId: DBCluster
-    region: string
-  }) {
-    const auditObject: AuditResultInterface = {
+  async audit({ resource, region }: { resource: DBCluster; region: string }) {
+    assert(resource.DBClusterArn, 'cluster does not have a cluster ARN')
+    const audit: AuditResultInterface = {
       provider: 'aws',
-      physicalId: resourceId.DBClusterArn,
+      physicalId: resource.DBClusterArn,
       service: this.service,
       rule: this.rule,
       region: region,
@@ -75,21 +59,21 @@ export default class ClusterEncrypted extends AWS {
       time: new Date().toISOString(),
     }
 
-    if (typeof resourceId.KmsKeyId === 'string') {
+    if (typeof resource.KmsKeyId === 'string') {
       /** if there is a key it should be encrypted, if not, something unexpected is going on */
       assert(
-        resourceId.StorageEncrypted === true,
+        resource.StorageEncrypted === true,
         'key found, but rds instance is not encrypted'
       )
-      auditObject.state = await this.isKeyTrusted(
-        resourceId.KmsKeyId,
+      audit.state = await this.isKeyTrusted(
+        resource.KmsKeyId,
         this.keyType,
         region
       )
     } else {
-      auditObject.state = 'FAIL'
+      audit.state = 'FAIL'
     }
-    this.audits.push(auditObject)
+    this.audits.push(audit)
   }
 
   scan = async ({
@@ -109,19 +93,20 @@ export default class ClusterEncrypted extends AWS {
     for (const cluster of clusters) {
       assert(cluster.DBClusterArn, 'a cluster must have a ARN')
       await this.audit({
-        resourceId: cluster,
+        resource: cluster,
         region,
       })
     }
   }
 }
 
-export const handler = async (args: ClusterEncryptedCliInterface) => {
+export const handler = async (args: ClusterEncryptedInterface) => {
   const scanner = new ClusterEncrypted({
     region: args.region,
     profile: args.profile,
     resourceId: args.resourceId,
     keyType: args.keyType,
+    verbosity: args.verbosity,
   })
 
   await scanner.start()

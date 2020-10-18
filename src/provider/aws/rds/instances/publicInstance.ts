@@ -2,7 +2,7 @@
 
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import assert from 'assert'
-import AWS from '../../../../lib/aws/AWS'
+import { AWS } from '../../../../lib/aws/AWS'
 
 const rule = 'PublicInstance'
 
@@ -30,22 +30,23 @@ export default class PublicInstance extends AWS {
       profile: params.profile,
       resourceId: params.resourceId,
       region: params.region,
+      verbosity: params.verbosity,
       rule,
     })
   }
 
   async audit({
     publiclyAccessible,
-    resourceId,
+    resource,
     region,
   }: {
     publiclyAccessible: boolean | undefined
-    resourceId: string
+    resource: string
     region: string
   }) {
-    const auditObject: AuditResultInterface = {
+    const audit: AuditResultInterface = {
       provider: 'aws',
-      physicalId: resourceId,
+      physicalId: resource,
       service: this.service,
       rule: this.rule,
       region: region,
@@ -54,11 +55,11 @@ export default class PublicInstance extends AWS {
       time: new Date().toISOString(),
     }
     if (publiclyAccessible === true) {
-      auditObject.state = 'FAIL'
+      audit.state = 'FAIL'
     } else if (publiclyAccessible === false) {
-      auditObject.state = 'OK'
+      audit.state = 'OK'
     }
-    this.audits.push(auditObject)
+    this.audits.push(audit)
   }
 
   scan = async ({
@@ -79,7 +80,7 @@ export default class PublicInstance extends AWS {
       assert(instance.DBInstanceArn, 'instances must have a ARN')
       await this.audit({
         publiclyAccessible: instance.PubliclyAccessible,
-        resourceId: instance.DBInstanceArn,
+        resource: instance.DBInstanceArn,
         region,
       })
     }
@@ -91,6 +92,7 @@ export const handler = async (args: AWSScannerInterface) => {
     region: args.region,
     profile: args.profile,
     resourceId: args.resourceId,
+    verbosity: args.verbosity,
   })
 
   await scanner.start()

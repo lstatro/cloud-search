@@ -1,4 +1,9 @@
-import { AWSClientOptionsInterface } from 'cloud-search'
+import { CommandBuilder } from 'yargs'
+import {
+  AWSClientOptionsInterface,
+  AWSParamsInterface,
+  KeyType,
+} from 'cloud-search'
 import _AWS from 'aws-sdk'
 import Provider from '../Provider'
 
@@ -10,22 +15,15 @@ import {
   Snapshot,
   Volume,
 } from 'aws-sdk/clients/ec2'
-import { KeyListEntry, KeyMetadata } from 'aws-sdk/clients/kms'
+import { KeyMetadata, KeyListEntry } from 'aws-sdk/clients/kms'
 import { Role, User } from 'aws-sdk/clients/iam'
 import { Topic } from 'aws-sdk/clients/sns'
 import { QueueUrlList } from 'aws-sdk/clients/sqs'
 import { DBCluster, DBInstance } from 'aws-sdk/clients/rds'
 
-interface AWSParamsInterface {
-  profile: string
-  rule: string
-  resourceId?: string
-  region: string
-}
-
 interface ScanInterface {
   region?: string
-  resourceId?: string
+  resourceId?: unknown
 }
 
 interface KeyCacheInterface extends KeyMetadata {
@@ -34,11 +32,21 @@ interface KeyCacheInterface extends KeyMetadata {
 
 interface AuditInterface {
   [key: string]: unknown
-  resourceId: unknown
+  resource: unknown
   region?: string
 }
 
-export default abstract class AwsService extends Provider {
+export const keyTypeArg: CommandBuilder = {
+  keyType: {
+    alias: 't',
+    describe: 'the AWS key type',
+    type: 'string',
+    default: 'aws',
+    choices: ['aws', 'cmk'],
+  },
+}
+
+export abstract class AWS extends Provider {
   abstract service: string
 
   options: AWSClientOptionsInterface
@@ -50,9 +58,10 @@ export default abstract class AwsService extends Provider {
   keyMetaData: KeyCacheInterface[] = []
   profile?: string
   resourceId?: string
+  keyType?: KeyType
 
   constructor(params: AWSParamsInterface) {
-    super(params.rule)
+    super(params.rule, params.verbosity)
 
     this.region = params.region
     this.profile = params.profile
@@ -132,14 +141,14 @@ export default abstract class AwsService extends Provider {
     await this.getRegions()
 
     for (const region of this.regions) {
-      this.spinner.text = region
+      this.handleSpinnerText({ message: region })
       await this.scan({ region })
     }
   }
 
   start = async () => {
     try {
-      this.spinner.start()
+      this.handleSpinnerStatus({ method: 'start' })
       if (this.resourceId) {
         assert(
           this.region !== 'all',
@@ -149,9 +158,11 @@ export default abstract class AwsService extends Provider {
       } else {
         await this.handleRegions()
       }
-      this.spinner.succeed()
+      this.handleSpinnerStatus({ method: 'succeed' })
     } catch (err) {
-      this.spinner.fail(err.message)
+      this.handleSpinnerStatus({ method: 'fail', message: err.message })
+      /** we want to rethrow this so that tests outright fail and the user can see the reason why */
+      throw err
     }
   }
 

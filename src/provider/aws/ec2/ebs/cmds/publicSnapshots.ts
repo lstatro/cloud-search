@@ -1,11 +1,7 @@
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-  AWSScannerCliArgsInterface,
-} from 'cloud-search'
+import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import assert from 'assert'
 
-import AWS from '../../../../../lib/aws/AWS'
+import { AWS } from '../../../../../lib/aws/AWS'
 
 const rule = 'PublicSnapshot'
 
@@ -31,20 +27,21 @@ export default class PublicSnapshot extends AWS {
       profile: params.profile,
       resourceId: params.resourceId,
       region: params.region,
+      verbosity: params.verbosity,
       rule,
     })
   }
 
-  async audit({ resourceId, region }: { resourceId: string; region: string }) {
+  async audit({ resource, region }: { resource: string; region: string }) {
     const options = this.getOptions()
     options.region = region
 
     const ec2 = new this.AWS.EC2(options)
 
-    const auditObject: AuditResultInterface = {
-      name: resourceId,
+    const audit: AuditResultInterface = {
+      name: resource,
       provider: 'aws',
-      physicalId: resourceId,
+      physicalId: resource,
       service: this.service,
       rule: this.rule,
       region: region,
@@ -55,7 +52,7 @@ export default class PublicSnapshot extends AWS {
 
     const describe = await ec2
       .describeSnapshotAttribute({
-        SnapshotId: resourceId,
+        SnapshotId: resource,
         Attribute: 'createVolumePermission',
       })
       .promise()
@@ -70,12 +67,12 @@ export default class PublicSnapshot extends AWS {
     }
 
     if (isPublic) {
-      auditObject.state = 'FAIL'
+      audit.state = 'FAIL'
     } else {
-      auditObject.state = 'OK'
+      audit.state = 'OK'
     }
 
-    this.audits.push(auditObject)
+    this.audits.push(audit)
   }
 
   scan = async ({
@@ -86,22 +83,23 @@ export default class PublicSnapshot extends AWS {
     resourceId: string
   }) => {
     if (resourceId) {
-      await this.audit({ resourceId, region })
+      await this.audit({ resource: resourceId, region })
     } else {
       const snapshots = await this.listSnapshots(region)
       for (const snapshot of snapshots) {
         assert(snapshot.SnapshotId, 'does not have an id')
-        await this.audit({ resourceId: snapshot.SnapshotId, region })
+        await this.audit({ resource: snapshot.SnapshotId, region })
       }
     }
   }
 }
 
-export const handler = async (args: AWSScannerCliArgsInterface) => {
+export const handler = async (args: AWSScannerInterface) => {
   const scanner = new PublicSnapshot({
     region: args.region,
     profile: args.profile,
     resourceId: args.resourceId,
+    verbosity: args.verbosity,
   })
 
   await scanner.start()

@@ -1,6 +1,6 @@
 import 'mocha'
 import { mock, restore } from 'aws-sdk-mock'
-import { handler } from './age'
+import { handler } from './maxKeyAge'
 import { expect } from 'chai'
 
 describe('iam user key age', () => {
@@ -105,7 +105,6 @@ describe('iam user key age', () => {
   it('should handle no users', async () => {
     mock('IAM', 'listUsers', {})
     const audits = await handler({
-      resourceId: 'test',
       region: 'all',
       maxAge: 30,
       profile: 'test',

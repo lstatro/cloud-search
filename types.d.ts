@@ -13,20 +13,34 @@ declare module 'cloud-search' {
   /** cloud provider name */
   export type CloudProviderNameType = 'aws'
 
+  /** aws kms key types */
+  export type KeyType = 'aws' | 'cmk'
+
   /** time the resource was last scanned */
   export type ScanTimeType = string
 
   /** the name of the rule that scanned the resource */
   export type RuleNameType = string
 
+  /** controls how much data is dumped to terminal, silent for testing */
+  export type VerbosityType = 'silent' | 'normal'
+
   export type AuditStateType = 'OK' | 'FAIL' | 'UNKNOWN' | 'WARNING'
+
+  export interface AWSParamsInterface {
+    profile?: string
+    rule: string
+    resourceId?: string
+    region: string
+    verbosity?: VerbosityType
+  }
 
   /** The compliance data about the resource */
   export interface AuditResultInterface {
     name?: ResourceFriendlyNameType
     provider: CloudProviderNameType
     comment?: string
-    physicalId?: PhysicalIdType
+    physicalId: PhysicalIdType
     region: string
     service: CloudServiceType
     time: ScanTimeType
@@ -47,8 +61,10 @@ declare module 'cloud-search' {
 
   export interface AWSScannerInterface {
     region: string
-    profile: string
+    keyType?: KeyType
+    profile?: string
     resourceId?: string
+    verbosity?: VerbosityType
   }
 
   interface AWSScannerCliArgsInterface extends AWSScannerInterface, Arguments {}

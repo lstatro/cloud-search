@@ -1,10 +1,7 @@
-import {
-  AuditResultInterface,
-  AWSScannerCliArgsInterface,
-  AWSScannerInterface,
-} from 'cloud-search'
+import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import { SecurityGroup } from 'aws-sdk/clients/ec2'
-import AWS from '../../../../../lib/aws/AWS'
+import { AWS } from '../../../../../lib/aws/AWS'
+import assert from 'assert'
 
 const rule = 'PublicPermission'
 
@@ -28,22 +25,24 @@ export default class PublicPermission extends AWS {
       profile: params.profile,
       resourceId: params.resourceId,
       region: params.region,
+      verbosity: params.verbosity,
       rule,
     })
   }
 
   audit = async ({
-    resourceId,
+    resource,
     region,
   }: {
-    resourceId: SecurityGroup
+    resource: SecurityGroup
     region: string
   }) => {
+    assert(resource.GroupId, 'security group does nto have a group id')
     let suspect
     /** does the security group have any inbound permissions? */
-    if (resourceId.IpPermissions) {
+    if (resource.IpPermissions) {
       /** for each permission in the group lets look for something bad */
-      for (const permission of resourceId.IpPermissions) {
+      for (const permission of resource.IpPermissions) {
         /** are there any ranges */
         if (permission.IpRanges) {
           /** we need to inspect each range in the group */
@@ -69,17 +68,12 @@ export default class PublicPermission extends AWS {
       }
     }
     this.audits.push({
-      name: resourceId.GroupName,
+      name: resource.GroupName,
       provider: 'aws',
-      physicalId: resourceId.GroupId,
+      physicalId: resource.GroupId,
       service: this.service,
       rule,
       region: region,
-      /**
-       * ew ternary- did we find something sketchy when reviewing the group?
-       * - yea? FAIL!  this is crap, we should seek out an adult
-       * - nah bro (or broette), we OK
-       */
       state: suspect ? 'FAIL' : 'OK',
       profile: this.profile,
       time: new Date().toISOString(),
@@ -95,16 +89,17 @@ export default class PublicPermission extends AWS {
   }) => {
     const groups = await this.describeSecurityGroups(region, resourceId)
     for (const group of groups) {
-      await this.audit({ resourceId: group, region })
+      await this.audit({ resource: group, region })
     }
   }
 }
 
-export const handler = async (args: AWSScannerCliArgsInterface) => {
+export const handler = async (args: AWSScannerInterface) => {
   const scanner = await new PublicPermission({
     region: args.region,
     profile: args.profile,
     resourceId: args.resourceId,
+    verbosity: args.verbosity,
   })
   await scanner.start()
   scanner.output()

@@ -1,7 +1,7 @@
 import 'mocha'
 import { mock, restore } from 'aws-sdk-mock'
 import { useFakeTimers, SinonFakeTimers } from 'sinon'
-import { handler, BucketEncryptedCliInterface } from './bucketEncryption'
+import { handler } from './bucketEncryption'
 import { expect } from 'chai'
 import { AWSError } from 'aws-sdk'
 describe('iam user key age', () => {
@@ -35,7 +35,7 @@ describe('iam user key age', () => {
 
       region: 'test',
       keyType: 'aws',
-    } as BucketEncryptedCliInterface)
+    })
 
     expect(audits).to.eql([
       {
@@ -69,7 +69,7 @@ describe('iam user key age', () => {
       resourceId: 'test',
       region: 'test',
       keyType: 'cmk',
-    } as BucketEncryptedCliInterface)
+    })
 
     expect(audits).to.eql([
       {
@@ -108,7 +108,7 @@ describe('iam user key age', () => {
     const audits = await handler({
       region: 'test',
       keyType: 'aws',
-    } as BucketEncryptedCliInterface)
+    })
 
     expect(audits).to.eql([
       {
@@ -141,7 +141,7 @@ describe('iam user key age', () => {
     const audits = await handler({
       region: 'test',
       keyType: 'aws',
-    } as BucketEncryptedCliInterface)
+    })
 
     expect(audits).to.eql([
       {
@@ -178,7 +178,7 @@ describe('iam user key age', () => {
     const audits = await handler({
       region: 'test',
       keyType: 'aws',
-    } as BucketEncryptedCliInterface)
+    })
 
     expect(audits).to.eql([
       {
@@ -217,7 +217,7 @@ describe('iam user key age', () => {
     const audits = await handler({
       region: 'test',
       keyType: 'aws',
-    } as BucketEncryptedCliInterface)
+    })
 
     expect(audits).to.eql([
       {
@@ -260,7 +260,7 @@ describe('iam user key age', () => {
     const audits = await handler({
       region: 'test',
       keyType: 'cmk',
-    } as BucketEncryptedCliInterface)
+    })
 
     expect(audits).to.eql([
       {
@@ -303,7 +303,7 @@ describe('iam user key age', () => {
     const audits = await handler({
       region: 'test',
       keyType: 'cmk',
-    } as BucketEncryptedCliInterface)
+    })
 
     expect(audits).to.eql([
       {
@@ -339,7 +339,7 @@ describe('iam user key age', () => {
     const audits = await handler({
       region: 'test',
       keyType: 'cmk',
-    } as BucketEncryptedCliInterface)
+    })
 
     expect(audits).to.eql([
       {
@@ -368,7 +368,7 @@ describe('iam user key age', () => {
     const audits = await handler({
       region: 'test',
       keyType: 'cmk',
-    } as BucketEncryptedCliInterface)
+    })
 
     expect(audits).to.eql([
       {
@@ -402,7 +402,7 @@ describe('iam user key age', () => {
     const audits = await handler({
       region: 'test',
       keyType: 'test' as 'aws',
-    } as BucketEncryptedCliInterface)
+    })
 
     expect(audits).to.eql([
       {
@@ -433,7 +433,7 @@ describe('iam user key age', () => {
     const audits = await handler({
       region: 'test',
       keyType: 'test' as 'aws',
-    } as BucketEncryptedCliInterface)
+    })
 
     expect(audits).to.eql([
       {

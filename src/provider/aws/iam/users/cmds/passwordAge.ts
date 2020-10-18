@@ -1,7 +1,7 @@
-/** TODO: this needs to support resourceId */
+/** TODO: this needs to support resource */
 
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
-import AWS from '../../../../../lib/aws/AWS'
+import { AWS } from '../../../../../lib/aws/AWS'
 import { CommandBuilder } from 'yargs'
 import { assert } from 'console'
 
@@ -41,18 +41,19 @@ export default class PasswordAge extends AWS {
       profile: params.profile,
       resourceId: params.resourceId,
       region: params.region,
+      verbosity: params.verbosity,
       rule,
     })
     this.maxAge = params.maxAge
   }
 
-  async audit({ resourceId }: { resourceId: string }) {
+  async audit({ resource }: { resource: string }) {
     const iam = new this.AWS.IAM(this.options)
     let createDate
     try {
       const getLoginProfile = await iam
         .getLoginProfile({
-          UserName: resourceId,
+          UserName: resource,
         })
         .promise()
 
@@ -63,13 +64,13 @@ export default class PasswordAge extends AWS {
       assert(err.code === 'NoSuchEntity', err)
     }
 
-    this.validate(resourceId, createDate)
+    this.validate(resource, createDate)
   }
 
   validate = (userName: string, createDate?: Date) => {
     const now = new Date()
 
-    const auditObject: AuditResultInterface = {
+    const audit: AuditResultInterface = {
       name: userName,
       provider: 'aws',
       physicalId: userName,
@@ -89,26 +90,26 @@ export default class PasswordAge extends AWS {
       const days = hours / 24
 
       if (days >= this.maxAge) {
-        auditObject.state = 'FAIL'
+        audit.state = 'FAIL'
       } else {
-        auditObject.state = 'OK'
+        audit.state = 'OK'
       }
     } else {
-      auditObject.state = 'OK'
-      auditObject.comment = 'user does not have a password'
+      audit.state = 'OK'
+      audit.comment = 'user does not have a password'
     }
 
-    this.audits.push(auditObject)
+    this.audits.push(audit)
   }
 
   scan = async ({ resourceId }: { resourceId: string }) => {
     if (resourceId) {
-      await this.audit({ resourceId })
+      await this.audit({ resource: resourceId })
     } else {
       const users = await this.listUsers()
 
       for (const user of users) {
-        await this.audit({ resourceId: user.UserName })
+        await this.audit({ resource: user.UserName })
       }
     }
   }
@@ -124,6 +125,7 @@ export const handler = async (args: MaxKeyAgeCliInterface) => {
     profile: args.profile,
     resourceId: args.resourceId,
     maxAge: args.maxAge,
+    verbosity: args.verbosity,
   })
 
   await scanner.start()

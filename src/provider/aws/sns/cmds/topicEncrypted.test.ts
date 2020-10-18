@@ -287,13 +287,18 @@ describe('sns topic encryption', () => {
     mock('KMS', 'describeKey', {
       KeyMetadata: { Arn: 'test', KeyManager: 'CUSTOMER' },
     })
-    const audits = await handler({
-      region: 'us-east-1',
-      profile: 'test',
-      resourceId: 'test',
-      keyType: 'test' as 'aws',
-    })
-    expect(audits).to.eql([])
+    let audits
+    try {
+      audits = await handler({
+        region: 'us-east-1',
+        profile: 'test',
+        resourceId: 'test',
+        keyType: 'test' as 'aws',
+      })
+    } catch (err) {
+      audits = err
+    }
+    expect(audits instanceof Error).to.be.true
   })
 
   it('should report nothing for when there are no topics to scan', async () => {

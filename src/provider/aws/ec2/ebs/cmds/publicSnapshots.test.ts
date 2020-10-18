@@ -3,9 +3,8 @@ import { useFakeTimers, SinonFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
 import { handler } from './publicSnapshots'
 import { expect } from 'chai'
-import { AWSScannerCliArgsInterface } from 'cloud-search'
 
-describe('sns topic encryption', () => {
+describe('ebs snapshot public', () => {
   const now = new Date(0)
   let clock: SinonFakeTimers
 
@@ -25,13 +24,15 @@ describe('sns topic encryption', () => {
     let audits
     audits = await handler({
       profile: 'test',
-    } as AWSScannerCliArgsInterface)
+      region: 'all',
+    })
 
     expect(audits).to.eql([])
 
     audits = await handler({
       profile: 'test',
-    } as AWSScannerCliArgsInterface)
+      region: 'all',
+    })
 
     expect(audits).to.eql([])
   })
@@ -42,7 +43,7 @@ describe('sns topic encryption', () => {
       profile: 'test',
       region: 'test',
       resourceId: 'test',
-    } as AWSScannerCliArgsInterface)
+    })
 
     expect(audits).to.eql([
       {
@@ -65,7 +66,7 @@ describe('sns topic encryption', () => {
     const audits = await handler({
       profile: 'test',
       region: 'all',
-    } as AWSScannerCliArgsInterface)
+    })
 
     expect(audits).to.eql([
       {
@@ -89,7 +90,7 @@ describe('sns topic encryption', () => {
       profile: 'test',
       region: 'test',
       resourceId: 'test',
-    } as AWSScannerCliArgsInterface)
+    })
 
     expect(audits).to.eql([
       {
@@ -115,7 +116,7 @@ describe('sns topic encryption', () => {
       profile: 'test',
       region: 'test',
       resourceId: 'test',
-    } as AWSScannerCliArgsInterface)
+    })
 
     expect(audits).to.eql([
       {
@@ -141,7 +142,7 @@ describe('sns topic encryption', () => {
       profile: 'test',
       region: 'test',
       resourceId: 'test',
-    } as AWSScannerCliArgsInterface)
+    })
 
     expect(audits).to.eql([
       {

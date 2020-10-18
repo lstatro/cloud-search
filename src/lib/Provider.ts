@@ -1,17 +1,20 @@
-import { AuditResultInterface } from 'cloud-search'
+import { AuditResultInterface, VerbosityType } from 'cloud-search'
 import chalk from 'chalk'
 import ora, { Ora } from 'ora'
 
 export default abstract class Provider {
   audits: AuditResultInterface[] = []
-  spinner: Ora
-  rule: string
+  spinner?: Ora
 
-  constructor(rule: string) {
+  constructor(public rule: string, public verbosity: VerbosityType = 'silent') {
     this.rule = rule
-    this.spinner = ora({
-      prefixText: rule,
-    })
+
+    /** we want to have a spinner for anything that is not silent */
+    if (verbosity !== 'silent') {
+      this.spinner = ora({
+        prefixText: rule,
+      })
+    }
   }
 
   // getBackOff = (modifier: number) => {
@@ -23,7 +26,25 @@ export default abstract class Provider {
   //   await new Promise((resolve) => setTimeout(resolve, this.getBackOff(timer)))
   // }
 
-  output = () => {
+  handleSpinnerStatus = ({
+    method,
+    message,
+  }: {
+    method: 'fail' | 'succeed' | 'start'
+    message?: string
+  }) => {
+    if (this.spinner) {
+      this.spinner[method](message)
+    }
+  }
+
+  handleSpinnerText = ({ message }: { message: string }) => {
+    if (this.spinner) {
+      this.spinner.text = message
+    }
+  }
+
+  handleNormalOutput = () => {
     const log = console.log
 
     log(
@@ -57,5 +78,18 @@ export default abstract class Provider {
         )
       }
     }
+  }
+
+  handleSilentOutput = () => {
+    // do nothing
+  }
+
+  output = () => {
+    const methods = {
+      silent: this.handleSilentOutput,
+      normal: this.handleNormalOutput,
+    }
+
+    methods[this.verbosity]()
   }
 }

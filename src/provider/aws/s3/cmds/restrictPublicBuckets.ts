@@ -19,6 +19,7 @@ export const handler = async (args: AWSScannerCliArgsInterface) => {
     profile: args.profile,
     resourceId: args.resourceId,
     region: args.region,
+    verbosity: args.verbosity,
     rule,
   })
   await scanner.start()
