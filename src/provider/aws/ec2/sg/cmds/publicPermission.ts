@@ -87,7 +87,7 @@ export default class PublicPermission extends AWS {
     region: string
     resourceId?: string
   }) => {
-    const groups = await this.describeSecurityGroups(region, resourceId)
+    const groups = await this.listSecurityGroups(region, resourceId)
     for (const group of groups) {
       await this.audit({ resource: group, region })
     }

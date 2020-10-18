@@ -4,10 +4,6 @@ import {
   AWSParamsInterface,
   KeyType,
 } from 'cloud-search'
-import _AWS from 'aws-sdk'
-import Provider from '../Provider'
-
-import assert from 'assert'
 import { Bucket } from 'aws-sdk/clients/s3'
 import {
   InternetGateway,
@@ -20,6 +16,9 @@ import { Role, User } from 'aws-sdk/clients/iam'
 import { Topic } from 'aws-sdk/clients/sns'
 import { QueueUrlList } from 'aws-sdk/clients/sqs'
 import { DBCluster, DBInstance } from 'aws-sdk/clients/rds'
+import _AWS from 'aws-sdk'
+import Provider from '../Provider'
+import assert from 'assert'
 
 interface ScanInterface {
   region?: string
@@ -98,7 +97,7 @@ export abstract class AWS extends Provider {
     return options
   }
 
-  describeRegions = async () => {
+  listRegions = async () => {
     const options = this.getOptions()
     options.region = 'us-east-1'
     const describeRegions = await new this.AWS.EC2(options)
@@ -122,7 +121,7 @@ export abstract class AWS extends Provider {
       /** if this is not a global rule we need to get all regions, if it is, then we default o just one */
       if (this.global === false) {
         /** welp, lets start with by setting us-east-1 and getting a list of all regions */
-        const regions = await this.describeRegions()
+        const regions = await this.listRegions()
         this.regions = this.regions.concat(regions)
       } else {
         this.regions.push('us-east-1')
@@ -166,7 +165,7 @@ export abstract class AWS extends Provider {
     }
   }
 
-  describeInternetGateways = async (region: string, resourceId?: string) => {
+  listInternetGateways = async (region: string, resourceId?: string) => {
     const options = this.getOptions()
     options.region = region
 
@@ -208,7 +207,7 @@ export abstract class AWS extends Provider {
     return buckets
   }
 
-  describeSecurityGroups = async (region: string, resourceId?: string) => {
+  listSecurityGroups = async (region: string, resourceId?: string) => {
     const options = this.getOptions()
     options.region = region
 
@@ -234,7 +233,7 @@ export abstract class AWS extends Provider {
     return groups
   }
 
-  describeVolumes = async (region: string, resourceId?: string) => {
+  listVolumes = async (region: string, resourceId?: string) => {
     const options = this.getOptions()
     options.region = region
 
