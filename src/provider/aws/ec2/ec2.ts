@@ -1,7 +1,7 @@
 import { Argv } from 'yargs'
 
 export const command = 'ec2'
-export const desc = 'elastic cloud compute (ec2)'
+export const desc = 'Elastic Cloud Compute (EC2)'
 
 const opts = {
   exclude: /.*.test.js/,

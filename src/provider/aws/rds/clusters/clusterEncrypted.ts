@@ -18,7 +18,7 @@ export const desc = `RDS clusters must have their stroage at rest encrypted
   WARNING - RDS cluster storage is encrypted but not with the specified key type
   FAIL    - RDS cluster storage is not encrypted at rest
 
-  resource: RDS clusters ARN
+  resourceId: RDS clusters ARN
 
   note: this rule targets DB Clusters not DB Instances' (MySQL, PostgreSQL, Oracle, MariaDB, MSSQL).
 

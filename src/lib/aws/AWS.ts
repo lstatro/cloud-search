@@ -19,6 +19,7 @@ import { DBCluster, DBInstance } from 'aws-sdk/clients/rds'
 import _AWS from 'aws-sdk'
 import Provider from '../Provider'
 import assert from 'assert'
+import { TrailInfo } from 'aws-sdk/clients/cloudtrail'
 
 interface ScanInterface {
   region?: string
@@ -530,5 +531,30 @@ export abstract class AWS extends Provider {
     } while (marker)
 
     return dbClusters
+  }
+
+  listTrails = async (region: string) => {
+    const options = this.getOptions()
+    options.region = region
+
+    const cloudtrail = new this.AWS.CloudTrail(options)
+
+    let nextToken: string | undefined
+
+    let trails: TrailInfo[] = []
+
+    do {
+      const listTrails = await cloudtrail
+        .listTrails({
+          NextToken: nextToken,
+        })
+        .promise()
+      nextToken = listTrails.NextToken
+      if (listTrails.Trails) {
+        trails = trails.concat(listTrails.Trails)
+      }
+    } while (nextToken)
+
+    return trails
   }
 }

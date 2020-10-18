@@ -1,7 +1,7 @@
 import { Argv } from 'yargs'
 
 export const command = 's3'
-export const desc = 'simple storage service (s3)'
+export const desc = 'Simple Storage Service (S3)'
 
 const opts = {
   exclude: /.*.test.js/,

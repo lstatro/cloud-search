@@ -1,7 +1,7 @@
 import { Argv } from 'yargs'
 
-export const command = 'kms'
-export const desc = 'Key Management Service (KMS)'
+export const command = 'cloudtrail'
+export const desc = 'CloudTrail'
 
 const opts = {
   exclude: /.*.test.js/,
