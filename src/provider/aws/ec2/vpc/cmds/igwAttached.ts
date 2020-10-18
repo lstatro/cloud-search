@@ -1,6 +1,6 @@
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import { InternetGateway } from 'aws-sdk/clients/ec2'
-import AWS from '../../../../../lib/aws/AWS'
+import { AWS } from '../../../../../lib/aws/AWS'
 import assert from 'assert'
 
 const rule = 'IgwAttachedToVpc'

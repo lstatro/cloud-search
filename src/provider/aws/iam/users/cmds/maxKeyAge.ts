@@ -1,7 +1,7 @@
 /** TODO: this needs to support resource */
 
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
-import AWS from '../../../../../lib/aws/AWS'
+import { AWS } from '../../../../../lib/aws/AWS'
 import { AccessKeyMetadata, User } from 'aws-sdk/clients/iam'
 import { CommandBuilder } from 'yargs'
 

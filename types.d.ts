@@ -13,6 +13,9 @@ declare module 'cloud-search' {
   /** cloud provider name */
   export type CloudProviderNameType = 'aws'
 
+  /** aws kms key types */
+  export type KeyType = 'aws' | 'cmk'
+
   /** time the resource was last scanned */
   export type ScanTimeType = string
 
@@ -58,6 +61,7 @@ declare module 'cloud-search' {
 
   export interface AWSScannerInterface {
     region: string
+    keyType?: KeyType
     profile?: string
     resourceId?: string
     verbosity?: VerbosityType

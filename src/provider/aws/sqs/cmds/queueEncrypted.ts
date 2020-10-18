@@ -1,20 +1,14 @@
 import { CommandBuilder } from 'yargs'
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
-
-import AWS from '../../../../lib/aws/AWS'
+import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
+import assert from 'assert'
 
 const rule = 'QueueEncrypted'
 
 export const command = `${rule} [args]`
 
 export const builder: CommandBuilder = {
-  keyType: {
-    alias: 't',
-    describe: 'the AWS key type',
-    type: 'string',
-    default: 'aws',
-    choices: ['aws', 'cmk'],
-  },
+  ...keyTypeArg,
 }
 
 export const desc = `SQS topics must be encrypted
@@ -28,18 +22,13 @@ export const desc = `SQS topics must be encrypted
 
 `
 
-export interface QueueEncryptedInterface extends AWSScannerInterface {
-  keyType: 'aws' | 'cmk'
-}
-
 export default class TopicEncrypted extends AWS {
   audits: AuditResultInterface[] = []
   service = 'sqs'
   global = false
   keyId?: string
-  keyType: 'aws' | 'cmk'
 
-  constructor(public params: QueueEncryptedInterface) {
+  constructor(public params: AWSScannerInterface) {
     super({
       profile: params.profile,
       resourceId: params.resourceId,
@@ -78,6 +67,7 @@ export default class TopicEncrypted extends AWS {
      */
     if (getQueueAttributes.Attributes) {
       if (getQueueAttributes.Attributes.KmsMasterKeyId) {
+        assert(this.keyType, 'key type is required')
         const isTrusted = await this.isKeyTrusted(
           getQueueAttributes.Attributes.KmsMasterKeyId,
           this.keyType,
@@ -111,7 +101,7 @@ export default class TopicEncrypted extends AWS {
   }
 }
 
-export const handler = async (args: QueueEncryptedInterface) => {
+export const handler = async (args: AWSScannerInterface) => {
   const scanner = new TopicEncrypted({
     region: args.region,
     profile: args.profile,

@@ -1,4 +1,9 @@
-import { AWSClientOptionsInterface, AWSParamsInterface } from 'cloud-search'
+import { CommandBuilder } from 'yargs'
+import {
+  AWSClientOptionsInterface,
+  AWSParamsInterface,
+  KeyType,
+} from 'cloud-search'
 import _AWS from 'aws-sdk'
 import Provider from '../Provider'
 
@@ -31,7 +36,17 @@ interface AuditInterface {
   region?: string
 }
 
-export default abstract class AwsService extends Provider {
+export const keyTypeArg: CommandBuilder = {
+  keyType: {
+    alias: 't',
+    describe: 'the AWS key type',
+    type: 'string',
+    default: 'aws',
+    choices: ['aws', 'cmk'],
+  },
+}
+
+export abstract class AWS extends Provider {
   abstract service: string
 
   options: AWSClientOptionsInterface
@@ -43,6 +58,7 @@ export default abstract class AwsService extends Provider {
   keyMetaData: KeyCacheInterface[] = []
   profile?: string
   resourceId?: string
+  keyType?: KeyType
 
   constructor(params: AWSParamsInterface) {
     super(params.rule, params.verbosity)

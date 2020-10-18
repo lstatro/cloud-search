@@ -2,7 +2,7 @@
 
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import assert from 'assert'
-import AWS from '../../../../../lib/aws/AWS'
+import { AWS } from '../../../../../lib/aws/AWS'
 
 const rule = 'PublicRole'
 

@@ -1,19 +1,13 @@
 import { CommandBuilder } from 'yargs'
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import assert from 'assert'
-import AWS from '../../../../lib/aws/AWS'
+import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
 import { DBInstance } from 'aws-sdk/clients/rds'
 
 const rule = 'InstanceEncrypted'
 
 export const builder: CommandBuilder = {
-  keyType: {
-    alias: 't',
-    describe: 'the AWS key type',
-    type: 'string',
-    default: 'aws',
-    choices: ['aws', 'cmk'],
-  },
+  ...keyTypeArg,
 }
 
 export const command = `${rule} [args]`
@@ -30,17 +24,12 @@ export const desc = `RDS instances must not have the PubliclyAccessible flag set
 
 `
 
-export interface InstanceEncryptedInterface extends AWSScannerInterface {
-  keyType: 'aws' | 'cmk'
-}
-
 export default class PublicInstance extends AWS {
   audits: AuditResultInterface[] = []
   service = 'rds'
   global = false
-  keyType: 'aws' | 'cmk'
 
-  constructor(public params: InstanceEncryptedInterface) {
+  constructor(public params: AWSScannerInterface) {
     super({
       profile: params.profile,
       resourceId: params.resourceId,
@@ -70,6 +59,7 @@ export default class PublicInstance extends AWS {
         resource.StorageEncrypted === true,
         'key found, but rds instance is not encrypted'
       )
+      assert(this.keyType, 'key type is required')
       audit.state = await this.isKeyTrusted(
         resource.KmsKeyId,
         this.keyType,
@@ -106,7 +96,7 @@ export default class PublicInstance extends AWS {
   }
 }
 
-export const handler = async (args: InstanceEncryptedInterface) => {
+export const handler = async (args: AWSScannerInterface) => {
   const scanner = new PublicInstance({
     region: args.region,
     profile: args.profile,

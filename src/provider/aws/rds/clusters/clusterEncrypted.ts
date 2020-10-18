@@ -1,19 +1,12 @@
-import { CommandBuilder } from 'yargs'
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import assert from 'assert'
-import AWS from '../../../../lib/aws/AWS'
+import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
 import { DBCluster } from 'aws-sdk/clients/rds'
 
 const rule = 'ClusterEncrypted'
 
-export const builder: CommandBuilder = {
-  keyType: {
-    alias: 't',
-    describe: 'the AWS key type',
-    type: 'string',
-    default: 'aws',
-    choices: ['aws', 'cmk'],
-  },
+export const builder = {
+  ...keyTypeArg,
 }
 
 export const command = `${rule} [args]`

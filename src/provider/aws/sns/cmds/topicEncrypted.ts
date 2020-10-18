@@ -1,20 +1,14 @@
 import { CommandBuilder } from 'yargs'
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import assert from 'assert'
-import AWS from '../../../../lib/aws/AWS'
+import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
 
 const rule = 'TopicEncrypted'
 
 export const command = `${rule} [args]`
 
 export const builder: CommandBuilder = {
-  keyType: {
-    alias: 't',
-    describe: 'the AWS key type',
-    type: 'string',
-    default: 'aws',
-    choices: ['aws', 'cmk'],
-  },
+  ...keyTypeArg,
 }
 
 export const desc = `SNS topics must be encrypted
@@ -28,18 +22,13 @@ export const desc = `SNS topics must be encrypted
 
 `
 
-export interface TopicEncryptedInterface extends AWSScannerInterface {
-  keyType: 'aws' | 'cmk'
-}
-
 export default class TopicEncrypted extends AWS {
   audits: AuditResultInterface[] = []
   service = 'sns'
   global = false
   keyId?: string
-  keyType: 'aws' | 'cmk'
 
-  constructor(public params: TopicEncryptedInterface) {
+  constructor(public params: AWSScannerInterface) {
     super({
       profile: params.profile,
       resourceId: params.resourceId,
@@ -76,6 +65,7 @@ export default class TopicEncrypted extends AWS {
 
     if (getTopicAttributes.Attributes) {
       if (getTopicAttributes.Attributes.KmsMasterKeyId) {
+        assert(this.keyType, 'key type is required')
         const isTrusted = await this.isKeyTrusted(
           getTopicAttributes.Attributes.KmsMasterKeyId,
           this.keyType,
@@ -109,7 +99,7 @@ export default class TopicEncrypted extends AWS {
   }
 }
 
-export const handler = async (args: TopicEncryptedInterface) => {
+export const handler = async (args: AWSScannerInterface) => {
   const scanner = new TopicEncrypted({
     region: args.region,
     profile: args.profile,

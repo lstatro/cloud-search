@@ -1,29 +1,15 @@
 import { CommandBuilder } from 'yargs'
 import { Volume } from 'aws-sdk/clients/ec2'
-import {
-  AuditResultInterface,
-  AWSScannerCliArgsInterface,
-  AWSScannerInterface,
-} from 'cloud-search'
+import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import assert from 'assert'
-import AWS from '../../../../../lib/aws/AWS'
+import { AWS, keyTypeArg } from '../../../../../lib/aws/AWS'
 
 const rule = 'VolumesEncrypted'
 
 export const command = `${rule} [args]`
+
 export const builder: CommandBuilder = {
-  keyType: {
-    alias: 't',
-    describe: 'the AWS key type',
-    type: 'string',
-    default: 'aws',
-    choices: ['aws', 'cmk'],
-  },
-  keyArn: {
-    alias: 'a',
-    describe: 'a KMS key arn',
-    type: 'string',
-  },
+  ...keyTypeArg,
 }
 
 export const desc = `Verifies that EBS volume are encrypted
@@ -37,18 +23,11 @@ export const desc = `Verifies that EBS volume are encrypted
 
 `
 
-export interface VolumesEncryptedInterface extends AWSScannerInterface {
-  keyArn?: string
-  keyType: 'aws' | 'cmk'
-}
-
 export default class VolumesEncrypted extends AWS {
   audits: AuditResultInterface[] = []
   service = 'ebs'
-  keyArn?: string
-  keyType: 'aws' | 'cmk'
 
-  constructor(public params: VolumesEncryptedInterface) {
+  constructor(public params: AWSScannerInterface) {
     super({
       profile: params.profile,
       resourceId: params.resourceId,
@@ -56,8 +35,7 @@ export default class VolumesEncrypted extends AWS {
       verbosity: params.verbosity,
       rule,
     })
-    this.keyArn = params.keyArn
-    this.keyType = params.keyType
+    this.keyType = params.keyType || 'aws'
   }
 
   async audit({ resource, region }: { resource: Volume; region: string }) {
@@ -78,6 +56,7 @@ export default class VolumesEncrypted extends AWS {
         resource.Encrypted === true,
         'key detected, but volume reports as not encrypted'
       )
+      assert(this.keyType, 'key type is required')
       audit.state = await this.isKeyTrusted(
         resource.KmsKeyId,
         this.keyType,
@@ -108,16 +87,11 @@ export default class VolumesEncrypted extends AWS {
   }
 }
 
-export interface VolumesEncryptedCliInterface
-  extends VolumesEncryptedInterface,
-    AWSScannerCliArgsInterface {}
-
-export const handler = async (args: VolumesEncryptedInterface) => {
+export const handler = async (args: AWSScannerInterface) => {
   const scanner = await new VolumesEncrypted({
     region: args.region,
     profile: args.profile,
     resourceId: args.resourceId,
-    keyArn: args.keyArn,
     keyType: args.keyType,
     verbosity: args.verbosity,
   })

@@ -1,7 +1,7 @@
 import { CommandBuilder } from 'yargs'
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 
-import AWS from '../../../../lib/aws/AWS'
+import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
 import assert from 'assert'
 import { ServerSideEncryptionConfiguration } from 'aws-sdk/clients/s3'
 
@@ -10,13 +10,7 @@ const rule = 'BucketEncryption'
 export const command = `${rule} [args]`
 
 export const builder: CommandBuilder = {
-  keyType: {
-    alias: 't',
-    describe: 'the AWS key type',
-    type: 'string',
-    default: 'aws',
-    choices: ['aws', 'cmk'],
-  },
+  ...keyTypeArg,
 }
 
 export const desc = `SQS topics must be encrypted
@@ -30,17 +24,12 @@ export const desc = `SQS topics must be encrypted
 
 `
 
-export interface BucketEncryptedInterface extends AWSScannerInterface {
-  keyType: 'aws' | 'cmk'
-}
-
 export default class TopicEncrypted extends AWS {
   audits: AuditResultInterface[] = []
   service = 's3'
   global = true
-  keyType: 'aws' | 'cmk'
 
-  constructor(public params: BucketEncryptedInterface) {
+  constructor(public params: AWSScannerInterface) {
     super({
       profile: params.profile,
       resourceId: params.resourceId,
@@ -86,6 +75,7 @@ export default class TopicEncrypted extends AWS {
       }
       if (rule.ApplyServerSideEncryptionByDefault?.KMSMasterKeyID) {
         isEncrypted = true
+        assert(this.keyType, 'key type is required')
         audit.state = await this.isKeyTrusted(
           rule.ApplyServerSideEncryptionByDefault.KMSMasterKeyID,
           this.keyType,
@@ -167,7 +157,7 @@ export default class TopicEncrypted extends AWS {
   }
 }
 
-export const handler = async (args: BucketEncryptedInterface) => {
+export const handler = async (args: AWSScannerInterface) => {
   const scanner = new TopicEncrypted({
     region: args.region,
     profile: args.profile,
