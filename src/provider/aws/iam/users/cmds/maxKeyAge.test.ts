@@ -1,6 +1,6 @@
 import 'mocha'
 import { mock, restore } from 'aws-sdk-mock'
-import { handler } from './age'
+import { handler } from './maxKeyAge'
 import { expect } from 'chai'
 
 describe('iam user key age', () => {
