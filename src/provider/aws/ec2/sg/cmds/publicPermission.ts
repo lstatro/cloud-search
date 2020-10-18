@@ -1,8 +1,4 @@
-import {
-  AuditResultInterface,
-  AWSScannerCliArgsInterface,
-  AWSScannerInterface,
-} from 'cloud-search'
+import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import { SecurityGroup } from 'aws-sdk/clients/ec2'
 import AWS from '../../../../../lib/aws/AWS'
 import assert from 'assert'
@@ -98,7 +94,7 @@ export default class PublicPermission extends AWS {
   }
 }
 
-export const handler = async (args: AWSScannerCliArgsInterface) => {
+export const handler = async (args: AWSScannerInterface) => {
   const scanner = await new PublicPermission({
     region: args.region,
     profile: args.profile,

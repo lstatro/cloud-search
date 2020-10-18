@@ -3,7 +3,6 @@ import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import assert from 'assert'
 import AWS from '../../../../lib/aws/AWS'
 import { DBCluster } from 'aws-sdk/clients/rds'
-import { AWSScannerCliArgsInterface } from 'cloud-search'
 
 const rule = 'ClusterEncrypted'
 
@@ -35,10 +34,6 @@ export const desc = `RDS clusters must have their stroage at rest encrypted
 export interface ClusterEncryptedInterface extends AWSScannerInterface {
   keyType: 'aws' | 'cmk'
 }
-
-export interface ClusterEncryptedCliInterface
-  extends ClusterEncryptedInterface,
-    AWSScannerCliArgsInterface {}
 
 export default class ClusterEncrypted extends AWS {
   audits: AuditResultInterface[] = []
@@ -112,7 +107,7 @@ export default class ClusterEncrypted extends AWS {
   }
 }
 
-export const handler = async (args: ClusterEncryptedCliInterface) => {
+export const handler = async (args: ClusterEncryptedInterface) => {
   const scanner = new ClusterEncrypted({
     region: args.region,
     profile: args.profile,

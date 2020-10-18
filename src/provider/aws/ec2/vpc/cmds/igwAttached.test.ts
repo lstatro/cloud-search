@@ -3,10 +3,7 @@ import 'chai'
 import { useFakeTimers, SinonFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
 import { handler } from './igwAttached'
-import { AWSScannerCliArgsInterface } from 'cloud-search'
 import { expect } from 'chai'
-
-/** none of these tests should throw */
 
 describe('igw vpc attachment', () => {
   const now = new Date(0)
@@ -38,7 +35,7 @@ describe('igw vpc attachment', () => {
       region: 'us-east-1',
       profile: 'test',
       resourceId: 'test',
-    } as AWSScannerCliArgsInterface)
+    })
     expect(audits).to.eql([
       {
         provider: 'aws',
@@ -70,7 +67,7 @@ describe('igw vpc attachment', () => {
       region: 'us-east-1',
       profile: 'test',
       resourceId: 'test',
-    } as AWSScannerCliArgsInterface)
+    })
 
     expect(audits).to.eql([
       {
@@ -99,7 +96,7 @@ describe('igw vpc attachment', () => {
       region: 'us-east-1',
       profile: 'test',
       resourceId: 'test',
-    } as AWSScannerCliArgsInterface)
+    })
 
     expect(audits).to.eql([
       {
@@ -128,7 +125,7 @@ describe('igw vpc attachment', () => {
       region: 'us-east-1',
       profile: 'test',
       resourceId: 'test',
-    } as AWSScannerCliArgsInterface)
+    })
 
     expect(audits).to.eql([
       {
@@ -156,7 +153,7 @@ describe('igw vpc attachment', () => {
       region: 'us-east-1',
       profile: 'test',
       resourceId: 'test',
-    } as AWSScannerCliArgsInterface)
+    })
 
     expect(audits).to.eql([
       {
@@ -183,7 +180,7 @@ describe('igw vpc attachment', () => {
     })
     const audits = await handler({
       region: 'all',
-    } as AWSScannerCliArgsInterface)
+    })
 
     expect(audits).to.eql([
       {
@@ -203,7 +200,7 @@ describe('igw vpc attachment', () => {
     mock('EC2', 'describeInternetGateways', {})
     const audits = await handler({
       region: 'all',
-    } as AWSScannerCliArgsInterface)
+    })
     expect(audits).to.eql([])
   })
 
@@ -211,7 +208,7 @@ describe('igw vpc attachment', () => {
     mock('EC2', 'describeInternetGateways', {})
     const audits = await handler({
       region: 'all',
-    } as AWSScannerCliArgsInterface)
+    })
     expect(audits).to.eql([])
   })
 
@@ -219,7 +216,7 @@ describe('igw vpc attachment', () => {
     mock('EC2', 'describeInternetGateways', {})
     const audits = await handler({
       region: 'us-east-1',
-    } as AWSScannerCliArgsInterface)
+    })
     expect(audits).to.eql([])
   })
 })

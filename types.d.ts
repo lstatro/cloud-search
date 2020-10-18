@@ -25,7 +25,7 @@ declare module 'cloud-search' {
   export type AuditStateType = 'OK' | 'FAIL' | 'UNKNOWN' | 'WARNING'
 
   export interface AWSParamsInterface {
-    profile: string
+    profile?: string
     rule: string
     resourceId?: string
     region: string
@@ -58,7 +58,7 @@ declare module 'cloud-search' {
 
   export interface AWSScannerInterface {
     region: string
-    profile: string
+    profile?: string
     resourceId?: string
     verbosity?: VerbosityType
   }

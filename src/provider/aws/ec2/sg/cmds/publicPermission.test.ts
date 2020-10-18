@@ -3,7 +3,6 @@ import 'chai'
 import { useFakeTimers, SinonFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
 import { handler } from './publicPermission'
-import { AWSScannerCliArgsInterface } from 'cloud-search'
 import { expect } from 'chai'
 
 /** none of these tests should throw */
@@ -42,7 +41,7 @@ describe('security group with a public permission', () => {
       region: 'us-east-1',
       profile: 'test',
       resourceId: 'test',
-    } as AWSScannerCliArgsInterface)
+    })
     expect(audits).to.eql([
       {
         name: undefined,
@@ -79,7 +78,7 @@ describe('security group with a public permission', () => {
       region: 'us-east-1',
       profile: 'test',
       resourceId: 'test',
-    } as AWSScannerCliArgsInterface)
+    })
     expect(audits).to.eql([
       {
         name: undefined,
@@ -115,7 +114,7 @@ describe('security group with a public permission', () => {
     const audits = await handler({
       profile: 'test',
       region: 'all',
-    } as AWSScannerCliArgsInterface)
+    })
     expect(audits).to.eql([
       {
         name: undefined,
@@ -144,7 +143,7 @@ describe('security group with a public permission', () => {
       region: 'us-east-1',
       profile: 'test',
       resourceId: 'test',
-    } as AWSScannerCliArgsInterface)
+    })
     expect(audits).to.eql([
       {
         name: undefined,
@@ -172,7 +171,7 @@ describe('security group with a public permission', () => {
       region: 'us-east-1',
       profile: 'test',
       resourceId: 'test',
-    } as AWSScannerCliArgsInterface)
+    })
     expect(audits).to.eql([
       {
         name: undefined,
@@ -209,7 +208,7 @@ describe('security group with a public permission', () => {
       region: 'us-east-1',
       profile: 'test',
       resourceId: 'test',
-    } as AWSScannerCliArgsInterface)
+    })
     expect(audits).to.eql([
       {
         name: undefined,
@@ -246,7 +245,7 @@ describe('security group with a public permission', () => {
       region: 'us-east-1',
       profile: 'test',
       resourceId: 'test',
-    } as AWSScannerCliArgsInterface)
+    })
     expect(audits).to.eql([
       {
         name: undefined,
@@ -268,7 +267,7 @@ describe('security group with a public permission', () => {
       region: 'us-east-1',
       profile: 'test',
       resourceId: 'test',
-    } as AWSScannerCliArgsInterface)
+    })
     expect(audits).to.eql([])
   })
 
@@ -284,7 +283,7 @@ describe('security group with a public permission', () => {
         region: 'us-east-1',
         profile: 'test',
         resourceId: 'test',
-      } as AWSScannerCliArgsInterface)
+      })
     } catch (err) {
       audits = err
     }
