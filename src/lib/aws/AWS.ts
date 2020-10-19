@@ -541,7 +541,7 @@ export abstract class AWS extends Provider {
 
     let nextToken: string | undefined
 
-    let trails: TrailInfo[] = []
+    const trails: TrailInfo[] = []
 
     do {
       const listTrails = await cloudtrail
@@ -551,7 +551,20 @@ export abstract class AWS extends Provider {
         .promise()
       nextToken = listTrails.NextToken
       if (listTrails.Trails) {
-        trails = trails.concat(listTrails.Trails)
+        for (const trail of listTrails.Trails) {
+          /**
+           * Weird, but global trails are returned in every listTrails api call.
+           * This is a little misleading as technically CT isn't a global service.
+           * To combat this oddness, we're going to only validate trails in the
+           * target region.  If it's global and it's not in this region we just
+           * ignore it.  If its then we'll audit it.  This allows us to also audit
+           * regional trails as false in all regions.  This used to be a global
+           * rules but the weirdness bit us in the long run.
+           */
+          if (trail.HomeRegion === region) {
+            trails.push(trail)
+          }
+        }
       }
     } while (nextToken)
 

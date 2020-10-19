@@ -18,7 +18,7 @@ describe('cloudtrail multi region trail enabled', () => {
     restore()
   })
 
-  it('should return FAIL if no trails are found', async () => {
+  it('should return nothing if no trails are found', async () => {
     mock('CloudTrail', 'listTrails', {})
 
     const audits = await handler({
@@ -28,7 +28,7 @@ describe('cloudtrail multi region trail enabled', () => {
     expect(audits).to.eql([])
   })
 
-  it('should return FAIL if no trails are returned', async () => {
+  it('should return nothing if no trails are returned', async () => {
     mock('CloudTrail', 'listTrails', { Trails: [] })
 
     const audits = await handler({
