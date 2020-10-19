@@ -16,12 +16,17 @@ export const desc = `a cloudtrail trail's multi-region flag is set to true and t
 
   resourceId: trail ARN
 
+  note: multi-regional trails are global.  Meaning, we only need to search one region to find a multi-region
+        trail.  To combat this we validate the trail returned in a scan lives in the region we made the api 
+        call too.  If it does not, it is ignored.  This ensures that we we catch a multi-region trail we also
+        catch the real home region.
+
 `
 
 export default class MultiRegionTrailEnabled extends AWS {
   audits: AuditResultInterface[] = []
   service = 'cloudtrail'
-  global = true
+  global = false
 
   constructor(public params: AWSScannerInterface) {
     super({
@@ -61,12 +66,16 @@ export default class MultiRegionTrailEnabled extends AWS {
       })
       .promise()
 
+    // console.log(JSON.stringify({ getTrail, getTrailStatus }, null, 2))
+
     if (getTrail.Trail) {
       if (getTrail.Trail.IsMultiRegionTrail === true) {
         audit.state = 'WARNING'
         if (getTrailStatus.IsLogging === true) {
           audit.state = 'OK'
         }
+      } else {
+        audit.state = 'FAIL'
       }
     }
 
@@ -85,8 +94,19 @@ export default class MultiRegionTrailEnabled extends AWS {
     } else {
       const trails = await this.listTrails(region)
       for (const trail of trails) {
-        assert(trail.TrailARN, 'trail does not have a ARN')
-        await this.audit({ resource: trail.TrailARN, region })
+        /**
+         * Weird, but global trails are returned in every listTrails api call.
+         * This is a little misleading as technically CT isn't a global service.
+         * To combat this oddness, we're going to only validate trails in the
+         * target region.  If it's global and it's not in this region we just
+         * ignore it.  If its then we'll audit it.  This allows us to also audit
+         * regional trails as false in all regions.  This used to be a global
+         * rules but the weirdness bit us in the long run.
+         */
+        if (trail.HomeRegion === region) {
+          assert(trail.TrailARN, 'trail does not have a ARN')
+          await this.audit({ resource: trail.TrailARN, region })
+        }
       }
     }
   }
