@@ -37,4 +37,44 @@ describe('cloudtrail events must be configured correctly', () => {
 
     expect(audits).to.eql([])
   })
+
+  it('should return OK if the trail is encrypted', async () => {
+    mock('CloudTrail', 'listTrails', {
+      Trails: [
+        {
+          TrailARN: 'test',
+          HomeRegion: 'us-east-1',
+        },
+      ],
+    })
+
+    mock('CloudTrail', 'getTrail', {
+      Trail: {
+        KmsKeyId: 'test',
+      },
+    })
+
+    mock('KMS', 'describeKey', {
+      KeyMetadata: { Arn: 'test', KeyManager: 'AWS' },
+    })
+
+    const audits = await handler({
+      region: 'all',
+      keyType: 'aws',
+      profile: 'test',
+    })
+
+    expect(audits).to.eql([
+      {
+        physicalId: 'test',
+        profile: 'test',
+        provider: 'aws',
+        region: 'us-east-1',
+        rule: 'TrailEncrypted',
+        service: 'cloudtrail',
+        state: 'OK',
+        time: '1970-01-01T00:00:00.000Z',
+      },
+    ])
+  })
 })
