@@ -79,7 +79,7 @@ export default class VolumesEncrypted extends AWS {
     const options = this.getOptions()
     options.region = region
 
-    const volumes = await this.describeVolumes(region, resourceId)
+    const volumes = await this.listVolumes(region, resourceId)
 
     for (const volume of volumes) {
       this.audit({ resource: volume, region })

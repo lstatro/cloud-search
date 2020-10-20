@@ -15,6 +15,8 @@ export const desc = `Roles must not allow * in trust policy principal
   WARNING - role allows for public access under a specific condition more investigation is required
   FAIL    - Role allows * in the trust document principal
 
+  resourceId: role name
+
   note: iam is global, passing in a region won't change results
   note: this does not take into account the statement ACTION, this means that even DENY statements will flag as
         an issue.  

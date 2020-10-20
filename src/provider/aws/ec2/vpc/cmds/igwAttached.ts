@@ -72,7 +72,7 @@ export default class IgwAttachedToVpc extends AWS {
     region: string
     resourceId?: string
   }) => {
-    const igws = await this.describeInternetGateways(region, resourceId)
+    const igws = await this.listInternetGateways(region, resourceId)
     for (const igw of igws) {
       this.audit({ resource: igw, region })
     }
