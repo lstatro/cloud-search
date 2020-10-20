@@ -7,8 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- AWS - SnapshotEncrypted
+
+## [1.3.0] - 2020-10-19
+
+### Added
+
 - AWS - TrailEncrypted
 - CHANGELOG.md
+
+### Changed
+
+- removed unnecessary keyId references
+
+### Removed
 
 ## [1.2.0] - 2020-10-19
 
