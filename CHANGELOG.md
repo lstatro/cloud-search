@@ -41,6 +41,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Removed
 
 - coveralls will no longer run on pull requests
+- deprecated all `1.0.*` builds in npm
 
 ## [1.1.0] - 2020-10-18
 
