@@ -1,57 +1,50 @@
-import { CommandBuilder } from 'yargs'
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import assert from 'assert'
+
 import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
 
-const rule = 'TopicEncrypted'
+const rule = 'TrailEncrypted'
 
-export const command = `${rule} [args]`
-
-export const builder: CommandBuilder = {
+export const builder = {
   ...keyTypeArg,
 }
 
-export const desc = `SNS topics must be encrypted
+export const command = `${rule} [args]`
 
-  OK      - Topic is encrypted
-  UNKNOWN - Unable to determine topic encryption
-  WARNING - Topic encrypted but not with the specified key type
-  FAIL    - Topic is not encrypted
+export const desc = `a cloudtrail trail must be configured for encryption
 
-  resourceId - Topic ARN
+  OK      - the trail is encrypted
+  WARNING - the trail is encrypted but with the wrong key type
+  UNKNOWN - unable to determine trail encryption
+  FAIL    - the trail is not encrypted
+
+  resourceId: trail name
 
 `
 
-export default class TopicEncrypted extends AWS {
+export default class TrailEncrypted extends AWS {
   audits: AuditResultInterface[] = []
-  service = 'sns'
+  service = 'cloudtrail'
   global = false
 
   constructor(public params: AWSScannerInterface) {
     super({
       profile: params.profile,
-      resourceId: params.resourceId,
       region: params.region,
       verbosity: params.verbosity,
+      resourceId: params.resourceId,
       keyType: params.keyType,
       rule,
     })
   }
 
   async audit({ resource, region }: { resource: string; region: string }) {
+    assert(this.keyType, 'key type is required')
+
     const options = this.getOptions()
     options.region = region
 
-    const sns = new this.AWS.SNS(options)
-
-    const getTopicAttributes = await sns
-      .getTopicAttributes({
-        TopicArn: resource,
-      })
-      .promise()
-
     const audit: AuditResultInterface = {
-      name: resource,
       provider: 'aws',
       physicalId: resource,
       service: this.service,
@@ -62,15 +55,20 @@ export default class TopicEncrypted extends AWS {
       time: new Date().toISOString(),
     }
 
-    if (getTopicAttributes.Attributes) {
-      if (getTopicAttributes.Attributes.KmsMasterKeyId) {
-        assert(this.keyType, 'key type is required')
-        const isTrusted = await this.isKeyTrusted(
-          getTopicAttributes.Attributes.KmsMasterKeyId,
+    const cloudtrail = new this.AWS.CloudTrail(options)
+    const getTrail = await cloudtrail
+      .getTrail({
+        Name: resource,
+      })
+      .promise()
+
+    if (getTrail.Trail) {
+      if (getTrail.Trail.KmsKeyId) {
+        audit.state = await this.isKeyTrusted(
+          getTrail.Trail.KmsKeyId,
           this.keyType,
           region
         )
-        audit.state = isTrusted
       } else {
         audit.state = 'FAIL'
       }
@@ -89,17 +87,17 @@ export default class TopicEncrypted extends AWS {
     if (resourceId) {
       await this.audit({ resource: resourceId, region })
     } else {
-      const topics = await this.listTopics(region)
-      for (const topic of topics) {
-        assert(topic.TopicArn, 'topic does not have an arn')
-        await this.audit({ resource: topic.TopicArn, region })
+      const trails = await this.listTrails(region)
+      for (const trail of trails) {
+        assert(trail.TrailARN, 'trail does not have a ARN')
+        await this.audit({ resource: trail.TrailARN, region })
       }
     }
   }
 }
 
 export const handler = async (args: AWSScannerInterface) => {
-  const scanner = new TopicEncrypted({
+  const scanner = new TrailEncrypted({
     region: args.region,
     profile: args.profile,
     resourceId: args.resourceId,

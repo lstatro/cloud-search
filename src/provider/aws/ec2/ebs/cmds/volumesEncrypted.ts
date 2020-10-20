@@ -33,9 +33,9 @@ export default class VolumesEncrypted extends AWS {
       resourceId: params.resourceId,
       region: params.region,
       verbosity: params.verbosity,
+      keyType: params.keyType,
       rule,
     })
-    this.keyType = params.keyType || 'aws'
   }
 
   async audit({ resource, region }: { resource: Volume; region: string }) {

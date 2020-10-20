@@ -11,7 +11,7 @@ export const builder = {
 
 export const command = `${rule} [args]`
 
-export const desc = `RDS clusters must have their stroage at rest encrypted
+export const desc = `RDS clusters must have their storage at rest encrypted
 
   OK      - RDS cluster storage is encrypted at rest
   UNKNOWN - unable to determine if the storage is encrypted at rest
@@ -24,26 +24,20 @@ export const desc = `RDS clusters must have their stroage at rest encrypted
 
 `
 
-export interface ClusterEncryptedInterface extends AWSScannerInterface {
-  keyType: 'aws' | 'cmk'
-}
-
 export default class ClusterEncrypted extends AWS {
   audits: AuditResultInterface[] = []
   service = 'rds'
   global = false
-  keyId?: string
-  keyType: 'aws' | 'cmk'
 
-  constructor(public params: ClusterEncryptedInterface) {
+  constructor(public params: AWSScannerInterface) {
     super({
       profile: params.profile,
       resourceId: params.resourceId,
       region: params.region,
       verbosity: params.verbosity,
+      keyType: params.keyType,
       rule,
     })
-    this.keyType = params.keyType
   }
 
   async audit({ resource, region }: { resource: DBCluster; region: string }) {
@@ -65,6 +59,7 @@ export default class ClusterEncrypted extends AWS {
         resource.StorageEncrypted === true,
         'key found, but rds instance is not encrypted'
       )
+      assert(this.keyType, 'key type is required')
       audit.state = await this.isKeyTrusted(
         resource.KmsKeyId,
         this.keyType,
@@ -100,7 +95,7 @@ export default class ClusterEncrypted extends AWS {
   }
 }
 
-export const handler = async (args: ClusterEncryptedInterface) => {
+export const handler = async (args: AWSScannerInterface) => {
   const scanner = new ClusterEncrypted({
     region: args.region,
     profile: args.profile,
