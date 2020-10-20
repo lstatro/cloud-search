@@ -33,6 +33,7 @@ declare module 'cloud-search' {
     resourceId?: string
     region: string
     verbosity?: VerbosityType
+    keyType?: KeyType
   }
 
   /** The compliance data about the resource */

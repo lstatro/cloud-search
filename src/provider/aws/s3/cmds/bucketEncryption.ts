@@ -35,9 +35,9 @@ export default class TopicEncrypted extends AWS {
       resourceId: params.resourceId,
       region: params.region,
       verbosity: params.verbosity,
+      keyType: params.keyType,
       rule,
     })
-    this.keyType = params.keyType
   }
 
   handleAwsKeyType = (

@@ -26,7 +26,6 @@ export default class TopicEncrypted extends AWS {
   audits: AuditResultInterface[] = []
   service = 'sqs'
   global = false
-  keyId?: string
 
   constructor(public params: AWSScannerInterface) {
     super({
@@ -34,9 +33,9 @@ export default class TopicEncrypted extends AWS {
       resourceId: params.resourceId,
       region: params.region,
       verbosity: params.verbosity,
+      keyType: params.keyType,
       rule,
     })
-    this.keyType = params.keyType
   }
 
   async audit({ resource, region }: { resource: string; region: string }) {

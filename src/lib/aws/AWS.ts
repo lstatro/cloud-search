@@ -71,6 +71,8 @@ export abstract class AWS extends Provider {
       maxRetries: 20,
     })
 
+    this.keyType = params.keyType
+
     this.options = this.getOptions()
   }
 
