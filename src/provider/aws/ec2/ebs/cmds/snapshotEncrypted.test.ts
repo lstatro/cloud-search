@@ -1,10 +1,10 @@
 import 'mocha'
 import { useFakeTimers, SinonFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { handler } from './snapshotPublic'
+import { handler } from './snapshotEncrypted'
 import { expect } from 'chai'
 
-describe('ebs snapshot should not be public', () => {
+describe('ebs snapshots should be encrypted', () => {
   const now = new Date(0)
   let clock: SinonFakeTimers
 
@@ -37,45 +37,25 @@ describe('ebs snapshot should not be public', () => {
     expect(audits).to.eql([])
   })
 
-  it('should return OK for private snapshots', async () => {
-    mock('EC2', 'describeSnapshotAttribute', { CreateVolumePermissions: [] })
-    const audits = await handler({
-      profile: 'test',
-      region: 'test',
-      resourceId: 'test',
+  it('should report OK for aws managed key type encrypted snapshots', async () => {
+    mock('EC2', 'describeSnapshots', {
+      Snapshots: [{ SnapshotId: 'test', KmsKeyId: 'test', Encrypted: true }],
     })
+    mock('KMS', 'describeKey', { KeyMetadata: { KeyManager: 'AWS' } })
 
-    expect(audits).to.eql([
-      {
-        name: 'test',
-        physicalId: 'test',
-        profile: 'test',
-        provider: 'aws',
-        region: 'test',
-        rule: 'PublicSnapshot',
-        service: 'ebs',
-        state: 'OK',
-        time: '1970-01-01T00:00:00.000Z',
-      },
-    ])
-  })
-
-  it('should return OK for private snapshots when doing a full scan', async () => {
-    mock('EC2', 'describeSnapshots', { Snapshots: [{ SnapshotId: 'test' }] })
-    mock('EC2', 'describeSnapshotAttribute', { CreateVolumePermissions: [] })
     const audits = await handler({
       profile: 'test',
       region: 'all',
+      keyType: 'aws',
     })
 
     expect(audits).to.eql([
       {
-        name: 'test',
         physicalId: 'test',
         profile: 'test',
         provider: 'aws',
         region: 'us-east-1',
-        rule: 'PublicSnapshot',
+        rule: 'SnapshotEncrypted',
         service: 'ebs',
         state: 'OK',
         time: '1970-01-01T00:00:00.000Z',
@@ -83,49 +63,25 @@ describe('ebs snapshot should not be public', () => {
     ])
   })
 
-  it('should return OK for private snapshots', async () => {
-    mock('EC2', 'describeSnapshotAttribute', {})
+  it('should report FAIL un-encrypted snapshots', async () => {
+    mock('EC2', 'describeSnapshots', {
+      Snapshots: [{ SnapshotId: 'test' }],
+    })
+    mock('KMS', 'describeKey', { KeyMetadata: { KeyManager: 'AWS' } })
 
     const audits = await handler({
       profile: 'test',
-      region: 'test',
-      resourceId: 'test',
+      region: 'all',
+      keyType: 'aws',
     })
 
     expect(audits).to.eql([
       {
-        name: 'test',
         physicalId: 'test',
         profile: 'test',
         provider: 'aws',
-        region: 'test',
-        rule: 'PublicSnapshot',
-        service: 'ebs',
-        state: 'OK',
-        time: '1970-01-01T00:00:00.000Z',
-      },
-    ])
-  })
-
-  it('should return FAIL for public snapshots', async () => {
-    mock('EC2', 'describeSnapshotAttribute', {
-      CreateVolumePermissions: [{ Group: 'all' }],
-    })
-
-    const audits = await handler({
-      profile: 'test',
-      region: 'test',
-      resourceId: 'test',
-    })
-
-    expect(audits).to.eql([
-      {
-        name: 'test',
-        physicalId: 'test',
-        profile: 'test',
-        provider: 'aws',
-        region: 'test',
-        rule: 'PublicSnapshot',
+        region: 'us-east-1',
+        rule: 'SnapshotEncrypted',
         service: 'ebs',
         state: 'FAIL',
         time: '1970-01-01T00:00:00.000Z',
@@ -133,25 +89,52 @@ describe('ebs snapshot should not be public', () => {
     ])
   })
 
-  it('should return OK for snapshots shared with specific accounts', async () => {
-    mock('EC2', 'describeSnapshotAttribute', {
-      CreateVolumePermissions: [{ UserId: 'test' }],
+  it('should report WARNING for aws key managed encryption when looking for type cmk', async () => {
+    mock('EC2', 'describeSnapshots', {
+      Snapshots: [{ SnapshotId: 'test', KmsKeyId: 'test', Encrypted: true }],
     })
+    mock('KMS', 'describeKey', { KeyMetadata: { KeyManager: 'AWS' } })
 
     const audits = await handler({
       profile: 'test',
-      region: 'test',
+      region: 'us-east-1',
       resourceId: 'test',
+      keyType: 'cmk',
     })
 
     expect(audits).to.eql([
       {
-        name: 'test',
         physicalId: 'test',
         profile: 'test',
         provider: 'aws',
-        region: 'test',
-        rule: 'PublicSnapshot',
+        region: 'us-east-1',
+        rule: 'SnapshotEncrypted',
+        service: 'ebs',
+        state: 'WARNING',
+        time: '1970-01-01T00:00:00.000Z',
+      },
+    ])
+  })
+
+  it('should report OK for cmk key managed encryption when looking for type aws', async () => {
+    mock('EC2', 'describeSnapshots', {
+      Snapshots: [{ SnapshotId: 'test', KmsKeyId: 'test', Encrypted: true }],
+    })
+    mock('KMS', 'describeKey', { KeyMetadata: { KeyManager: 'CUSTOMER' } })
+
+    const audits = await handler({
+      profile: 'test',
+      region: 'all',
+      keyType: 'aws',
+    })
+
+    expect(audits).to.eql([
+      {
+        physicalId: 'test',
+        profile: 'test',
+        provider: 'aws',
+        region: 'us-east-1',
+        rule: 'SnapshotEncrypted',
         service: 'ebs',
         state: 'OK',
         time: '1970-01-01T00:00:00.000Z',
