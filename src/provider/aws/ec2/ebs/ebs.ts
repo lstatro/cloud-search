@@ -29,4 +29,7 @@ export const builder = (yargs: Argv) => {
         'check all volumes for encryption by a specific key, report other volumes as warnings if encrypted',
       ],
     ])
+    .epilogue(
+      'note: snapshot controls list only snapshots owned by the target account'
+    )
 }

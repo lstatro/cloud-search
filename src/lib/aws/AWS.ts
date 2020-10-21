@@ -432,7 +432,7 @@ export abstract class AWS extends Provider {
     return queues
   }
 
-  listSnapshots = async (region: string) => {
+  listSnapshots = async (region: string, resourceId?: string) => {
     const options = this.getOptions()
     options.region = region
 
@@ -447,6 +447,7 @@ export abstract class AWS extends Provider {
         .describeSnapshots({
           NextToken: nextToken,
           OwnerIds: ['self'],
+          SnapshotIds: resourceId ? [resourceId] : undefined,
         })
         .promise()
       nextToken = describeSnapshots.NextToken

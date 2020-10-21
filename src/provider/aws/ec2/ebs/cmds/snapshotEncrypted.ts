@@ -1,10 +1,10 @@
 import { CommandBuilder } from 'yargs'
-import { Volume } from 'aws-sdk/clients/ec2'
+import { Snapshot } from 'aws-sdk/clients/ec2'
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import assert from 'assert'
 import { AWS, keyTypeArg } from '../../../../../lib/aws/AWS'
 
-const rule = 'VolumesEncrypted'
+const rule = 'SnapshotEncrypted'
 
 export const command = `${rule} [args]`
 
@@ -12,18 +12,18 @@ export const builder: CommandBuilder = {
   ...keyTypeArg,
 }
 
-export const desc = `Verifies that EBS volume are encrypted
+export const desc = `EBS Snapshots should be encrypted
 
-  OK      - The volume is encrypted with the specified key
-  UNKNOWN - unable to determine the volume's encryption state
-  WARNING - the volume is encrypted, but not with the right key
-  FAIL    - the volume is not encrypted
+  OK      - the snapshot is encrypted 
+  UNKNOWN - unable to determine if the snapshot is encrypted
+  WARNING - the snapshot is encrypted, but not with the key type
+  FAIL    - the snapshot is not encrypted
 
-  resourceId - volume id (vol-xxxxxx)
+  resourceId - volume id
 
 `
 
-export default class VolumesEncrypted extends AWS {
+export default class SnapshotEncrypted extends AWS {
   audits: AuditResultInterface[] = []
   service = 'ebs'
 
@@ -38,11 +38,11 @@ export default class VolumesEncrypted extends AWS {
     })
   }
 
-  async audit({ resource, region }: { resource: Volume; region: string }) {
-    assert(resource.VolumeId, 'volume does not have an ID')
+  async audit({ resource, region }: { resource: Snapshot; region: string }) {
+    assert(resource.SnapshotId, 'snapshot must have a snapshot id')
     const audit: AuditResultInterface = {
       provider: 'aws',
-      physicalId: resource.VolumeId,
+      physicalId: resource.SnapshotId,
       service: this.service,
       rule,
       region: region,
@@ -54,7 +54,7 @@ export default class VolumesEncrypted extends AWS {
     if (resource.KmsKeyId) {
       assert(
         resource.Encrypted === true,
-        'key detected, but volume reports as not encrypted'
+        'key detected, but snapshot reports as not encrypted'
       )
       assert(this.keyType, 'key type is required')
       audit.state = await this.isKeyTrusted(
@@ -76,19 +76,16 @@ export default class VolumesEncrypted extends AWS {
     region: string
     resourceId?: string
   }) => {
-    const options = this.getOptions()
-    options.region = region
+    const snapshots = await this.listSnapshots(region, resourceId)
 
-    const volumes = await this.listVolumes(region, resourceId)
-
-    for (const volume of volumes) {
-      this.audit({ resource: volume, region })
+    for (const snapshot of snapshots) {
+      await this.audit({ resource: snapshot, region })
     }
   }
 }
 
 export const handler = async (args: AWSScannerInterface) => {
-  const scanner = await new VolumesEncrypted({
+  const scanner = await new SnapshotEncrypted({
     region: args.region,
     profile: args.profile,
     resourceId: args.resourceId,
