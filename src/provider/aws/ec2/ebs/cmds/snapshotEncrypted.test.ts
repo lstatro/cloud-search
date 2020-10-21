@@ -4,6 +4,8 @@ import { mock, restore } from 'aws-sdk-mock'
 import { handler } from './snapshotEncrypted'
 import { expect } from 'chai'
 
+/** test */
+
 describe('ebs snapshots should be encrypted', () => {
   const now = new Date(0)
   let clock: SinonFakeTimers
