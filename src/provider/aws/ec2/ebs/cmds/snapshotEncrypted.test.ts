@@ -4,7 +4,7 @@ import { mock, restore } from 'aws-sdk-mock'
 import { handler } from './snapshotEncrypted'
 import { expect } from 'chai'
 
-/** test */
+/** test2 */
 
 describe('ebs snapshots should be encrypted', () => {
   const now = new Date(0)
