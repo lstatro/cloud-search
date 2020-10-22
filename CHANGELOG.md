@@ -7,7 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- AWS - SnapshotEncrypted
+- AWS - ebs - SnapshotEncrypted
+- AWS - elasticache - EncryptionAtRest
 
 ## [1.3.0] - 2020-10-19
 
@@ -26,8 +27,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- AWS - TrailEvents
-- AWS - MultiRegionTrailEnabled
+- AWS - cloudtrail - TrailEvents
+- AWS - cloudtrail - MultiRegionTrailEnabled
 
 ### Changed
 
@@ -59,7 +60,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- AWS - KeyRotationEnabled
+- AWS - kms - KeyRotationEnabled
 - verbosity option bug fixes
 
 ### Changed

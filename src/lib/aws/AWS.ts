@@ -20,6 +20,7 @@ import _AWS from 'aws-sdk'
 import Provider from '../Provider'
 import assert from 'assert'
 import { TrailInfo } from 'aws-sdk/clients/cloudtrail'
+import { CacheCluster } from 'aws-sdk/clients/elasticache'
 
 interface ScanInterface {
   region?: string
@@ -573,4 +574,63 @@ export abstract class AWS extends Provider {
 
     return trails
   }
+
+  listElastiCacheClusters = async (region: string, resourceId?: string) => {
+    const options = this.getOptions()
+    options.region = region
+
+    const ec = new this.AWS.ElastiCache(options)
+
+    let marker: string | undefined
+
+    let cacheCluster: CacheCluster[] = []
+
+    do {
+      const describeCacheClusters = await ec
+        .describeCacheClusters({
+          CacheClusterId: resourceId,
+          Marker: marker,
+        })
+        .promise()
+      marker = describeCacheClusters.Marker
+      if (describeCacheClusters.CacheClusters) {
+        cacheCluster = cacheCluster.concat(describeCacheClusters.CacheClusters)
+      }
+    } while (marker)
+
+    return cacheCluster
+  }
+
+  // listElastiCacheReplicationGroups = async (
+  //   region: string,
+  //   resourceId?: string
+  // ) => {
+  //   const options = this.getOptions()
+  //   options.region = region
+
+  //   const ec = new this.AWS.ElastiCache(options)
+
+  //   let marker: string | undefined
+
+  //   // let cacheCluster: CacheCluster[] = []
+  //   let replicationGroup: ReplicationGroup[] = []
+
+  //   do {
+  //     const describeCacheClusters = await ec
+  //       .describeReplicationGroups({
+  //         ReplicationGroupId: resourceId,
+  //         // CacheClusterId: resourceId,
+  //         Marker: marker,
+  //       })
+  //       .promise()
+  //     marker = describeCacheClusters.Marker
+  //     if (describeCacheClusters.ReplicationGroups) {
+  //       replicationGroup = replicationGroup.concat(
+  //         describeCacheClusters.ReplicationGroups
+  //       )
+  //     }
+  //   } while (marker)
+
+  //   return replicationGroup
+  // }
 }
