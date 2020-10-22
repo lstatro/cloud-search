@@ -13,10 +13,10 @@ export const command = `${rule} [args]`
 
 export const desc = `Elasticache instances should have storage encrypted at rest
 
-  OK      - elasticache cluster storage is encrypted at rest
-  WARNING - elasticache cluster storage is encrypted at rest, but with the wrong key type
-  UNKNOWN - unable to determine if the elasticache storage is encrypted
-  FAIL    - elasticache cluster storage is not encrypted at rest
+  OK      - Elasticache cluster storage is encrypted at rest
+  WARNING - Elasticache cluster storage is encrypted at rest, but with the wrong key type
+  UNKNOWN - Unable to determine if the elasticache storage is encrypted
+  FAIL    - Elasticache cluster storage is not encrypted at rest
 
   resourceId: cluster, instance, or shard name
 

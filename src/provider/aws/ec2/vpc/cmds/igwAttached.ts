@@ -10,9 +10,9 @@ export const desc = `Verifies that all internet gateways owned by this account.
 are detached Note, shared VPC's don't necessarily own the IGW so they may not 
 show up in this scan.
 
-  OK      - the IGW is not attached to a VPC
-  UNKNOWN - unable to determine if the IGW has an attachment
-  FAIL    - the IGW is attached to a VPC
+  OK      - The IGW is not attached to a VPC
+  UNKNOWN - Unable to determine if the IGW has an attachment
+  FAIL    - The IGW is attached to a VPC
 
   resourceId - IGW ID (igw-xxxxxx)
   

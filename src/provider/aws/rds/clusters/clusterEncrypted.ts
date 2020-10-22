@@ -14,7 +14,7 @@ export const command = `${rule} [args]`
 export const desc = `RDS clusters must have their storage at rest encrypted
 
   OK      - RDS cluster storage is encrypted at rest
-  UNKNOWN - unable to determine if the storage is encrypted at rest
+  UNKNOWN - Unable to determine if the storage is encrypted at rest
   WARNING - RDS cluster storage is encrypted but not with the specified key type
   FAIL    - RDS cluster storage is not encrypted at rest
 

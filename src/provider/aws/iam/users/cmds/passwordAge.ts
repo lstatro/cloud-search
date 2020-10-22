@@ -19,7 +19,7 @@ export const builder: CommandBuilder = {
 export const desc = `Passwords may not be older then so many days
 
   OK      - Password within expiration window
-  UNKNOWN - unable to determine password age
+  UNKNOWN - Unable to determine password age
   FAIL    - Password outside of expiration window
 
   note: iam is global, passing in a region won't change results

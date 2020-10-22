@@ -14,10 +14,10 @@ export const desc = `a cloudtrail configuration must include:
   - include management events
   - capture both read and write api calls
 
-  OK      - this trail has all of the desired configuration targets
-  WARNING - this trail has all of the desired configuration targets, but is not actively logging
-  UNKNOWN - unable to determine if the trail is configured correctly
-  FAIL    - the trail is missing one or all of the desired configuration targets
+  OK      - This trail has all of the desired configuration targets
+  WARNING - This trail has all of the desired configuration targets, but is not actively logging
+  UNKNOWN - Unable to determine if the trail is configured correctly
+  FAIL    - The trail is missing one or all of the desired configuration targets
 
   resourceId: trail name
 

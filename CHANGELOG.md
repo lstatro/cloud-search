@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - AWS - ebs - SnapshotEncrypted
 - AWS - elasticache - EncryptionAtRest
+- updated cli description format
 
 ## [1.3.0] - 2020-10-19
 

@@ -15,9 +15,9 @@ export const builder: CommandBuilder = {
 export const desc = `EBS volumes should be encrypted at rest
 
   OK      - The volume is encrypted with the specified key
-  UNKNOWN - unable to determine the volume's encryption state
-  WARNING - the volume is encrypted, but not with the right key type
-  FAIL    - the volume is not encrypted
+  UNKNOWN - Unable to determine the volume's encryption state
+  WARNING - The volume is encrypted, but not with the right key type
+  FAIL    - The volume is not encrypted
 
   resourceId - snapshot id
 

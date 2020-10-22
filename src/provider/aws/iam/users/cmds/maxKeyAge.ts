@@ -19,8 +19,8 @@ export const builder: CommandBuilder = {
 export const desc = `Keys may not be older then so many days
 
   OK      - Keys are within the rotation period
-  UNKNOWN - unable to determine the key's age
-  FAIL    - they keys need rotation
+  UNKNOWN - Unable to determine the key's age
+  FAIL    - They keys need rotation
 
   note: iam is global, passing in a region won't change results
   note: does not support single user requests (yet!)

@@ -1,7 +1,7 @@
 import { Argv } from 'yargs'
 
 export const command = 'elasticache'
-export const desc = 'ElastiCache clusters (RDS)'
+export const desc = 'ElastiCache clusters'
 
 const opts = {
   exclude: /.*.test.js/,

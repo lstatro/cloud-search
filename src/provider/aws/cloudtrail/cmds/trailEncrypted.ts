@@ -13,10 +13,10 @@ export const command = `${rule} [args]`
 
 export const desc = `a cloudtrail trail must be configured for encryption
 
-  OK      - the trail is encrypted
-  WARNING - the trail is encrypted but with the wrong key type
-  UNKNOWN - unable to determine trail encryption
-  FAIL    - the trail is not encrypted
+  OK      - The trail is encrypted
+  WARNING - The trail is encrypted but with the wrong key type
+  UNKNOWN - Unable to determine trail encryption
+  FAIL    - The trail is not encrypted
 
   resourceId: trail name
 

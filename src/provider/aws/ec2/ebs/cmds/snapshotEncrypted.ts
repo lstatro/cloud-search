@@ -14,10 +14,10 @@ export const builder: CommandBuilder = {
 
 export const desc = `EBS Snapshots should be encrypted
 
-  OK      - the snapshot is encrypted 
-  UNKNOWN - unable to determine if the snapshot is encrypted
-  WARNING - the snapshot is encrypted, but not with the key type
-  FAIL    - the snapshot is not encrypted
+  OK      - The snapshot is encrypted 
+  UNKNOWN - Unable to determine if the snapshot is encrypted
+  WARNING - The snapshot is encrypted, but not with the key type
+  FAIL    - The snapshot is not encrypted
 
   resourceId - volume id
 

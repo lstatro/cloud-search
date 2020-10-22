@@ -9,10 +9,10 @@ export const command = `${rule} [args]`
 
 export const desc = `a cloudtrail trail's multi-region flag is set to true and the trail is logging
 
-  OK      - this trail has its multi-region flag set to true and is actively logging
-  UNKNOWN - unable to determine if a multi-region trail exists or if it is enabled
-  WARNING - this trail has its multi-region flag set to true, but is not logging
-  FAIL    - this trail has its multi-region flag set to false, or is undefined
+  OK      - This trail has its multi-region flag set to true and is actively logging
+  UNKNOWN - Unable to determine if a multi-region trail exists or if it is enabled
+  WARNING - This trail has its multi-region flag set to true, but is not logging
+  FAIL    - This trail has its multi-region flag set to false, or is undefined
 
   resourceId: trail ARN
 
