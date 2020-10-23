@@ -9,9 +9,9 @@ export const command = `${rule} [args]`
 
 export const desc = `AWS managed customer keys (CMK's) should have yearly rotation enabled
 
-  OK      - yearly rotation enabled
-  UNKNOWN - unable to determine if yearly rotation is enabled
-  FAIL    - yearly rotation is not enabled
+  OK      - Yearly rotation enabled
+  UNKNOWN - Unable to determine if yearly rotation is enabled
+  FAIL    - Yearly rotation is not enabled
 
   resourceId: KMS Key ID
 

@@ -14,9 +14,9 @@ export const command = `${rule} [args]`
 
 export const desc = `RDS instances must not have the PubliclyAccessible flag set to true
 
-  OK      - the RDS instance has PubliclyAccessible set to false
-  UNKNOWN - unable to verify the public state of the instance
-  FAIL    - the RDS instance has PubliclyAccessible set to true, meaning it's public
+  OK      - The RDS instance has PubliclyAccessible set to false
+  UNKNOWN - Unable to verify the public state of the instance
+  FAIL    - The RDS instance has PubliclyAccessible set to true, meaning it's public
 
   resourceId: RDS instance ARN
 

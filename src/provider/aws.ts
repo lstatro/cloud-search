@@ -43,6 +43,7 @@ export const builder = (yargs: Argv) => {
     .commandDir('./aws/rds', opts)
     .commandDir('./aws/kms', opts)
     .commandDir('./aws/cloudtrail', opts)
+    .commandDir('./aws/elasticache', opts)
     .demandCommand(1)
     .option('region', {
       alias: 'r',

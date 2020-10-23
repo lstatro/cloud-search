@@ -1,7 +1,7 @@
 import 'mocha'
 import { mock, restore } from 'aws-sdk-mock'
 import { SinonFakeTimers, useFakeTimers } from 'sinon'
-import { handler } from './volumesEncrypted'
+import { handler } from './volumeEncrypted'
 import { expect } from 'chai'
 
 describe('ebs volume encryption', () => {

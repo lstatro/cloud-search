@@ -1,10 +1,10 @@
 import 'mocha'
 import { useFakeTimers, SinonFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { handler } from './publicSnapshots'
+import { handler } from './snapshotPublic'
 import { expect } from 'chai'
 
-describe('ebs snapshot public', () => {
+describe('ebs snapshot should not be public', () => {
   const now = new Date(0)
   let clock: SinonFakeTimers
 

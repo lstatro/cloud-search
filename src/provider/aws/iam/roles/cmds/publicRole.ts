@@ -11,8 +11,8 @@ export const command = `${rule} [args]`
 export const desc = `Roles must not allow * in trust policy principal
 
   OK      - Role does not allow * in the trust document principal
-  UNKNOWN - unable view the trust policy
-  WARNING - role allows for public access under a specific condition more investigation is required
+  UNKNOWN - Unable view the trust policy
+  WARNING - Role allows for public access under a specific condition more investigation is required
   FAIL    - Role allows * in the trust document principal
 
   resourceId: role name

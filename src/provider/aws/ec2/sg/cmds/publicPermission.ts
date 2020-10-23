@@ -8,9 +8,9 @@ const rule = 'PublicPermission'
 export const command = `${rule} [args]`
 export const desc = `searches security groups for 0.0.0.0/0 or ::/0 on any port
 
-  OK      - the group does not contain 0.0.0.0/0 or ::/0 ingress permissions
-  UNKNOWN - unable to determine if the group includes 0.0.0.0/0 or ::/0
-  FAIL    - the group allows 0.0.0.0/0 or ::/0 ingress
+  OK      - The group does not contain 0.0.0.0/0 or ::/0 ingress permissions
+  UNKNOWN - Unable to determine if the group includes 0.0.0.0/0 or ::/0
+  FAIL    - The group allows 0.0.0.0/0 or ::/0 ingress
 
   resourceId - security group id (sg-xxxxxx)
 
