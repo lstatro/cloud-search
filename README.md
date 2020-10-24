@@ -28,3 +28,13 @@ Use `--help` at any CLI level, it will contain information about the control and
     <img src="https://coveralls.io/repos/github/lstatro/cloud-search/badge.svg?branch=develop"/>
   </a>
 </p>
+
+# outputs and formatting
+
+- When running as a CLI everything it output to terminal. This includes the `json` format type.
+
+# FAQ
+
+## How can I save a point in time report of what this found?
+
+Pipe terminal output to a file for later post processing. If necessary change the format to JSON to make post processing easier.
