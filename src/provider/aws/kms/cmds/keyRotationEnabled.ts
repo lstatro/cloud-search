@@ -23,13 +23,7 @@ export default class KeyRotationEnabled extends AWS {
   global = false
 
   constructor(public params: AWSScannerInterface) {
-    super({
-      profile: params.profile,
-      resourceId: params.resourceId,
-      region: params.region,
-      verbosity: params.verbosity,
-      rule,
-    })
+    super({ ...params, rule })
   }
 
   async audit({ resource, region }: { resource: string; region: string }) {
@@ -91,12 +85,7 @@ export default class KeyRotationEnabled extends AWS {
 }
 
 export const handler = async (args: AWSScannerInterface) => {
-  const scanner = new KeyRotationEnabled({
-    region: args.region,
-    profile: args.profile,
-    resourceId: args.resourceId,
-    verbosity: args.verbosity,
-  })
+  const scanner = new KeyRotationEnabled(args)
   await scanner.start()
   scanner.output()
   return scanner.audits

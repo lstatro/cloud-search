@@ -29,13 +29,7 @@ export default class TrailEvents extends AWS {
   global = false
 
   constructor(public params: AWSScannerInterface) {
-    super({
-      profile: params.profile,
-      region: params.region,
-      verbosity: params.verbosity,
-      resourceId: params.resourceId,
-      rule,
-    })
+    super({ ...params, rule })
   }
 
   async audit({ resource, region }: { resource: string; region: string }) {
@@ -159,12 +153,7 @@ export default class TrailEvents extends AWS {
 }
 
 export const handler = async (args: AWSScannerInterface) => {
-  const scanner = new TrailEvents({
-    region: args.region,
-    profile: args.profile,
-    resourceId: args.resourceId,
-    verbosity: args.verbosity,
-  })
+  const scanner = new TrailEvents(args)
 
   await scanner.start()
   scanner.output()

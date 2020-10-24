@@ -23,13 +23,7 @@ export default class IgwAttachedToVpc extends AWS {
   service = 'ec2'
 
   constructor(public params: AWSScannerInterface) {
-    super({
-      profile: params.profile,
-      resourceId: params.resourceId,
-      region: params.region,
-      verbosity: params.verbosity,
-      rule,
-    })
+    super({ ...params, rule })
   }
 
   async audit({
@@ -80,12 +74,7 @@ export default class IgwAttachedToVpc extends AWS {
 }
 
 export const handler = async (args: AWSScannerInterface) => {
-  const scanner = await new IgwAttachedToVpc({
-    region: args.region,
-    profile: args.profile,
-    resourceId: args.resourceId,
-    verbosity: args.verbosity,
-  })
+  const scanner = await new IgwAttachedToVpc(args)
   await scanner.start()
   scanner.output()
   return scanner.audits

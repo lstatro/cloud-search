@@ -16,10 +16,7 @@ export const desc = `report the ignore public ACLs toggle
 
 export const handler = async (args: AWSScannerCliArgsInterface) => {
   const scanner = new PublicAccessBlocks({
-    profile: args.profile,
-    resourceId: args.resourceId,
-    region: args.region,
-    verbosity: args.verbosity,
+    ...args,
     rule,
   })
   await scanner.start()

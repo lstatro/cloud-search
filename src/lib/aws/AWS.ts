@@ -62,7 +62,7 @@ export abstract class AWS extends Provider {
   keyType?: KeyType
 
   constructor(params: AWSParamsInterface) {
-    super(params.rule, params.verbosity)
+    super(params.rule, params.verbosity, params.format)
 
     this.region = params.region
     this.profile = params.profile

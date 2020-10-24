@@ -1,14 +1,17 @@
-import { AuditResultInterface, VerbosityType } from 'cloud-search'
+import { AuditResultInterface, VerbosityType, FormatType } from 'cloud-search'
 import chalk from 'chalk'
 import ora, { Ora } from 'ora'
+import { assert } from 'console'
 
 export default abstract class Provider {
   audits: AuditResultInterface[] = []
   spinner?: Ora
 
-  constructor(public rule: string, public verbosity: VerbosityType = 'silent') {
-    this.rule = rule
-
+  constructor(
+    public rule: string,
+    public verbosity: VerbosityType = 'silent',
+    public format: FormatType = 'terminal'
+  ) {
     /** we want to have a spinner for anything that is not silent */
     if (verbosity !== 'silent') {
       this.spinner = ora({
@@ -44,7 +47,7 @@ export default abstract class Provider {
     }
   }
 
-  handleNormalOutput = () => {
+  handleTerminal = () => {
     const log = console.log
 
     log(
@@ -77,6 +80,23 @@ export default abstract class Provider {
           chalk.bold(audit.physicalId)
         )
       }
+    }
+  }
+
+  handleJson = () => {
+    console.log(JSON.stringify(this.audits, null, 2))
+  }
+
+  handleNormalOutput = () => {
+    const methods = {
+      terminal: this.handleTerminal,
+      json: this.handleJson,
+    }
+
+    assert(methods[this.format], `unsupported format ${this.format}`)
+
+    if (methods[this.format]) {
+      methods[this.format]()
     }
   }
 

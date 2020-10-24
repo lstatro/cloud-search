@@ -30,14 +30,7 @@ export default class TopicEncrypted extends AWS {
   global = true
 
   constructor(public params: AWSScannerInterface) {
-    super({
-      profile: params.profile,
-      resourceId: params.resourceId,
-      region: params.region,
-      verbosity: params.verbosity,
-      keyType: params.keyType,
-      rule,
-    })
+    super({ ...params, rule })
   }
 
   handleAwsKeyType = (
@@ -158,13 +151,7 @@ export default class TopicEncrypted extends AWS {
 }
 
 export const handler = async (args: AWSScannerInterface) => {
-  const scanner = new TopicEncrypted({
-    region: args.region,
-    profile: args.profile,
-    resourceId: args.resourceId,
-    keyType: args.keyType,
-    verbosity: args.verbosity,
-  })
+  const scanner = new TopicEncrypted(args)
 
   await scanner.start()
   scanner.output()

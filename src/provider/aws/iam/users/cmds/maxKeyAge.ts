@@ -38,13 +38,7 @@ export default class MaxKeyAge extends AWS {
   maxAge: number
 
   constructor(public params: MaxKeyAgeInterface) {
-    super({
-      profile: params.profile,
-      resourceId: params.resourceId,
-      region: params.region,
-      verbosity: params.verbosity,
-      rule,
-    })
+    super({ ...params, rule })
     this.maxAge = params.maxAge
   }
 
@@ -129,13 +123,7 @@ export interface MaxKeyAgeCliInterface
     MaxKeyAgeInterface {}
 
 export const handler = async (args: MaxKeyAgeCliInterface) => {
-  const scanner = new MaxKeyAge({
-    region: args.region,
-    profile: args.profile,
-    resourceId: args.resourceId,
-    maxAge: args.maxAge,
-    verbosity: args.verbosity,
-  })
+  const scanner = new MaxKeyAge(args)
 
   await scanner.start()
   scanner.output()
