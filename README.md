@@ -1,3 +1,11 @@
+<p align="center">
+  <a href="https://coveralls.io/github/lstatro/cloud-search?branch=develop">
+    <img src="https://coveralls.io/repos/github/lstatro/cloud-search/badge.svg?branch=develop"/>
+  </a>
+</p>
+
+---
+
 # Cloud-search
 
 A node based CLI that attempts to find and report on common cloud misconfigurations or insecure practices.
@@ -20,14 +28,6 @@ Use `--help` at any CLI level, it will contain information about the control and
 
 - The list of services changes often, `cloud-search --help`
 - tease though the cli, it should tell you what it wants
-
----
-
-<p align="center">
-  <a href="https://coveralls.io/github/lstatro/cloud-search?branch=develop">
-    <img src="https://coveralls.io/repos/github/lstatro/cloud-search/badge.svg?branch=develop"/>
-  </a>
-</p>
 
 # outputs and formatting
 
