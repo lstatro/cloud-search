@@ -32,6 +32,7 @@ Use `--help` at any CLI level, it will contain information about the control and
 # outputs and formatting
 
 - When running as a CLI everything it output to terminal. This includes the `json` format type.
+- The `json` output type includes more information then the standard terminal output
 
 # FAQ
 
