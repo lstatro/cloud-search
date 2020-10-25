@@ -8,6 +8,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 - AWS - iam, groups - HasManagedAdmin
+- AWS - iam, roles - HasManagedAdmin
+- AWS - guardduty - DetectorEnabled
+- AWS - guardduty - DetectorExists
+- AWS - guardduty - DetectorDataSources
 
 ## [1.5.0] - 2020-10-24
 

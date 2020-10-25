@@ -1,5 +1,3 @@
-/** TODO: can this be handled by iam.simulatePrincipalPolicy? */
-
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import { AWS } from '../../../../lib/aws/AWS'
 import assert from 'assert'

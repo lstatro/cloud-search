@@ -21,6 +21,7 @@ import Provider from '../Provider'
 import assert from 'assert'
 import { TrailInfo } from 'aws-sdk/clients/cloudtrail'
 import { CacheCluster } from 'aws-sdk/clients/elasticache'
+import { DetectorId } from 'aws-sdk/clients/guardduty'
 
 interface ScanInterface {
   region?: string
@@ -703,5 +704,30 @@ export abstract class AWS extends Provider {
     } while (marker)
 
     return policies
+  }
+
+  listDetectors = async (region: string) => {
+    const options = this.getOptions()
+    options.region = region
+
+    const gd = new this.AWS.GuardDuty(options)
+
+    let nextToken: string | undefined
+
+    let detectors: DetectorId[] = []
+
+    do {
+      const listDetectors = await gd
+        .listDetectors({
+          NextToken: nextToken,
+        })
+        .promise()
+      nextToken = listDetectors.NextToken
+      if (listDetectors.DetectorIds) {
+        detectors = detectors.concat(listDetectors.DetectorIds)
+      }
+    } while (nextToken)
+
+    return detectors
   }
 }
