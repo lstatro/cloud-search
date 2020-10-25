@@ -1,3 +1,11 @@
+<p align="center">
+  <a href="https://coveralls.io/github/lstatro/cloud-search?branch=develop">
+    <img src="https://coveralls.io/repos/github/lstatro/cloud-search/badge.svg?branch=develop"/>
+  </a>
+</p>
+
+---
+
 # Cloud-search
 
 A node based CLI that attempts to find and report on common cloud misconfigurations or insecure practices.
@@ -21,10 +29,13 @@ Use `--help` at any CLI level, it will contain information about the control and
 - The list of services changes often, `cloud-search --help`
 - tease though the cli, it should tell you what it wants
 
----
+# outputs and formatting
 
-<p align="center">
-  <a href="https://coveralls.io/github/lstatro/cloud-search?branch=develop">
-    <img src="https://coveralls.io/repos/github/lstatro/cloud-search/badge.svg?branch=develop"/>
-  </a>
-</p>
+- When running as a CLI everything is output to terminal including the `json` format type.
+- The `json` output type includes more information then the standard terminal output
+
+# FAQ
+
+## How can I save a point in time report?
+
+Pipe terminal to a file for later post processing. If necessary change the format to JSON to make post processing easier.

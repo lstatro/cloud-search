@@ -39,13 +39,7 @@ export default class PublicRole extends AWS {
   global = true
 
   constructor(public params: AWSScannerInterface) {
-    super({
-      profile: params.profile,
-      resourceId: params.resourceId,
-      region: params.region,
-      verbosity: params.verbosity,
-      rule,
-    })
+    super({ ...params, rule })
   }
 
   handleString = (params: TypeHandlerInterface) => {
@@ -159,12 +153,7 @@ export default class PublicRole extends AWS {
 }
 
 export const handler = async (args: AWSScannerInterface) => {
-  const scanner = new PublicRole({
-    region: args.region,
-    profile: args.profile,
-    resourceId: args.resourceId,
-    verbosity: args.verbosity,
-  })
+  const scanner = new PublicRole(args)
 
   await scanner.start()
   scanner.output()

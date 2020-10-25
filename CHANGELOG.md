@@ -7,7 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-## [1.4.0] - 2020-10-19
+- AWS - iam, groups - HasManagedAdmin
+
+## [1.5.0] - 2020-10-24
+
+### Added
+
+- AWS - elasticache - TransitEncryptionEnabled
+- AWS - iam, users - HasManagedAdmin
+- terminal output as JSON
+
+### Changed
+
+- service arg and class constructor param changes no longer require manual updating should the cli's argument interface change in the future
+
+### Removed
+
+## [1.4.0] - 2020-10-22
 
 ### Added
 
@@ -22,7 +38,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Removed
 
-## [1.3.0] - 2020-10-19
+## [1.3.0] - 2020-10-20
 
 ### Added
 

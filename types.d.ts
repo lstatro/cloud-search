@@ -25,6 +25,9 @@ declare module 'cloud-search' {
   /** controls how much data is dumped to terminal, silent for testing */
   export type VerbosityType = 'silent' | 'normal'
 
+  /** output formatting */
+  export type FormatType = 'terminal' | 'json'
+
   export type AuditStateType = 'OK' | 'FAIL' | 'UNKNOWN' | 'WARNING'
 
   export interface AWSParamsInterface {
@@ -34,6 +37,7 @@ declare module 'cloud-search' {
     region: string
     verbosity?: VerbosityType
     keyType?: KeyType
+    format?: FormatType
   }
 
   /** The compliance data about the resource */
@@ -66,6 +70,7 @@ declare module 'cloud-search' {
     profile?: string
     resourceId?: string
     verbosity?: VerbosityType
+    format?: FormatType
   }
 
   interface AWSScannerCliArgsInterface extends AWSScannerInterface, Arguments {}

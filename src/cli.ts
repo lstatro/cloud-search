@@ -12,6 +12,13 @@ require('yargs')
     default: 'normal',
     choices: ['normal', 'silent'],
   })
+  .option('format', {
+    alias: 'f',
+    describe: 'output format',
+    type: 'string',
+    default: 'terminal',
+    choices: ['terminal', 'json'],
+  })
   .example([
     [
       'cloud-search aws <service>...',

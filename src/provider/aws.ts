@@ -26,6 +26,19 @@ const epilogue = `
   source account has removed access to the target account.  This also
   effectively breaks the resource making it unusable.
 
+************************* Policy and Access Rights *****************************
+
+• IAM inline, managed, and group policy rights are all unique.  Many of the
+  rules that check for permissions do so in a vacuum.  Meaning, if a user has 
+  admin directly applied, the group policy check may return OK,  where as the 
+  user admin check will return FAIL.  This was done purposely as it allow finer 
+  view over how a user got the targeted rights.  
+
+  This also means that when looking for resources that have admin more then one
+  scan is necessary.  For example when looking for users with admin it is
+  necessary to check the user, the user's, groups, and any inline policy they
+  have.
+
 ********************************************************************************
 `
 

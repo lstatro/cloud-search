@@ -12,13 +12,7 @@ export default class PublicAccessBlocks extends AWS {
   global = true
 
   constructor(public params: PublicAccessBlocksInterface) {
-    super({
-      profile: params.profile,
-      resourceId: params.resourceId,
-      region: params.region,
-      rule: params.rule,
-      verbosity: params.verbosity,
-    })
+    super(params)
   }
 
   async audit({ resource }: { resource: string }) {
