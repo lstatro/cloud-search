@@ -12,7 +12,7 @@ import {
   Volume,
 } from 'aws-sdk/clients/ec2'
 import { KeyMetadata, KeyListEntry } from 'aws-sdk/clients/kms'
-import { Role, User } from 'aws-sdk/clients/iam'
+import { AttachedPolicy, Role, User } from 'aws-sdk/clients/iam'
 import { Topic } from 'aws-sdk/clients/sns'
 import { QueueUrlList } from 'aws-sdk/clients/sqs'
 import { DBCluster, DBInstance } from 'aws-sdk/clients/rds'
@@ -601,36 +601,29 @@ export abstract class AWS extends Provider {
     return cacheCluster
   }
 
-  // listElastiCacheReplicationGroups = async (
-  //   region: string,
-  //   resourceId?: string
-  // ) => {
-  //   const options = this.getOptions()
-  //   options.region = region
+  listAttachedUserPolicies = async (resourceId: string) => {
+    const options = this.getOptions()
 
-  //   const ec = new this.AWS.ElastiCache(options)
+    const iam = new this.AWS.IAM(options)
 
-  //   let marker: string | undefined
+    let marker: string | undefined
 
-  //   // let cacheCluster: CacheCluster[] = []
-  //   let replicationGroup: ReplicationGroup[] = []
+    let policies: AttachedPolicy[] = []
 
-  //   do {
-  //     const describeCacheClusters = await ec
-  //       .describeReplicationGroups({
-  //         ReplicationGroupId: resourceId,
-  //         // CacheClusterId: resourceId,
-  //         Marker: marker,
-  //       })
-  //       .promise()
-  //     marker = describeCacheClusters.Marker
-  //     if (describeCacheClusters.ReplicationGroups) {
-  //       replicationGroup = replicationGroup.concat(
-  //         describeCacheClusters.ReplicationGroups
-  //       )
-  //     }
-  //   } while (marker)
+    do {
+      const listAttachedUserPolicies = await iam
+        .listAttachedUserPolicies({
+          UserName: resourceId,
+          Marker: marker,
+        })
+        .promise()
 
-  //   return replicationGroup
-  // }
+      marker = listAttachedUserPolicies.Marker
+      if (listAttachedUserPolicies.AttachedPolicies) {
+        policies = policies.concat(listAttachedUserPolicies.AttachedPolicies)
+      }
+    } while (marker)
+
+    return policies
+  }
 }
