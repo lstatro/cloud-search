@@ -31,11 +31,11 @@ Use `--help` at any CLI level, it will contain information about the control and
 
 # outputs and formatting
 
-- When running as a CLI everything it output to terminal. This includes the `json` format type.
+- When running as a CLI everything is output to terminal including the `json` format type.
 - The `json` output type includes more information then the standard terminal output
 
 # FAQ
 
-## How can I save a point in time report of what this found?
+## How can I save a point in time report?
 
-Pipe terminal output to a file for later post processing. If necessary change the format to JSON to make post processing easier.
+Pipe terminal to a file for later post processing. If necessary change the format to JSON to make post processing easier.
