@@ -1,5 +1,3 @@
-/** TODO: this needs to support resource */
-
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import { AWS } from '../../../../../lib/aws/AWS'
 import { CommandBuilder } from 'yargs'

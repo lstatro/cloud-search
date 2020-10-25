@@ -678,4 +678,30 @@ export abstract class AWS extends Provider {
 
     return policies
   }
+
+  listAttachedRolePolicies = async (resourceId: string) => {
+    const options = this.getOptions()
+
+    const iam = new this.AWS.IAM(options)
+
+    let marker: string | undefined
+
+    let policies: AttachedPolicy[] = []
+
+    do {
+      const listAttachedRolePolicies = await iam
+        .listAttachedRolePolicies({
+          RoleName: resourceId,
+          Marker: marker,
+        })
+        .promise()
+
+      marker = listAttachedRolePolicies.Marker
+      if (listAttachedRolePolicies.AttachedPolicies) {
+        policies = policies.concat(listAttachedRolePolicies.AttachedPolicies)
+      }
+    } while (marker)
+
+    return policies
+  }
 }
