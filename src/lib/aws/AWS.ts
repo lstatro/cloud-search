@@ -12,7 +12,7 @@ import {
   Volume,
 } from 'aws-sdk/clients/ec2'
 import { KeyMetadata, KeyListEntry } from 'aws-sdk/clients/kms'
-import { AttachedPolicy, Role, User } from 'aws-sdk/clients/iam'
+import { AttachedPolicy, Group, Role, User } from 'aws-sdk/clients/iam'
 import { Topic } from 'aws-sdk/clients/sns'
 import { QueueUrlList } from 'aws-sdk/clients/sqs'
 import { DBCluster, DBInstance } from 'aws-sdk/clients/rds'
@@ -128,6 +128,7 @@ export abstract class AWS extends Provider {
         const regions = await this.listRegions()
         this.regions = this.regions.concat(regions)
       } else {
+        this.region = 'global'
         this.regions.push('us-east-1')
       }
     } else {
@@ -313,6 +314,31 @@ export abstract class AWS extends Provider {
     } while (marker)
 
     return users
+  }
+
+  listGroups = async () => {
+    /** no need to set a region iam is global */
+    const iam = new this.AWS.IAM(this.options)
+
+    let groups: Group[] = []
+
+    let marker: string | undefined
+
+    do {
+      const listGroups = await iam
+        .listGroups({
+          Marker: marker,
+        })
+        .promise()
+
+      marker = listGroups.Marker
+
+      if (listGroups.Groups) {
+        groups = groups.concat(listGroups.Groups)
+      }
+    } while (marker)
+
+    return groups
   }
 
   listTopics = async (region: string) => {
@@ -621,6 +647,32 @@ export abstract class AWS extends Provider {
       marker = listAttachedUserPolicies.Marker
       if (listAttachedUserPolicies.AttachedPolicies) {
         policies = policies.concat(listAttachedUserPolicies.AttachedPolicies)
+      }
+    } while (marker)
+
+    return policies
+  }
+
+  listAttachedGroupPolicies = async (resourceId: string) => {
+    const options = this.getOptions()
+
+    const iam = new this.AWS.IAM(options)
+
+    let marker: string | undefined
+
+    let policies: AttachedPolicy[] = []
+
+    do {
+      const listAttachedGroupPolicies = await iam
+        .listAttachedGroupPolicies({
+          GroupName: resourceId,
+          Marker: marker,
+        })
+        .promise()
+
+      marker = listAttachedGroupPolicies.Marker
+      if (listAttachedGroupPolicies.AttachedPolicies) {
+        policies = policies.concat(listAttachedGroupPolicies.AttachedPolicies)
       }
     } while (marker)
 

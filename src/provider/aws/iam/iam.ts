@@ -11,6 +11,7 @@ export const builder = (yargs: Argv) => {
   return yargs
     .commandDir('users', opts)
     .commandDir('roles', opts)
+    .commandDir('groups', opts)
     .demandCommand(1)
     .example([
       [
