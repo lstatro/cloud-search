@@ -103,7 +103,6 @@ describe('publicAccessBlocks', () => {
         $0: 'test',
         profile: 'test',
         resourceId: 'test',
-
         region: 'us-east-1',
       })
       expect(audits[0].state).to.equal('FAIL')
