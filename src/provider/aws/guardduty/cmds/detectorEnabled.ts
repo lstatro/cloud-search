@@ -18,7 +18,7 @@ export const desc = `Existing GuardDuty detectors are enabled
 
 export default class DetectorEnabled extends AWS {
   audits: AuditResultInterface[] = []
-  service = 'kms'
+  service = 'guardduty'
   global = false
 
   constructor(public params: AWSScannerInterface) {
@@ -50,7 +50,7 @@ export default class DetectorEnabled extends AWS {
 
     if (getDetector.Status === 'ENABLED') {
       audit.state = 'OK'
-    } else {
+    } else if (getDetector.Status === 'DISABLED') {
       audit.state = 'FAIL'
     }
 

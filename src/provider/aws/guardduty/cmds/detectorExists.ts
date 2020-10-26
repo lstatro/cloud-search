@@ -24,7 +24,7 @@ export const desc = `A GuardDuty detector exists for this region
 
 export default class DetectorExists extends AWS {
   audits: AuditResultInterface[] = []
-  service = 'kms'
+  service = 'guardduty'
   global = false
 
   constructor(public params: AWSScannerInterface) {
