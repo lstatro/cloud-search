@@ -1,7 +1,7 @@
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import { AWS } from '../../../../lib/aws/AWS'
 
-type SourceType = 'CloudTrail' | 'DNSLogs' | 'FlowLogs' | 'S3Logs'
+export type SourceType = 'CloudTrail' | 'DNSLogs' | 'FlowLogs' | 'S3Logs'
 
 export interface DetectorDataSourcesInterface extends AWSScannerInterface {
   source: SourceType
@@ -42,8 +42,11 @@ export default class DetectorDataSources extends AWS {
       })
       .promise()
 
-    if (getDetector.DataSources) {
-      if (getDetector.DataSources[this.source].Status) {
+    const dataSources = getDetector.DataSources
+    if (dataSources) {
+      const status = dataSources[this.source].Status
+
+      if (status === 'ENABLED') {
         audit.state = 'OK'
       } else {
         audit.state = 'FAIL'

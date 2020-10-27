@@ -21,6 +21,7 @@ export const handler = async (args: DetectorDataSourcesInterface) => {
     source: 'DNSLogs',
     rule,
   })
+
   await scanner.start()
   scanner.output()
   return scanner.audits
