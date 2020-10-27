@@ -32,17 +32,7 @@ export default class PublicSnapshot extends AWS {
 
     const ec2 = new this.AWS.EC2(options)
 
-    const audit: AuditResultInterface = {
-      name: resource,
-      provider: 'aws',
-      physicalId: resource,
-      service: this.service,
-      rule: this.rule,
-      region: region,
-      state: 'UNKNOWN',
-      profile: this.profile,
-      time: new Date().toISOString(),
-    }
+    const audit = this.getDefaultAuditObj({ resource, region })
 
     const describe = await ec2
       .describeSnapshotAttribute({

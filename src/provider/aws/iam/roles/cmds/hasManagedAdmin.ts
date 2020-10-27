@@ -29,18 +29,7 @@ export default class HasManagedAdmin extends AWS {
   }
 
   async audit({ resource }: { resource: string }) {
-    const now = new Date()
-
-    const audit: AuditResultInterface = {
-      provider: 'aws',
-      physicalId: resource,
-      service: this.service,
-      rule: this.rule,
-      region: this.region,
-      state: 'UNKNOWN',
-      profile: this.profile,
-      time: now.toISOString(),
-    }
+    const audit = this.getDefaultAuditObj({ resource, region: this.region })
 
     const policies = await this.listAttachedRolePolicies(resource)
 

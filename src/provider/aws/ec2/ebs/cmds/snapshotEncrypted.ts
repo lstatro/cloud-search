@@ -33,16 +33,11 @@ export default class SnapshotEncrypted extends AWS {
 
   async audit({ resource, region }: { resource: Snapshot; region: string }) {
     assert(resource.SnapshotId, 'snapshot must have a snapshot id')
-    const audit: AuditResultInterface = {
-      provider: 'aws',
-      physicalId: resource.SnapshotId,
-      service: this.service,
-      rule,
+
+    const audit = this.getDefaultAuditObj({
+      resource: resource.SnapshotId,
       region: region,
-      state: 'UNKNOWN',
-      profile: this.profile,
-      time: new Date().toISOString(),
-    }
+    })
 
     if (resource.KmsKeyId) {
       assert(

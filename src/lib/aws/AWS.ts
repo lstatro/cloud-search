@@ -1,5 +1,6 @@
 import { CommandBuilder } from 'yargs'
 import {
+  AuditResultInterface,
   AWSClientOptionsInterface,
   AWSParamsInterface,
   KeyType,
@@ -81,6 +82,25 @@ export abstract class AWS extends Provider {
   abstract async scan(params: ScanInterface): Promise<void>
 
   abstract audit(params: AuditInterface): Promise<void>
+
+  getDefaultAuditObj = ({
+    resource,
+    region,
+  }: {
+    resource: string
+    region: string
+  }) => {
+    return {
+      provider: 'aws',
+      physicalId: resource,
+      service: this.service,
+      rule: this.rule,
+      region: region,
+      state: 'UNKNOWN',
+      profile: this.profile,
+      time: new Date().toISOString(),
+    } as AuditResultInterface
+  }
 
   getOptions = () => {
     let options: AWSClientOptionsInterface
