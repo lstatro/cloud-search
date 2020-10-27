@@ -3,7 +3,7 @@ import { mock, restore } from 'aws-sdk-mock'
 import { handler } from './maxKeyAge'
 import { expect } from 'chai'
 
-describe('iam user key age', () => {
+describe('iam keys should not be older then a specific age', () => {
   beforeEach(() => {
     mock('EC2', 'describeRegions', { Regions: [{ RegionName: 'us-east-1' }] })
   })

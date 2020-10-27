@@ -3,7 +3,7 @@ import { mock, restore } from 'aws-sdk-mock'
 import { handler } from './passwordAge'
 import { expect } from 'chai'
 import { AWSError } from 'aws-sdk'
-describe('passwordAge', () => {
+describe('user passwords should not be older then a specific age', () => {
   beforeEach(() => {
     mock('EC2', 'describeRegions', { Regions: [{ RegionName: 'us-east-1' }] })
   })

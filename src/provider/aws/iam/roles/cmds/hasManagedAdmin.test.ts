@@ -4,7 +4,7 @@ import { useFakeTimers, SinonFakeTimers } from 'sinon'
 import { handler } from './hasManagedAdmin'
 import { expect } from 'chai'
 
-describe('users should not have managed admin attached', () => {
+describe('roles should not have managed admin attached', () => {
   const now = new Date(0)
   let clock: SinonFakeTimers
 
@@ -18,8 +18,8 @@ describe('users should not have managed admin attached', () => {
     restore()
   })
 
-  it('should report nothing if no users are found', async () => {
-    mock('IAM', 'listUsers', {})
+  it('should report nothing if no roles are found', async () => {
+    mock('IAM', 'listRoles', {})
 
     const audits = await handler({
       region: 'all',
@@ -28,8 +28,8 @@ describe('users should not have managed admin attached', () => {
     expect(audits).to.eql([])
   })
 
-  it('should report nothing if no users are reported', async () => {
-    mock('IAM', 'listUsers', { Users: [] })
+  it('should report nothing if no roles are reported', async () => {
+    mock('IAM', 'listRoles', { Roles: [] })
 
     const audits = await handler({
       region: 'all',
@@ -38,16 +38,16 @@ describe('users should not have managed admin attached', () => {
     expect(audits).to.eql([])
   })
 
-  it('should report OK if a user does not have admin attached', async () => {
-    mock('IAM', 'listUsers', {
-      Users: [
+  it('should report OK if a role does not have admin attached', async () => {
+    mock('IAM', 'listRoles', {
+      Roles: [
         {
-          UserName: 'test',
+          RoleName: 'test',
         },
       ],
     })
 
-    mock('IAM', 'listAttachedUserPolicies', {
+    mock('IAM', 'listAttachedRolePolicies', {
       AttachedPolicies: [],
     })
 
@@ -69,16 +69,16 @@ describe('users should not have managed admin attached', () => {
     ])
   })
 
-  it('should report OK if a user has no attached policy', async () => {
-    mock('IAM', 'listUsers', {
-      Users: [
+  it('should report OK if a role has no attached policy', async () => {
+    mock('IAM', 'listRoles', {
+      Roles: [
         {
-          UserName: 'test',
+          RoleName: 'test',
         },
       ],
     })
 
-    mock('IAM', 'listAttachedUserPolicies', {})
+    mock('IAM', 'listAttachedRolePolicies', {})
 
     const audits = await handler({
       region: 'all',
@@ -98,16 +98,16 @@ describe('users should not have managed admin attached', () => {
     ])
   })
 
-  it('should report FAIL if a user has no attached policy', async () => {
-    mock('IAM', 'listUsers', {
-      Users: [
+  it('should report FAIL if a role has no attached policy', async () => {
+    mock('IAM', 'listRoles', {
+      Roles: [
         {
-          UserName: 'test',
+          RoleName: 'test',
         },
       ],
     })
 
-    mock('IAM', 'listAttachedUserPolicies', {
+    mock('IAM', 'listAttachedRolePolicies', {
       AttachedPolicies: [
         {
           PolicyName: 'AdministratorAccess',
@@ -134,16 +134,16 @@ describe('users should not have managed admin attached', () => {
     ])
   })
 
-  it('should report OK if a user has managed policy attached, but it is not admin', async () => {
-    mock('IAM', 'listUsers', {
-      Users: [
+  it('should report OK if a role has managed policy attached, but it is not admin', async () => {
+    mock('IAM', 'listRoles', {
+      Roles: [
         {
-          UserName: 'test',
+          RoleName: 'test',
         },
       ],
     })
 
-    mock('IAM', 'listAttachedUserPolicies', {
+    mock('IAM', 'listAttachedRolePolicies', {
       AttachedPolicies: [
         {
           PolicyName: 'MyTest1',

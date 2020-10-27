@@ -1,6 +1,6 @@
 {
   "name": "@lstatro/cloud-search",
-  "version": "1.5.0",
+  "version": "1.6.0",
   "description": "cloud guardrail scanner",
   "main": "build/cli.js",
   "scripts": {
@@ -32,6 +32,7 @@
   "keywords": [
     "security",
     "guardrail",
+    "guardduty",
     "amazon",
     "aws",
     "ec2",

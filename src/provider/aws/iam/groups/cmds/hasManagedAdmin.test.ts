@@ -4,7 +4,7 @@ import { useFakeTimers, SinonFakeTimers } from 'sinon'
 import { handler } from './hasManagedAdmin'
 import { expect } from 'chai'
 
-describe('users should not have managed admin attached', () => {
+describe('groups should not have managed admin attached', () => {
   const now = new Date(0)
   let clock: SinonFakeTimers
 
@@ -18,8 +18,8 @@ describe('users should not have managed admin attached', () => {
     restore()
   })
 
-  it('should report nothing if no users are found', async () => {
-    mock('IAM', 'listUsers', {})
+  it('should report nothing if no groups are found', async () => {
+    mock('IAM', 'listGroups', {})
 
     const audits = await handler({
       region: 'all',
@@ -28,8 +28,8 @@ describe('users should not have managed admin attached', () => {
     expect(audits).to.eql([])
   })
 
-  it('should report nothing if no users are reported', async () => {
-    mock('IAM', 'listUsers', { Users: [] })
+  it('should report nothing if no groups are reported', async () => {
+    mock('IAM', 'listGroups', { Groups: [] })
 
     const audits = await handler({
       region: 'all',
@@ -38,16 +38,16 @@ describe('users should not have managed admin attached', () => {
     expect(audits).to.eql([])
   })
 
-  it('should report OK if a user does not have admin attached', async () => {
-    mock('IAM', 'listUsers', {
-      Users: [
+  it('should report OK if a group does not have admin attached', async () => {
+    mock('IAM', 'listGroups', {
+      Groups: [
         {
-          UserName: 'test',
+          GroupName: 'test',
         },
       ],
     })
 
-    mock('IAM', 'listAttachedUserPolicies', {
+    mock('IAM', 'listAttachedGroupPolicies', {
       AttachedPolicies: [],
     })
 
@@ -69,21 +69,22 @@ describe('users should not have managed admin attached', () => {
     ])
   })
 
-  it('should report OK if a user has no attached policy', async () => {
-    mock('IAM', 'listUsers', {
-      Users: [
+  it('should report OK if a group has no attached policy', async () => {
+    mock('IAM', 'listGroups', {
+      Groups: [
         {
-          UserName: 'test',
+          GroupName: 'test',
         },
       ],
     })
 
-    mock('IAM', 'listAttachedUserPolicies', {})
+    mock('IAM', 'listAttachedGroupPolicies', {})
 
     const audits = await handler({
       region: 'all',
       profile: 'test',
     })
+
     expect(audits).to.eql([
       {
         physicalId: 'test',
@@ -98,16 +99,16 @@ describe('users should not have managed admin attached', () => {
     ])
   })
 
-  it('should report FAIL if a user has no attached policy', async () => {
-    mock('IAM', 'listUsers', {
-      Users: [
+  it('should report FAIL if a group has no attached policy', async () => {
+    mock('IAM', 'listGroups', {
+      Groups: [
         {
-          UserName: 'test',
+          GroupName: 'test',
         },
       ],
     })
 
-    mock('IAM', 'listAttachedUserPolicies', {
+    mock('IAM', 'listAttachedGroupPolicies', {
       AttachedPolicies: [
         {
           PolicyName: 'AdministratorAccess',
@@ -120,6 +121,7 @@ describe('users should not have managed admin attached', () => {
       resourceId: 'test',
       profile: 'test',
     })
+
     expect(audits).to.eql([
       {
         physicalId: 'test',
@@ -134,8 +136,8 @@ describe('users should not have managed admin attached', () => {
     ])
   })
 
-  it('should report OK if a user has managed policy attached, but it is not admin', async () => {
-    mock('IAM', 'listUsers', {
+  it('should report OK if a group has managed policy attached, but it is not admin', async () => {
+    mock('IAM', 'listGroups', {
       Users: [
         {
           UserName: 'test',
@@ -143,7 +145,7 @@ describe('users should not have managed admin attached', () => {
       ],
     })
 
-    mock('IAM', 'listAttachedUserPolicies', {
+    mock('IAM', 'listAttachedGroupPolicies', {
       AttachedPolicies: [
         {
           PolicyName: 'MyTest1',
