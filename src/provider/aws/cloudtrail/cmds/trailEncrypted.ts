@@ -37,16 +37,7 @@ export default class TrailEncrypted extends AWS {
     const options = this.getOptions()
     options.region = region
 
-    const audit: AuditResultInterface = {
-      provider: 'aws',
-      physicalId: resource,
-      service: this.service,
-      rule: this.rule,
-      region: region,
-      state: 'UNKNOWN',
-      profile: this.profile,
-      time: new Date().toISOString(),
-    }
+    const audit = this.getDefaultAuditObj({ resource, region })
 
     const cloudtrail = new this.AWS.CloudTrail(options)
     const getTrail = await cloudtrail

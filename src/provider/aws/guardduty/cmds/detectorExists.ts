@@ -35,16 +35,10 @@ export default class DetectorExists extends AWS {
     const options = this.getOptions()
     options.region = region
 
-    const audit: AuditResultInterface = {
-      provider: 'aws',
-      physicalId: region,
-      service: this.service,
-      rule: this.rule,
+    const audit = this.getDefaultAuditObj({
+      resource: region,
       region: region,
-      state: 'UNKNOWN',
-      profile: this.profile,
-      time: new Date().toISOString(),
-    }
+    })
 
     if (resource.length === 1) {
       audit.state = 'OK'

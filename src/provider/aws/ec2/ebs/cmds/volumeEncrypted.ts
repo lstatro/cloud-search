@@ -33,16 +33,11 @@ export default class VolumesEncrypted extends AWS {
 
   async audit({ resource, region }: { resource: Volume; region: string }) {
     assert(resource.VolumeId, 'volume does not have an ID')
-    const audit: AuditResultInterface = {
-      provider: 'aws',
-      physicalId: resource.VolumeId,
-      service: this.service,
-      rule,
+
+    const audit = this.getDefaultAuditObj({
+      resource: resource.VolumeId,
       region: region,
-      state: 'UNKNOWN',
-      profile: this.profile,
-      time: new Date().toISOString(),
-    }
+    })
 
     if (resource.KmsKeyId) {
       assert(

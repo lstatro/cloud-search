@@ -1,5 +1,5 @@
 import { GetPublicAccessBlockOutput } from 'aws-sdk/clients/s3'
-import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
+import { AWSScannerInterface } from 'cloud-search'
 import assert from 'assert'
 import { AWS } from '../../../../lib/aws/AWS'
 
@@ -24,18 +24,11 @@ export default class PublicAccessBlocks extends AWS {
       assert(getPublicAccessBlock, 'unable to locate bucket')
       this.validate(getPublicAccessBlock, resource)
     } catch (err) {
-      const audit: AuditResultInterface = {
-        name: resource,
-        comment: err.code,
-        provider: 'aws',
-        physicalId: resource,
-        service: this.service,
-        rule: this.rule,
-        region: this.region,
-        state: 'UNKNOWN',
-        profile: this.profile,
-        time: new Date().toISOString(),
-      }
+      const audit = this.getDefaultAuditObj({ resource, region: this.region })
+
+      audit.name = resource
+      audit.comment = err.code
+
       if (err.code === 'NoSuchPublicAccessBlockConfiguration') {
         audit.state = 'FAIL'
         audit.comment = err.code
@@ -51,17 +44,12 @@ export default class PublicAccessBlocks extends AWS {
     const config = getPublicAccessBlock.PublicAccessBlockConfiguration as {
       [key: string]: boolean
     }
-    const audit: AuditResultInterface = {
-      name: bucketName,
-      provider: 'aws',
-      physicalId: bucketName,
-      service: this.service,
-      rule: this.rule,
+
+    const audit = this.getDefaultAuditObj({
+      resource: bucketName,
       region: this.region,
-      state: 'UNKNOWN',
-      profile: this.profile,
-      time: new Date().toISOString(),
-    }
+    })
+
     if (config[this.rule] === true) {
       audit.state = 'OK'
     } else if (config[this.rule] === false) {

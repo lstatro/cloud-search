@@ -70,7 +70,7 @@ describe('iam public role tests', () => {
         physicalId: 'test',
         profile: 'test',
         provider: 'aws',
-        region: 'global',
+        region: 'test',
         rule: 'PublicRole',
         service: 'iam',
         state: 'OK',

@@ -25,16 +25,10 @@ export default class DetectorDataSources extends AWS {
 
     const gd = new this.AWS.GuardDuty(options)
 
-    const audit: AuditResultInterface = {
-      provider: 'aws',
-      physicalId: resource,
-      service: this.service,
-      rule: this.rule,
+    const audit = this.getDefaultAuditObj({
+      resource: resource,
       region: region,
-      state: 'UNKNOWN',
-      profile: this.profile,
-      time: new Date().toISOString(),
-    }
+    })
 
     const getDetector = await gd
       .getDetector({

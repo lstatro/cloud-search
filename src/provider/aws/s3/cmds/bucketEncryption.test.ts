@@ -4,7 +4,7 @@ import { useFakeTimers, SinonFakeTimers } from 'sinon'
 import { handler } from './bucketEncryption'
 import { expect } from 'chai'
 import { AWSError } from 'aws-sdk'
-describe('iam user key age', () => {
+describe('s3 bucket encryption', () => {
   const now = new Date(0)
   let clock: SinonFakeTimers
   beforeEach(() => {
@@ -39,7 +39,6 @@ describe('iam user key age', () => {
 
     expect(audits).to.eql([
       {
-        name: 'test',
         provider: 'aws',
         physicalId: 'test',
         service: 's3',
@@ -73,7 +72,6 @@ describe('iam user key age', () => {
 
     expect(audits).to.eql([
       {
-        name: 'test',
         provider: 'aws',
         physicalId: 'test',
         service: 's3',
@@ -112,7 +110,6 @@ describe('iam user key age', () => {
 
     expect(audits).to.eql([
       {
-        name: 'test',
         provider: 'aws',
         physicalId: 'test',
         service: 's3',
@@ -145,7 +142,6 @@ describe('iam user key age', () => {
 
     expect(audits).to.eql([
       {
-        name: 'test',
         provider: 'aws',
         physicalId: 'test',
         service: 's3',
@@ -182,7 +178,6 @@ describe('iam user key age', () => {
 
     expect(audits).to.eql([
       {
-        name: 'test',
         provider: 'aws',
         physicalId: 'test',
         service: 's3',
@@ -221,7 +216,6 @@ describe('iam user key age', () => {
 
     expect(audits).to.eql([
       {
-        name: 'test',
         provider: 'aws',
         physicalId: 'test',
         service: 's3',
@@ -264,7 +258,6 @@ describe('iam user key age', () => {
 
     expect(audits).to.eql([
       {
-        name: 'test',
         provider: 'aws',
         physicalId: 'test',
         service: 's3',
@@ -307,7 +300,6 @@ describe('iam user key age', () => {
 
     expect(audits).to.eql([
       {
-        name: 'test',
         provider: 'aws',
         physicalId: 'test',
         service: 's3',
@@ -343,7 +335,6 @@ describe('iam user key age', () => {
 
     expect(audits).to.eql([
       {
-        name: 'test',
         provider: 'aws',
         physicalId: 'test',
         service: 's3',
@@ -372,7 +363,6 @@ describe('iam user key age', () => {
 
     expect(audits).to.eql([
       {
-        name: 'test',
         provider: 'aws',
         physicalId: 'test',
         service: 's3',
@@ -406,7 +396,6 @@ describe('iam user key age', () => {
 
     expect(audits).to.eql([
       {
-        name: 'test',
         provider: 'aws',
         physicalId: 'test',
         service: 's3',
@@ -437,7 +426,6 @@ describe('iam user key age', () => {
 
     expect(audits).to.eql([
       {
-        name: 'test',
         provider: 'aws',
         physicalId: 'test',
         service: 's3',

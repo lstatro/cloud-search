@@ -41,16 +41,11 @@ export default class TransitEncryptionEnabled extends AWS {
     region: string
   }) {
     assert(resource.CacheClusterId, 'clusters must have a cluster ARN')
-    const audit: AuditResultInterface = {
-      provider: 'aws',
-      physicalId: resource.CacheClusterId,
-      service: this.service,
-      rule: this.rule,
+
+    const audit = this.getDefaultAuditObj({
+      resource: resource.CacheClusterId,
       region: region,
-      state: 'UNKNOWN',
-      profile: this.profile,
-      time: new Date().toISOString(),
-    }
+    })
 
     if (resource.TransitEncryptionEnabled) {
       audit.state = 'OK'

@@ -70,17 +70,10 @@ export default class MaxKeyAge extends AWS {
   validate = (user: User, keyMetaData: AccessKeyMetadata) => {
     const id = `${user.UserName}:${keyMetaData.AccessKeyId}`
     const now = new Date()
-    const audit: AuditResultInterface = {
-      name: id,
-      provider: 'aws',
-      physicalId: id,
-      service: this.service,
-      rule: this.rule,
+    const audit = this.getDefaultAuditObj({
+      resource: id,
       region: this.region,
-      state: 'UNKNOWN',
-      profile: this.profile,
-      time: now.toISOString(),
-    }
+    })
 
     if (keyMetaData.CreateDate) {
       const delta = now.getTime() - keyMetaData.CreateDate.getTime()

@@ -81,16 +81,10 @@ export default class PublicRole extends AWS {
     policyDocument: string
     resource: string
   }) {
-    const audit: AuditResultInterface = {
-      provider: 'aws',
-      physicalId: resource,
-      service: this.service,
-      rule: this.rule,
-      region: 'global',
-      state: 'UNKNOWN',
-      profile: this.profile,
-      time: new Date().toISOString(),
-    }
+    const audit = this.getDefaultAuditObj({
+      resource: resource,
+      region: this.region,
+    })
 
     const trust = JSON.parse(decodeURIComponent(policyDocument))
 

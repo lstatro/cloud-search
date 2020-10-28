@@ -38,16 +38,8 @@ export default class PublicInstance extends AWS {
     resource: string
     region: string
   }) {
-    const audit: AuditResultInterface = {
-      provider: 'aws',
-      physicalId: resource,
-      service: this.service,
-      rule: this.rule,
-      region: region,
-      state: 'UNKNOWN',
-      profile: this.profile,
-      time: new Date().toISOString(),
-    }
+    const audit = this.getDefaultAuditObj({ resource, region })
+
     if (publiclyAccessible === true) {
       audit.state = 'FAIL'
     } else if (publiclyAccessible === false) {

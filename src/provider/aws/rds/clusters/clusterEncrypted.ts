@@ -35,16 +35,11 @@ export default class ClusterEncrypted extends AWS {
 
   async audit({ resource, region }: { resource: DBCluster; region: string }) {
     assert(resource.DBClusterArn, 'cluster does not have a cluster ARN')
-    const audit: AuditResultInterface = {
-      provider: 'aws',
-      physicalId: resource.DBClusterArn,
-      service: this.service,
-      rule: this.rule,
-      region: region,
-      state: 'UNKNOWN',
-      profile: this.profile,
-      time: new Date().toISOString(),
-    }
+
+    const audit = this.getDefaultAuditObj({
+      resource: resource.DBClusterArn,
+      region,
+    })
 
     if (typeof resource.KmsKeyId === 'string') {
       /** if there is a key it should be encrypted, if not, something unexpected is going on */

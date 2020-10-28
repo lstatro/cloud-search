@@ -85,17 +85,7 @@ export default class TopicEncrypted extends AWS {
     const options = this.getOptions()
     const s3 = new this.AWS.S3(options)
 
-    const audit: AuditResultInterface = {
-      name: resource,
-      provider: 'aws',
-      physicalId: resource,
-      service: this.service,
-      rule: this.rule,
-      region: region,
-      state: 'UNKNOWN',
-      profile: this.profile,
-      time: new Date().toISOString(),
-    }
+    const audit = this.getDefaultAuditObj({ resource, region })
 
     try {
       const getBucket = await s3

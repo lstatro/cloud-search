@@ -47,16 +47,14 @@ export default class IgwAttachedToVpc extends AWS {
       }
     }
 
-    this.audits.push({
-      provider: 'aws',
-      physicalId: resource.InternetGatewayId,
-      service: this.service,
-      rule,
+    const audit = this.getDefaultAuditObj({
+      resource: resource.InternetGatewayId,
       region: region,
-      state: suspect ? 'FAIL' : 'OK',
-      profile: this.profile,
-      time: new Date().toISOString(),
     })
+
+    audit.state = suspect ? 'FAIL' : 'OK'
+
+    this.audits.push(audit)
   }
 
   scan = async ({
