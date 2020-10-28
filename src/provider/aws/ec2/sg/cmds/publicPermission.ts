@@ -61,17 +61,16 @@ export default class PublicPermission extends AWS {
         }
       }
     }
-    this.audits.push({
-      name: resource.GroupName,
-      provider: 'aws',
-      physicalId: resource.GroupId,
-      service: this.service,
-      rule,
+
+    const audit = this.getDefaultAuditObj({
+      resource: resource.GroupId,
       region: region,
-      state: suspect ? 'FAIL' : 'OK',
-      profile: this.profile,
-      time: new Date().toISOString(),
     })
+
+    audit.state = suspect ? 'FAIL' : 'OK'
+    audit.name = resource.GroupName
+
+    this.audits.push(audit)
   }
 
   scan = async ({

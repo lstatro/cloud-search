@@ -57,7 +57,6 @@ describe('sqs topic encryption', () => {
     })
     expect(audits).to.eql([
       {
-        name: 'test',
         physicalId: 'test',
         profile: 'test',
         provider: 'aws',
@@ -83,7 +82,6 @@ describe('sqs topic encryption', () => {
     })
     expect(audits).to.eql([
       {
-        name: 'test',
         physicalId: 'test',
         profile: 'test',
         provider: 'aws',
@@ -116,7 +114,6 @@ describe('sqs topic encryption', () => {
     })
     expect(audits).to.eql([
       {
-        name: 'test',
         physicalId: 'test',
         profile: 'test',
         provider: 'aws',
@@ -144,7 +141,6 @@ describe('sqs topic encryption', () => {
     })
     expect(audits).to.eql([
       {
-        name: 'test',
         physicalId: 'test',
         profile: 'test',
         provider: 'aws',
@@ -178,7 +174,6 @@ describe('sqs topic encryption', () => {
     })
     expect(audits).to.eql([
       {
-        name: 'test',
         physicalId: 'test',
         profile: 'test',
         provider: 'aws',

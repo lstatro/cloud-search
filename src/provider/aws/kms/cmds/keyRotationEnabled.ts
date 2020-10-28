@@ -36,16 +36,7 @@ export default class KeyRotationEnabled extends AWS {
 
     /** we only care about customer keys, we want to ignore AWS managed keys entirely as we cannot rotate them */
     if (describeKey.KeyMetadata.KeyManager === 'CUSTOMER') {
-      const audit: AuditResultInterface = {
-        provider: 'aws',
-        physicalId: resource,
-        service: this.service,
-        rule: this.rule,
-        region: region,
-        state: 'UNKNOWN',
-        profile: this.profile,
-        time: new Date().toISOString(),
-      }
+      const audit = this.getDefaultAuditObj({ resource, region })
 
       const getKeyRotationStatus = await kms
         .getKeyRotationStatus({

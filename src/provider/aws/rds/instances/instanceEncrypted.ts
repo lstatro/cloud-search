@@ -36,16 +36,11 @@ export default class PublicInstance extends AWS {
 
   async audit({ resource, region }: { resource: DBInstance; region: string }) {
     assert(resource.DBInstanceArn, 'instance does not have an instance ARN')
-    const audit: AuditResultInterface = {
-      provider: 'aws',
-      physicalId: resource.DBInstanceArn,
-      service: this.service,
-      rule: this.rule,
-      region: region,
-      state: 'UNKNOWN',
-      profile: this.profile,
-      time: new Date().toISOString(),
-    }
+
+    const audit = this.getDefaultAuditObj({
+      resource: resource.DBInstanceArn,
+      region,
+    })
 
     if (typeof resource.KmsKeyId === 'string') {
       /** if there is a key it should be encrypted, if not, something unexpected is going on */

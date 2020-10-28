@@ -47,7 +47,6 @@ describe('ebs snapshot should not be public', () => {
 
     expect(audits).to.eql([
       {
-        name: 'test',
         physicalId: 'test',
         profile: 'test',
         provider: 'aws',
@@ -70,7 +69,6 @@ describe('ebs snapshot should not be public', () => {
 
     expect(audits).to.eql([
       {
-        name: 'test',
         physicalId: 'test',
         profile: 'test',
         provider: 'aws',
@@ -94,7 +92,6 @@ describe('ebs snapshot should not be public', () => {
 
     expect(audits).to.eql([
       {
-        name: 'test',
         physicalId: 'test',
         profile: 'test',
         provider: 'aws',
@@ -120,7 +117,6 @@ describe('ebs snapshot should not be public', () => {
 
     expect(audits).to.eql([
       {
-        name: 'test',
         physicalId: 'test',
         profile: 'test',
         provider: 'aws',
@@ -146,7 +142,6 @@ describe('ebs snapshot should not be public', () => {
 
     expect(audits).to.eql([
       {
-        name: 'test',
         physicalId: 'test',
         profile: 'test',
         provider: 'aws',

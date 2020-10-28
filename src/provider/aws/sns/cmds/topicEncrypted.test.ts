@@ -49,7 +49,6 @@ describe('sns topic encryption', () => {
     })
     expect(audits).to.eql([
       {
-        name: 'test',
         physicalId: 'test',
         profile: 'test',
         provider: 'aws',
@@ -78,7 +77,6 @@ describe('sns topic encryption', () => {
     })
     expect(audits).to.eql([
       {
-        name: 'test',
         physicalId: 'test',
         profile: 'test',
         provider: 'aws',
@@ -114,7 +112,6 @@ describe('sns topic encryption', () => {
     })
     expect(audits).to.eql([
       {
-        name: 'test',
         physicalId: 'test',
         profile: 'test',
         provider: 'aws',
@@ -151,7 +148,6 @@ describe('sns topic encryption', () => {
     })
     expect(audits).to.eql([
       {
-        name: 'test',
         physicalId: 'test',
         profile: 'test',
         provider: 'aws',
@@ -188,7 +184,6 @@ describe('sns topic encryption', () => {
     })
     expect(audits).to.eql([
       {
-        name: 'test',
         physicalId: 'test',
         profile: 'test',
         provider: 'aws',
@@ -223,7 +218,6 @@ describe('sns topic encryption', () => {
     })
     expect(audits).to.eql([
       {
-        name: 'test',
         physicalId: 'test',
         profile: 'test',
         provider: 'aws',
@@ -258,7 +252,6 @@ describe('sns topic encryption', () => {
     })
     expect(audits).to.eql([
       {
-        name: 'test',
         physicalId: 'test',
         profile: 'test',
         provider: 'aws',

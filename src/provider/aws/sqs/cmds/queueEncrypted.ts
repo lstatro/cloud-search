@@ -41,17 +41,8 @@ export default class TopicEncrypted extends AWS {
         AttributeNames: ['KmsMasterKeyId'],
       })
       .promise()
-    const audit: AuditResultInterface = {
-      name: resource,
-      provider: 'aws',
-      physicalId: resource,
-      service: this.service,
-      rule: this.rule,
-      region: region,
-      state: 'UNKNOWN',
-      profile: this.profile,
-      time: new Date().toISOString(),
-    }
+
+    const audit = this.getDefaultAuditObj({ resource, region })
 
     /**
      * if we have attributes and that includes the key id attribute.

@@ -62,17 +62,10 @@ export default class PasswordAge extends AWS {
   validate = (userName: string, createDate?: Date) => {
     const now = new Date()
 
-    const audit: AuditResultInterface = {
-      name: userName,
-      provider: 'aws',
-      physicalId: userName,
-      service: this.service,
-      rule: this.rule,
+    const audit = this.getDefaultAuditObj({
+      resource: userName,
       region: this.region,
-      state: 'UNKNOWN',
-      profile: this.profile,
-      time: now.toISOString(),
-    }
+    })
 
     if (createDate) {
       const delta = now.getTime() - createDate.getTime()
