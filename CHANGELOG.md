@@ -7,6 +7,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [1.6.1] - 2020-10-27
+
+### Added
+
+### Changed
+
+- centralized audit object creation across all services
+
+### Removed
+
 ## [1.6.0] - 2020-10-26
 
 ### Added
