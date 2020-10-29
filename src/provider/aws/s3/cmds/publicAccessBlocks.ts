@@ -1,4 +1,4 @@
-import { GetPublicAccessBlockOutput } from 'aws-sdk/clients/s3'
+import { Bucket, GetPublicAccessBlockOutput } from 'aws-sdk/clients/s3'
 import { AWSScannerInterface } from 'cloud-search'
 import assert from 'assert'
 import { AWS } from '../../../../lib/aws/AWS'
@@ -65,7 +65,10 @@ export default class PublicAccessBlocks extends AWS {
     if (resourceId) {
       await this.audit({ resource: resourceId })
     } else {
-      const buckets = await this.listBuckets()
+      const buckets = await this.pager<Bucket>(
+        new this.AWS.S3(this.options).listBuckets().promise(),
+        'Buckets'
+      )
       for (const bucket of buckets) {
         assert(bucket.Name, 'bucket does not have a name')
         await this.audit({ resource: bucket.Name })

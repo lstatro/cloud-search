@@ -6,15 +6,9 @@ import {
   KeyType,
 } from 'cloud-search'
 import { Bucket } from 'aws-sdk/clients/s3'
-import {
-  InternetGateway,
-  SecurityGroup,
-  Snapshot,
-  Volume,
-} from 'aws-sdk/clients/ec2'
+import { Snapshot, Volume } from 'aws-sdk/clients/ec2'
 import { KeyMetadata, KeyListEntry } from 'aws-sdk/clients/kms'
 import { AttachedPolicy, Group, Role, User } from 'aws-sdk/clients/iam'
-import { Topic } from 'aws-sdk/clients/sns'
 import { QueueUrlList } from 'aws-sdk/clients/sqs'
 import { DBCluster, DBInstance } from 'aws-sdk/clients/rds'
 import _AWS from 'aws-sdk'
@@ -191,34 +185,6 @@ export abstract class AWS extends Provider {
     }
   }
 
-  listInternetGateways = async (region: string, resourceId?: string) => {
-    const options = this.getOptions()
-    options.region = region
-
-    const ec2 = new this.AWS.EC2(options)
-
-    let nextToken: string | undefined
-
-    let igws: InternetGateway[] = []
-
-    do {
-      const describeInternetGateways = await ec2
-        .describeInternetGateways({
-          NextToken: nextToken,
-          InternetGatewayIds: resourceId ? [resourceId] : undefined,
-        })
-        .promise()
-
-      nextToken = describeInternetGateways.NextToken
-
-      if (describeInternetGateways.InternetGateways) {
-        igws = igws.concat(describeInternetGateways.InternetGateways)
-      }
-    } while (nextToken)
-
-    return igws
-  }
-
   listBuckets = async () => {
     /** no need to define a region, s3 endpoint is global */
     const s3 = new this.AWS.S3(this.options)
@@ -231,32 +197,6 @@ export abstract class AWS extends Provider {
     }
 
     return buckets
-  }
-
-  listSecurityGroups = async (region: string, resourceId?: string) => {
-    const options = this.getOptions()
-    options.region = region
-
-    const ec2 = new this.AWS.EC2(options)
-
-    let nextToken: string | undefined
-
-    let groups: SecurityGroup[] = []
-
-    do {
-      const describeSecurityGroups = await ec2
-        .describeSecurityGroups({
-          NextToken: nextToken,
-          GroupIds: resourceId ? [resourceId] : undefined,
-        })
-        .promise()
-      nextToken = describeSecurityGroups.NextToken
-      if (describeSecurityGroups.SecurityGroups) {
-        groups = groups.concat(describeSecurityGroups.SecurityGroups)
-      }
-    } while (nextToken)
-
-    return groups
   }
 
   listVolumes = async (region: string, resourceId?: string) => {
@@ -362,29 +302,53 @@ export abstract class AWS extends Provider {
     return groups
   }
 
-  listTopics = async (region: string) => {
-    const options = this.getOptions()
-    options.region = region
-
-    const sns = new this.AWS.SNS(options)
-
-    let nextToken: string | undefined
-
-    let topics: Topic[] = []
+  pager = async <R>(
+    /** it pains me to use an "any", but we save a lot of pain by doing so */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    promise: any,
+    attribute: string
+  ) => {
+    let resources: R[] = []
+    let hasNextPage
 
     do {
-      const listTopics = await sns
-        .listTopics({
-          NextToken: nextToken,
-        })
-        .promise()
-      nextToken = listTopics.NextToken
-      if (listTopics.Topics) {
-        topics = topics.concat(listTopics.Topics)
-      }
-    } while (nextToken)
+      hasNextPage = false
 
-    return topics
+      /** wait for the promise to finish */
+      const result = await promise
+
+      /** in the result did we find the target response key? */
+      if (result[attribute]) {
+        /** looks like we did, lets add it to our resource array and move on */
+        resources = resources.concat(result[attribute])
+      }
+
+      /**
+       * honestly AWS always returns a response, I'm checking this because
+       * I don't want to go back and update every test.
+       *
+       * Call me lazy.  I'm good with that.  I'll trade one if check to save
+       * possibly hundreds of mocks.  Sounds like a good deal to me.
+       */
+
+      /** was there an AWS response object returned with the request? */
+      if (result.$response) {
+        /** is there another page to the request? */
+        hasNextPage = result.$response.hasNextPage()
+        if (hasNextPage) {
+          /**
+           * reset the promise to the next page and iterate.
+           * I am not entirely sure the sdk is setup to use .promise off the
+           * nextPage function, but it works!  If result wasn't any we would
+           * see an error indicating that .promise() is not a method off the
+           * nextPage function.
+           */
+          promise = result.$response.nextPage().promise()
+        }
+      }
+    } while (hasNextPage)
+
+    return resources
   }
 
   getKeyMetadata = async (keyId: string, region: string) => {
