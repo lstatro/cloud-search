@@ -5,7 +5,6 @@ import {
   AWSParamsInterface,
   KeyType,
 } from 'cloud-search'
-import { Bucket } from 'aws-sdk/clients/s3'
 import { Snapshot, Volume } from 'aws-sdk/clients/ec2'
 import { KeyMetadata, KeyListEntry } from 'aws-sdk/clients/kms'
 import { AttachedPolicy, Group, Role, User } from 'aws-sdk/clients/iam'
@@ -183,20 +182,6 @@ export abstract class AWS extends Provider {
       /** we want to rethrow this so that tests outright fail and the user can see the reason why */
       throw err
     }
-  }
-
-  listBuckets = async () => {
-    /** no need to define a region, s3 endpoint is global */
-    const s3 = new this.AWS.S3(this.options)
-    let buckets: Bucket[] = []
-
-    const listBuckets = await s3.listBuckets().promise()
-
-    if (listBuckets.Buckets) {
-      buckets = buckets.concat(listBuckets.Buckets)
-    }
-
-    return buckets
   }
 
   listVolumes = async (region: string, resourceId?: string) => {
