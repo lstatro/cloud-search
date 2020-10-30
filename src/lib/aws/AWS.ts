@@ -5,7 +5,6 @@ import {
   AWSParamsInterface,
   KeyType,
 } from 'cloud-search'
-import { Snapshot, Volume } from 'aws-sdk/clients/ec2'
 import { KeyMetadata, KeyListEntry } from 'aws-sdk/clients/kms'
 import { AttachedPolicy, Group, Role, User } from 'aws-sdk/clients/iam'
 import { QueueUrlList } from 'aws-sdk/clients/sqs'
@@ -182,34 +181,6 @@ export abstract class AWS extends Provider {
       /** we want to rethrow this so that tests outright fail and the user can see the reason why */
       throw err
     }
-  }
-
-  listVolumes = async (region: string, resourceId?: string) => {
-    const options = this.getOptions()
-    options.region = region
-
-    const ec2 = new this.AWS.EC2(options)
-
-    let nextToken: string | undefined
-
-    let volumes: Volume[] = []
-
-    do {
-      const describeVolumes = await ec2
-        .describeVolumes({
-          NextToken: nextToken,
-          VolumeIds: resourceId ? [resourceId] : undefined,
-        })
-        .promise()
-
-      nextToken = describeVolumes.NextToken
-
-      if (describeVolumes.Volumes) {
-        volumes = volumes.concat(describeVolumes.Volumes)
-      }
-    } while (nextToken)
-
-    return volumes
   }
 
   listKeys = async (region: string) => {
@@ -427,33 +398,6 @@ export abstract class AWS extends Provider {
     } while (nextToken)
 
     return queues
-  }
-
-  listSnapshots = async (region: string, resourceId?: string) => {
-    const options = this.getOptions()
-    options.region = region
-
-    const ec2 = new this.AWS.EC2(options)
-
-    let nextToken: string | undefined
-
-    let snapshots: Snapshot[] = []
-
-    do {
-      const describeSnapshots = await ec2
-        .describeSnapshots({
-          NextToken: nextToken,
-          OwnerIds: ['self'],
-          SnapshotIds: resourceId ? [resourceId] : undefined,
-        })
-        .promise()
-      nextToken = describeSnapshots.NextToken
-      if (describeSnapshots.Snapshots) {
-        snapshots = snapshots.concat(describeSnapshots.Snapshots)
-      }
-    } while (nextToken)
-
-    return snapshots
   }
 
   listRoles = async () => {

@@ -67,7 +67,14 @@ export default class VolumesEncrypted extends AWS {
     const options = this.getOptions()
     options.region = region
 
-    const volumes = await this.listVolumes(region, resourceId)
+    const volumes = await this.pager<Volume>(
+      new this.AWS.EC2(options)
+        .describeVolumes({
+          VolumeIds: resourceId ? [resourceId] : undefined,
+        })
+        .promise(),
+      'Volumes'
+    )
 
     for (const volume of volumes) {
       this.audit({ resource: volume, region })
