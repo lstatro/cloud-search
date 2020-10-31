@@ -2,6 +2,7 @@ import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import assert from 'assert'
 
 import { AWS } from '../../../../lib/aws/AWS'
+import { TrailInfo } from 'aws-sdk/clients/cloudtrail'
 
 const rule = 'MultiRegionTrailEnabled'
 
@@ -75,10 +76,19 @@ export default class MultiRegionTrailEnabled extends AWS {
     if (resourceId) {
       await this.audit({ resource: resourceId, region })
     } else {
-      const trails = await this.listTrails(region)
+      const options = this.getOptions()
+      options.region = region
+
+      const trails = await this.pager<TrailInfo>(
+        new this.AWS.CloudTrail(this.options).listTrails().promise(),
+        'Trails'
+      )
+
       for (const trail of trails) {
-        assert(trail.TrailARN, 'trail does not have a ARN')
-        await this.audit({ resource: trail.TrailARN, region })
+        if (trail.HomeRegion === region) {
+          assert(trail.TrailARN, 'trail does not have a ARN')
+          await this.audit({ resource: trail.TrailARN, region })
+        }
       }
     }
   }
