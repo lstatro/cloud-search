@@ -12,8 +12,6 @@ import { DBCluster, DBInstance } from 'aws-sdk/clients/rds'
 import _AWS from 'aws-sdk'
 import Provider from '../Provider'
 import assert from 'assert'
-import { TrailInfo } from 'aws-sdk/clients/cloudtrail'
-import { CacheCluster } from 'aws-sdk/clients/elasticache'
 import { DetectorId } from 'aws-sdk/clients/guardduty'
 
 interface ScanInterface {
@@ -475,70 +473,6 @@ export abstract class AWS extends Provider {
     } while (marker)
 
     return dbClusters
-  }
-
-  listTrails = async (region: string) => {
-    const options = this.getOptions()
-    options.region = region
-
-    const cloudtrail = new this.AWS.CloudTrail(options)
-
-    let nextToken: string | undefined
-
-    const trails: TrailInfo[] = []
-
-    do {
-      const listTrails = await cloudtrail
-        .listTrails({
-          NextToken: nextToken,
-        })
-        .promise()
-      nextToken = listTrails.NextToken
-      if (listTrails.Trails) {
-        for (const trail of listTrails.Trails) {
-          /**
-           * Weird, but global trails are returned in every listTrails api call.
-           * This is a little misleading as technically CT isn't a global service.
-           * To combat this oddness, we're going to only validate trails in the
-           * target region.  If it's global and it's not in this region we just
-           * ignore it.  If its then we'll audit it.  This allows us to also audit
-           * regional trails as false in all regions.  This used to be a global
-           * rules but the weirdness bit us in the long run.
-           */
-          if (trail.HomeRegion === region) {
-            trails.push(trail)
-          }
-        }
-      }
-    } while (nextToken)
-
-    return trails
-  }
-
-  listElastiCacheClusters = async (region: string, resourceId?: string) => {
-    const options = this.getOptions()
-    options.region = region
-
-    const ec = new this.AWS.ElastiCache(options)
-
-    let marker: string | undefined
-
-    let cacheCluster: CacheCluster[] = []
-
-    do {
-      const describeCacheClusters = await ec
-        .describeCacheClusters({
-          CacheClusterId: resourceId,
-          Marker: marker,
-        })
-        .promise()
-      marker = describeCacheClusters.Marker
-      if (describeCacheClusters.CacheClusters) {
-        cacheCluster = cacheCluster.concat(describeCacheClusters.CacheClusters)
-      }
-    } while (marker)
-
-    return cacheCluster
   }
 
   listAttachedUserPolicies = async (resourceId: string) => {
