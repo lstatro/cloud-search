@@ -130,10 +130,12 @@ export default class TopicEncrypted extends AWS {
     if (resourceId) {
       await this.audit({ resource: resourceId, region })
     } else {
-      const buckets = await this.pager<Bucket>(
-        new this.AWS.S3(this.options).listBuckets().promise(),
-        'Buckets'
-      )
+      const options = this.getOptions()
+      options.region = region
+
+      const promise = new this.AWS.S3(options).listBuckets().promise()
+      const buckets = await this.pager<Bucket>(promise, 'Buckets')
+
       for (const bucket of buckets) {
         assert(bucket.Name, 'bucket must have a name')
         await this.audit({ resource: bucket.Name, region })

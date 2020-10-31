@@ -73,15 +73,14 @@ export default class PublicSnapshot extends AWS {
       const options = this.getOptions()
       options.region = region
 
-      const snapshots = await this.pager<Snapshot>(
-        new this.AWS.EC2(options)
-          .describeSnapshots({
-            OwnerIds: ['self'],
-            SnapshotIds: resourceId ? [resourceId] : undefined,
-          })
-          .promise(),
-        'Snapshots'
-      )
+      const promise = new this.AWS.EC2(options)
+        .describeSnapshots({
+          OwnerIds: ['self'],
+          SnapshotIds: resourceId ? [resourceId] : undefined,
+        })
+        .promise()
+
+      const snapshots = await this.pager<Snapshot>(promise, 'Snapshots')
 
       for (const snapshot of snapshots) {
         assert(snapshot.SnapshotId, 'does not have an id')

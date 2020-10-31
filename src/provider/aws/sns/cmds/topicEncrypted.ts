@@ -76,10 +76,9 @@ export default class TopicEncrypted extends AWS {
       const options = this.getOptions()
       options.region = region
 
-      const topics = await this.pager<Topic>(
-        new this.AWS.SNS(options).listTopics().promise(),
-        'Topics'
-      )
+      const promise = new this.AWS.SNS(options).listTopics().promise()
+      const topics = await this.pager<Topic>(promise, 'Topics')
+
       for (const topic of topics) {
         assert(topic.TopicArn, 'topic does not have an arn')
         await this.audit({ resource: topic.TopicArn, region })

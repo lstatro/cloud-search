@@ -67,10 +67,20 @@ export default class ClusterEncrypted extends AWS {
     region: string
   }) => {
     let clusters
+
+    const options = this.getOptions()
+    options.region = region
+
     if (resourceId) {
-      clusters = await this.listDBClusters(region, resourceId)
+      const promise = new this.AWS.RDS(options)
+        .describeDBClusters({
+          DBClusterIdentifier: resourceId,
+        })
+        .promise()
+      clusters = await this.pager<DBCluster>(promise, 'DBClusters')
     } else {
-      clusters = await this.listDBClusters(region)
+      const promise = new this.AWS.RDS(options).describeDBClusters().promise()
+      clusters = await this.pager<DBCluster>(promise, 'DBClusters')
     }
 
     for (const cluster of clusters) {

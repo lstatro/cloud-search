@@ -1,3 +1,4 @@
+import { AttachedPolicy, Role } from 'aws-sdk/clients/iam'
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import { AWS } from '../../../../../lib/aws/AWS'
 
@@ -31,7 +32,18 @@ export default class HasManagedAdmin extends AWS {
   async audit({ resource }: { resource: string }) {
     const audit = this.getDefaultAuditObj({ resource, region: this.region })
 
-    const policies = await this.listAttachedRolePolicies(resource)
+    const options = this.getOptions()
+
+    const promise = new this.AWS.IAM(options)
+      .listAttachedRolePolicies({
+        RoleName: resource,
+      })
+      .promise()
+
+    const policies = await this.pager<AttachedPolicy>(
+      promise,
+      'AttachedPolicies'
+    )
 
     for (const policy of policies) {
       if (policy.PolicyName === 'AdministratorAccess') {
@@ -50,7 +62,10 @@ export default class HasManagedAdmin extends AWS {
     if (resourceId) {
       await this.audit({ resource: resourceId })
     } else {
-      const roles = await this.listRoles()
+      const options = this.getOptions()
+
+      const promise = new this.AWS.IAM(options).listRoles().promise()
+      const roles = await this.pager<Role>(promise, 'Roles')
 
       for (const role of roles) {
         await this.audit({ resource: role.RoleName })

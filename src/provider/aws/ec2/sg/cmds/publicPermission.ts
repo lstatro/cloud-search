@@ -83,14 +83,13 @@ export default class PublicPermission extends AWS {
     const options = this.getOptions()
     options.region = region
 
-    const groups = await this.pager<SecurityGroup>(
-      new this.AWS.EC2(options)
-        .describeSecurityGroups({
-          GroupIds: resourceId ? [resourceId] : undefined,
-        })
-        .promise(),
-      'SecurityGroups'
-    )
+    const promise = new this.AWS.EC2(options)
+      .describeSecurityGroups({
+        GroupIds: resourceId ? [resourceId] : undefined,
+      })
+      .promise()
+    const groups = await this.pager<SecurityGroup>(promise, 'SecurityGroups')
+
     for (const group of groups) {
       await this.audit({ resource: group, region })
     }

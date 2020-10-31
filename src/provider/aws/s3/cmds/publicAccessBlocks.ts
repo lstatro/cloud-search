@@ -16,7 +16,9 @@ export default class PublicAccessBlocks extends AWS {
   }
 
   async audit({ resource }: { resource: string }) {
-    const s3 = new this.AWS.S3(this.options)
+    const options = this.getOptions()
+    const s3 = new this.AWS.S3(options)
+
     try {
       const getPublicAccessBlock = await s3
         .getPublicAccessBlock({ Bucket: resource })
@@ -65,10 +67,11 @@ export default class PublicAccessBlocks extends AWS {
     if (resourceId) {
       await this.audit({ resource: resourceId })
     } else {
-      const buckets = await this.pager<Bucket>(
-        new this.AWS.S3(this.options).listBuckets().promise(),
-        'Buckets'
-      )
+      const options = this.getOptions()
+
+      const promise = new this.AWS.S3(options).listBuckets().promise()
+      const buckets = await this.pager<Bucket>(promise, 'Buckets')
+
       for (const bucket of buckets) {
         assert(bucket.Name, 'bucket does not have a name')
         await this.audit({ resource: bucket.Name })

@@ -5,14 +5,10 @@ import {
   AWSParamsInterface,
   KeyType,
 } from 'cloud-search'
-import { KeyMetadata, KeyListEntry } from 'aws-sdk/clients/kms'
-import { AttachedPolicy, Group, Role, User } from 'aws-sdk/clients/iam'
-import { QueueUrlList } from 'aws-sdk/clients/sqs'
-import { DBCluster, DBInstance } from 'aws-sdk/clients/rds'
+import { KeyMetadata } from 'aws-sdk/clients/kms'
 import _AWS from 'aws-sdk'
 import Provider from '../Provider'
 import assert from 'assert'
-import { DetectorId } from 'aws-sdk/clients/guardduty'
 
 interface ScanInterface {
   region?: string
@@ -42,8 +38,6 @@ export const keyTypeArg: CommandBuilder = {
 export abstract class AWS extends Provider {
   abstract service: string
 
-  options: AWSClientOptionsInterface
-
   region: string
   regions: string[] = []
   global = false
@@ -65,8 +59,6 @@ export abstract class AWS extends Provider {
     })
 
     this.keyType = params.keyType
-
-    this.options = this.getOptions()
   }
 
   abstract async scan(params: ScanInterface): Promise<void>
@@ -181,130 +173,6 @@ export abstract class AWS extends Provider {
     }
   }
 
-  listKeys = async (region: string) => {
-    const options = this.getOptions()
-    options.region = region
-
-    const kms = new this.AWS.KMS(options)
-
-    let marker: string | undefined
-
-    let keys: KeyListEntry[] = []
-
-    do {
-      const listKeys = await kms
-        .listKeys({
-          Marker: marker,
-        })
-        .promise()
-      marker = listKeys.NextMarker
-      if (listKeys.Keys) {
-        keys = keys.concat(listKeys.Keys)
-      }
-    } while (marker)
-
-    return keys
-  }
-
-  listUsers = async () => {
-    /** no need to set a region iam is global */
-    const iam = new this.AWS.IAM(this.options)
-
-    let users: User[] = []
-
-    let marker: string | undefined
-
-    do {
-      const listUsers = await iam
-        .listUsers({
-          Marker: marker,
-        })
-        .promise()
-
-      marker = listUsers.Marker
-
-      if (listUsers.Users) {
-        users = users.concat(listUsers.Users)
-      }
-    } while (marker)
-
-    return users
-  }
-
-  listGroups = async () => {
-    /** no need to set a region iam is global */
-    const iam = new this.AWS.IAM(this.options)
-
-    let groups: Group[] = []
-
-    let marker: string | undefined
-
-    do {
-      const listGroups = await iam
-        .listGroups({
-          Marker: marker,
-        })
-        .promise()
-
-      marker = listGroups.Marker
-
-      if (listGroups.Groups) {
-        groups = groups.concat(listGroups.Groups)
-      }
-    } while (marker)
-
-    return groups
-  }
-
-  pager = async <R>(
-    /** it pains me to use an "any", but we save a lot of pain by doing so */
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    promise: any,
-    attribute: string
-  ) => {
-    let resources: R[] = []
-    let hasNextPage
-
-    do {
-      hasNextPage = false
-
-      /** wait for the promise to finish */
-      const result = await promise
-
-      /** in the result did we find the target response key? */
-      if (result[attribute]) {
-        /** looks like we did, lets add it to our resource array and move on */
-        resources = resources.concat(result[attribute])
-      }
-
-      /**
-       * honestly AWS always returns a response, I'm checking this because
-       * I don't want to go back and update every test.
-       *
-       * Call me lazy.  I'm good with that.  I'll trade one if check to save
-       * possibly hundreds of mocks.  Sounds like a good deal to me.
-       */
-
-      /** was there an AWS response object returned with the request? */
-      if (result.$response) {
-        /** is there another page to the request? */
-        hasNextPage = result.$response.hasNextPage()
-        if (hasNextPage) {
-          /**
-           * reset the promise to the next page and iterate.
-           * I am not entirely sure the sdk is setup to use .promise off the
-           * nextPage function, but it works!  If result wasn't any we would
-           * see an error indicating that .promise() is not a method off the
-           * nextPage function.
-           */
-          promise = result.$response.nextPage().promise()
-        }
-      }
-    } while (hasNextPage)
-
-    return resources
-  }
-
   getKeyMetadata = async (keyId: string, region: string) => {
     const options = this.getOptions()
     try {
@@ -373,208 +241,51 @@ export abstract class AWS extends Provider {
     return trusted
   }
 
-  listQueues = async (region: string) => {
-    const options = this.getOptions()
-    options.region = region
-
-    const sqs = new this.AWS.SQS(options)
-
-    let nextToken: string | undefined
-
-    let queues: QueueUrlList = []
+  pager = async <R>(promise: Promise<unknown>, attribute: string) => {
+    let resources: R[] = []
+    let hasNextPage
 
     do {
-      const listQueues = await sqs
-        .listQueues({
-          NextToken: nextToken,
-        })
-        .promise()
-      nextToken = listQueues.NextToken
-      if (listQueues.QueueUrls) {
-        queues = queues.concat(listQueues.QueueUrls)
+      hasNextPage = false
+
+      /**
+       * - wait for the promise to finish
+       * - it pains me to use an "any", but we save a lot of pain by doing so
+       */
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const result = (await promise) as any
+
+      /** in the result did we find the target response key? */
+      if (result[attribute]) {
+        /** looks like we did, lets add it to our resource array and move on */
+        resources = resources.concat(result[attribute])
       }
-    } while (nextToken)
 
-    return queues
-  }
+      /**
+       * honestly AWS always returns a response, I'm checking this because
+       * I don't want to go back and update every test.
+       *
+       * Call me lazy.  I'm good with that.  I'll trade one if check to save
+       * possibly hundreds of mocks.  Sounds like a good deal to me.
+       */
 
-  listRoles = async () => {
-    /** no need to set a region iam is global */
-    const iam = new this.AWS.IAM(this.options)
-
-    let roles: Role[] = []
-
-    let marker: string | undefined
-
-    do {
-      const listRoles = await iam
-        .listRoles({
-          Marker: marker,
-        })
-        .promise()
-
-      marker = listRoles.Marker
-
-      if (listRoles.Roles) {
-        roles = roles.concat(listRoles.Roles)
+      /** was there an AWS response object returned with the request? */
+      if (result.$response) {
+        /** is there another page to the request? */
+        hasNextPage = result.$response.hasNextPage()
+        if (hasNextPage) {
+          /**
+           * reset the promise to the next page and iterate.
+           * I am not entirely sure the sdk is setup to use .promise off the
+           * nextPage function, but it works!  If result wasn't any we would
+           * see an error indicating that .promise() is not a method off the
+           * nextPage function.
+           */
+          promise = result.$response.nextPage().promise()
+        }
       }
-    } while (marker)
+    } while (hasNextPage)
 
-    return roles
-  }
-
-  listDBInstances = async (region: string, dBInstanceIdentifier?: string) => {
-    const options = this.getOptions()
-    options.region = region
-
-    const rds = new this.AWS.RDS(options)
-
-    let marker: string | undefined
-
-    let dbInstances: DBInstance[] = []
-
-    do {
-      const describeDBInstances = await rds
-        .describeDBInstances({
-          DBInstanceIdentifier: dBInstanceIdentifier,
-          Marker: marker,
-        })
-        .promise()
-      marker = describeDBInstances.Marker
-      if (describeDBInstances.DBInstances) {
-        dbInstances = dbInstances.concat(describeDBInstances.DBInstances)
-      }
-    } while (marker)
-
-    return dbInstances
-  }
-
-  listDBClusters = async (region: string, dbClusterIdentifier?: string) => {
-    const options = this.getOptions()
-    options.region = region
-
-    const rds = new this.AWS.RDS(options)
-
-    let marker: string | undefined
-
-    let dbClusters: DBCluster[] = []
-
-    do {
-      const describeDBClusters = await rds
-        .describeDBClusters({
-          DBClusterIdentifier: dbClusterIdentifier,
-          Marker: marker,
-        })
-        .promise()
-      marker = describeDBClusters.Marker
-      if (describeDBClusters.DBClusters) {
-        dbClusters = dbClusters.concat(describeDBClusters.DBClusters)
-      }
-    } while (marker)
-
-    return dbClusters
-  }
-
-  listAttachedUserPolicies = async (resourceId: string) => {
-    const options = this.getOptions()
-
-    const iam = new this.AWS.IAM(options)
-
-    let marker: string | undefined
-
-    let policies: AttachedPolicy[] = []
-
-    do {
-      const listAttachedUserPolicies = await iam
-        .listAttachedUserPolicies({
-          UserName: resourceId,
-          Marker: marker,
-        })
-        .promise()
-
-      marker = listAttachedUserPolicies.Marker
-      if (listAttachedUserPolicies.AttachedPolicies) {
-        policies = policies.concat(listAttachedUserPolicies.AttachedPolicies)
-      }
-    } while (marker)
-
-    return policies
-  }
-
-  listAttachedGroupPolicies = async (resourceId: string) => {
-    const options = this.getOptions()
-
-    const iam = new this.AWS.IAM(options)
-
-    let marker: string | undefined
-
-    let policies: AttachedPolicy[] = []
-
-    do {
-      const listAttachedGroupPolicies = await iam
-        .listAttachedGroupPolicies({
-          GroupName: resourceId,
-          Marker: marker,
-        })
-        .promise()
-
-      marker = listAttachedGroupPolicies.Marker
-      if (listAttachedGroupPolicies.AttachedPolicies) {
-        policies = policies.concat(listAttachedGroupPolicies.AttachedPolicies)
-      }
-    } while (marker)
-
-    return policies
-  }
-
-  listAttachedRolePolicies = async (resourceId: string) => {
-    const options = this.getOptions()
-
-    const iam = new this.AWS.IAM(options)
-
-    let marker: string | undefined
-
-    let policies: AttachedPolicy[] = []
-
-    do {
-      const listAttachedRolePolicies = await iam
-        .listAttachedRolePolicies({
-          RoleName: resourceId,
-          Marker: marker,
-        })
-        .promise()
-
-      marker = listAttachedRolePolicies.Marker
-      if (listAttachedRolePolicies.AttachedPolicies) {
-        policies = policies.concat(listAttachedRolePolicies.AttachedPolicies)
-      }
-    } while (marker)
-
-    return policies
-  }
-
-  listDetectors = async (region: string) => {
-    const options = this.getOptions()
-    options.region = region
-
-    const gd = new this.AWS.GuardDuty(options)
-
-    let nextToken: string | undefined
-
-    let detectors: DetectorId[] = []
-
-    do {
-      const listDetectors = await gd
-        .listDetectors({
-          NextToken: nextToken,
-        })
-        .promise()
-      nextToken = listDetectors.NextToken
-      if (listDetectors.DetectorIds) {
-        detectors = detectors.concat(listDetectors.DetectorIds)
-      }
-    } while (nextToken)
-
-    return detectors
+    return resources
   }
 }

@@ -67,15 +67,13 @@ export default class SnapshotEncrypted extends AWS {
     const options = this.getOptions()
     options.region = region
 
-    const snapshots = await this.pager<Snapshot>(
-      new this.AWS.EC2(options)
-        .describeSnapshots({
-          OwnerIds: ['self'],
-          SnapshotIds: resourceId ? [resourceId] : undefined,
-        })
-        .promise(),
-      'Snapshots'
-    )
+    const promise = new this.AWS.EC2(options)
+      .describeSnapshots({
+        OwnerIds: ['self'],
+        SnapshotIds: resourceId ? [resourceId] : undefined,
+      })
+      .promise()
+    const snapshots = await this.pager<Snapshot>(promise, 'Snapshots')
 
     for (const snapshot of snapshots) {
       await this.audit({ resource: snapshot, region })

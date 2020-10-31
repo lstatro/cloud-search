@@ -79,10 +79,8 @@ export default class MultiRegionTrailEnabled extends AWS {
       const options = this.getOptions()
       options.region = region
 
-      const trails = await this.pager<TrailInfo>(
-        new this.AWS.CloudTrail(this.options).listTrails().promise(),
-        'Trails'
-      )
+      const promise = new this.AWS.CloudTrail(options).listTrails().promise()
+      const trails = await this.pager<TrailInfo>(promise, 'Trails')
 
       for (const trail of trails) {
         if (trail.HomeRegion === region) {
