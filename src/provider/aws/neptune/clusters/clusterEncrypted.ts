@@ -1,7 +1,7 @@
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
-import { AWS } from '../../../../lib/aws/AWS'
-import { DescribeDBClustersMessage } from 'aws-sdk/clients/neptune'
-import { assert } from 'console'
+import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
+import { DBCluster } from 'aws-sdk/clients/neptune'
+import assert from 'assert'
 const rule = 'ClusterEncrypted'
 
 export const command = `${rule} [args]`
@@ -16,6 +16,9 @@ export const desc = `Amazon Neptune graph databases should have encryption enabl
 
 `
 //TODO: Figure out the resourceId for Neptune.
+export const builder = {
+  ...keyTypeArg,
+}
 
 export default class ClusterEncrypted extends AWS {
   audits: AuditResultInterface[] = []
@@ -26,14 +29,18 @@ export default class ClusterEncrypted extends AWS {
     super({ ...params, rule })
   }
 
-  async audit({ resource, region }: { resource: string; region: string }) {
+  async audit({ resource, region }: { resource: DBCluster; region: string }) {
+
     const options = this.getOptions()
     options.region = region
-    const neptune = new this.AWS.Neptune(options)
-    const describeCluster = await neptune.describeDBClusters({DBClusterIdentifier:resource}).promise();
-    console.log('this is describeCluster ...', describeCluster);
-    const audit = this.getDefaultAuditObj({ resource, region })
-    audit.state = 'OK'
+    assert(resource.DBClusterIdentifier, 'cluster missing its DB Identifier')
+    const audit = this.getDefaultAuditObj({ resource:resource.DBClusterIdentifier, region })
+    if(resource.KmsKeyId ) {
+      assert(this.keyType, 'Key type is required arguement for isKeyTrusted check')
+      audit.state = await this.isKeyTrusted(resource.KmsKeyId, this.keyType, region)
+    }else{
+      audit.state='FAIL'
+    }
     this.audits.push(audit)
   }
 
@@ -44,17 +51,22 @@ export default class ClusterEncrypted extends AWS {
     resourceId: string
     region: string
   }) => {
+    let clusters;
+    const options = this.getOptions()
+    options.region = region
     if (resourceId) {
-      await this.audit({ resource: resourceId, region })
+      const promise = new this.AWS.Neptune(options).describeDBClusters(
+        {
+          DBClusterIdentifier: resourceId
+        }
+      ).promise();
+      clusters = await this.pager<DBCluster>(promise, 'DBClusters')
     } else {
-      const options = this.getOptions()
-      options.region = region
       const promise = new this.AWS.Neptune(options).describeDBClusters().promise()
-      const clusters = await this.pager<DescribeDBClustersMessage>(promise, 'DBClusters')
-      for (const cluster of clusters) {
-        assert(cluster, 'cluster missing its DB Identifier')
-        await this.audit({ resource: cluster, region })
-      }
+      clusters = await this.pager<DBCluster>(promise, 'DBClusters')
+    }
+    for (const cluster of clusters) {
+      await this.audit({ resource: cluster, region })
     }
   }
 }
