@@ -1,23 +1,23 @@
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
-import { AWS } from '../../../../lib/aws/AWS'
+import { AWS } from '../../../../../lib/aws/AWS'
 import assert from 'assert'
 // import { KeyListEntry } from 'aws-sdk/clients/kms'
-const rule = 'NeptuneEncryptionEnabled'
+const rule = 'ClusterEncrypted'
 
 export const command = `${rule} [args]`
 
 export const desc = `Amazon Neptune graph databases should have encryption enabled
 
-  OK      - Encryption enabled
-  UNKNOWN - Unable to determine if encryption enabled
-  FAIL    - Encryption not enabled
+  OK      - Neptune cluster encryption is encrypted at rest
+  UNKNOWN - Unable to determine if Neptune cluster encryption enabled
+  FAIL    - Neptune cluster is not encrypted at rest
 
   resourceId: Unkown
 
 `
 //TODO: Figure out the resourceId for Neptune.
 
-export default class NeptuneEncryptionEnabled extends AWS {
+export default class ClusterEncrypted extends AWS {
   audits: AuditResultInterface[] = []
   service = 'neptune'
   global = false
@@ -62,7 +62,7 @@ export default class NeptuneEncryptionEnabled extends AWS {
 }
 
 export const handler = async (args: AWSScannerInterface) => {
-  const scanner = new NeptuneEncryptionEnabled(args)
+  const scanner = new ClusterEncrypted(args)
   await scanner.start()
   scanner.output()
   return scanner.audits
