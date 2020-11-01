@@ -12,7 +12,7 @@ export const desc = `Amazon Neptune graph databases should have encryption enabl
   UNKNOWN - Unable to determine if Neptune cluster encryption enabled
   FAIL    - Neptune cluster is not encrypted at rest
 
-  resourceId: Unkown
+  resourceId: Database Identifier
 
 `
 //TODO: Figure out the resourceId for Neptune.
@@ -29,9 +29,9 @@ export default class ClusterEncrypted extends AWS {
   async audit({ resource, region }: { resource: string; region: string }) {
     const options = this.getOptions()
     options.region = region
-    // const neptune = new this.AWS.Neptune(options)
-    // TODO: API call to audit the neptune instance for encryption enabled
-    // determine the audit state and then push the state.
+    const neptune = new this.AWS.Neptune(options)
+    const describeCluster = await neptune.describeDBClusters({DBClusterIdentifier:resource}).promise();
+    console.log('this is describeCluster ...', describeCluster);
     const audit = this.getDefaultAuditObj({ resource, region })
     audit.state = 'OK'
     this.audits.push(audit)
@@ -50,11 +50,10 @@ export default class ClusterEncrypted extends AWS {
       const options = this.getOptions()
       options.region = region
       const promise = new this.AWS.Neptune(options).describeDBClusters().promise()
-      const clusters = await this.pager<DescribeDBClustersMessage>(promise, 'Clusters')
-      console.log('these are clusters ...', clusters);
+      const clusters = await this.pager<DescribeDBClustersMessage>(promise, 'DBClusters')
       for (const cluster of clusters) {
-        assert(cluster.DBClusterIdentifier, 'cluster missing its DB Identifier')
-        // await this.audit({ resource: cluster.DBClusterIdentifier, region })
+        assert(cluster, 'cluster missing its DB Identifier')
+        await this.audit({ resource: cluster, region })
       }
     }
   }
