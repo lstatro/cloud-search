@@ -54,9 +54,7 @@ describe('neptune cluster storage is encrypted at rest', () => {
       ],
     })
 
-    let audits
-
-    audits = await handler({
+    const audits = await handler({
       region: 'test',
       profile: 'test',
       keyType: 'aws',
@@ -88,9 +86,7 @@ describe('neptune cluster storage is encrypted at rest', () => {
       ],
     })
 
-    let audits
-
-    audits = await handler({
+    const audits = await handler({
       region: 'test',
       profile: 'test',
       keyType: 'aws',
@@ -121,9 +117,7 @@ describe('neptune cluster storage is encrypted at rest', () => {
       ],
     })
 
-    let audits
-
-    audits = await handler({
+    const audits = await handler({
       resourceId: 'test',
       region: 'test',
       profile: 'test',
@@ -155,9 +149,7 @@ describe('neptune cluster storage is encrypted at rest', () => {
       ],
     })
 
-    let audits
-
-    audits = await handler({
+    const audits = await handler({
       resourceId: 'test',
       region: 'test',
       profile: 'test',
