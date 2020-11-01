@@ -30,16 +30,25 @@ export default class ClusterEncrypted extends AWS {
   }
 
   async audit({ resource, region }: { resource: DBCluster; region: string }) {
-
     const options = this.getOptions()
     options.region = region
     assert(resource.DBClusterIdentifier, 'cluster missing its DB Identifier')
-    const audit = this.getDefaultAuditObj({ resource:resource.DBClusterIdentifier, region })
-    if(resource.KmsKeyId ) {
-      assert(this.keyType, 'Key type is required arguement for isKeyTrusted check')
-      audit.state = await this.isKeyTrusted(resource.KmsKeyId, this.keyType, region)
-    }else{
-      audit.state='FAIL'
+    const audit = this.getDefaultAuditObj({
+      resource: resource.DBClusterIdentifier,
+      region,
+    })
+    if (resource.KmsKeyId) {
+      assert(
+        this.keyType,
+        'Key type is required arguement for isKeyTrusted check'
+      )
+      audit.state = await this.isKeyTrusted(
+        resource.KmsKeyId,
+        this.keyType,
+        region
+      )
+    } else {
+      audit.state = 'FAIL'
     }
     this.audits.push(audit)
   }
@@ -51,18 +60,20 @@ export default class ClusterEncrypted extends AWS {
     resourceId: string
     region: string
   }) => {
-    let clusters;
+    let clusters
     const options = this.getOptions()
     options.region = region
     if (resourceId) {
-      const promise = new this.AWS.Neptune(options).describeDBClusters(
-        {
-          DBClusterIdentifier: resourceId
-        }
-      ).promise();
+      const promise = new this.AWS.Neptune(options)
+        .describeDBClusters({
+          DBClusterIdentifier: resourceId,
+        })
+        .promise()
       clusters = await this.pager<DBCluster>(promise, 'DBClusters')
     } else {
-      const promise = new this.AWS.Neptune(options).describeDBClusters().promise()
+      const promise = new this.AWS.Neptune(options)
+        .describeDBClusters()
+        .promise()
       clusters = await this.pager<DBCluster>(promise, 'DBClusters')
     }
     for (const cluster of clusters) {
