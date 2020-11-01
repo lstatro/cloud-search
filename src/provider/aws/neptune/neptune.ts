@@ -10,7 +10,7 @@ const opts = {
 export const builder = (yargs: Argv) => {
   return yargs
     .commandDir('clusters', opts)
-    .commandDir('instances', opts)
+    // .commandDir('instances', opts)
     .demandCommand(1)
     .example([
       [

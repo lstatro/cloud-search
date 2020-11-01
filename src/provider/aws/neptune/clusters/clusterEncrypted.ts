@@ -1,7 +1,6 @@
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
-import { AWS } from '../../../../../lib/aws/AWS'
-import assert from 'assert'
-// import { KeyListEntry } from 'aws-sdk/clients/kms'
+import { AWS } from '../../../../lib/aws/AWS'
+import { DescribeDBClustersMessage } from 'aws-sdk/clients/neptune'
 const rule = 'ClusterEncrypted'
 
 export const command = `${rule} [args]`
@@ -29,7 +28,7 @@ export default class ClusterEncrypted extends AWS {
   async audit({ resource, region }: { resource: string; region: string }) {
     const options = this.getOptions()
     options.region = region
-    const neptune = new this.AWS.Neptune(options)
+    // const neptune = new this.AWS.Neptune(options)
     // TODO: API call to audit the neptune instance for encryption enabled
     // determine the audit state and then push the state.
     const audit = this.getDefaultAuditObj({ resource, region })
@@ -49,10 +48,9 @@ export default class ClusterEncrypted extends AWS {
     } else {
       const options = this.getOptions()
       options.region = region
-
-      // const promise = new this.AWS.Neptune(options).listKeys().promise()
-      // const keys = await this.pager<KeyListEntry>(promise, 'Keys')
-
+      const promise = new this.AWS.Neptune(options).describeDBClusters().promise()
+      const clusters = await this.pager<DescribeDBClustersMessage>(promise, 'Clusters')
+      console.log('these are clusters ...', clusters);
       // for (const key of keys) {
       //   assert(key.KeyArn, 'key missing its key ARN')
       //   await this.audit({ resource: key.KeyArn, region })
