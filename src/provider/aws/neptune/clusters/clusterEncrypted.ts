@@ -1,6 +1,7 @@
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import { AWS } from '../../../../lib/aws/AWS'
 import { DescribeDBClustersMessage } from 'aws-sdk/clients/neptune'
+import { assert } from 'console'
 const rule = 'ClusterEncrypted'
 
 export const command = `${rule} [args]`
@@ -51,10 +52,10 @@ export default class ClusterEncrypted extends AWS {
       const promise = new this.AWS.Neptune(options).describeDBClusters().promise()
       const clusters = await this.pager<DescribeDBClustersMessage>(promise, 'Clusters')
       console.log('these are clusters ...', clusters);
-      // for (const key of keys) {
-      //   assert(key.KeyArn, 'key missing its key ARN')
-      //   await this.audit({ resource: key.KeyArn, region })
-      // }
+      for (const cluster of clusters) {
+        assert(cluster.DBClusterIdentifier, 'cluster missing its DB Identifier')
+        // await this.audit({ resource: cluster.DBClusterIdentifier, region })
+      }
     }
   }
 }
