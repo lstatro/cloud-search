@@ -66,6 +66,7 @@ export const AWS = {
     QueueEncrypted: require('./provider/aws/sqs/cmds/queueEncrypted'),
   },
   neptune: {
-    ClusterEncrypted: require('./provider/aws/neptune/clusters/clusterEncrypted')
-  }
+    ClusterEncrypted: require('./provider/aws/neptune/clusters/clusterEncrypted'),
+    InstanceEncrypted: require('./provider/aws/neptune/instances/instanceEncrypted'),
+  },
 }
