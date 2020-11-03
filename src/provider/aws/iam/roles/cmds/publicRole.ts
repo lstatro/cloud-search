@@ -3,6 +3,7 @@
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import assert from 'assert'
 import { AWS } from '../../../../../lib/aws/AWS'
+import { Role } from 'aws-sdk/clients/iam'
 
 const rule = 'PublicRole'
 
@@ -116,8 +117,10 @@ export default class PublicRole extends AWS {
   }
 
   scan = async ({ resourceId }: { resourceId: string }) => {
+    const options = this.getOptions()
+
     if (resourceId) {
-      const iam = new this.AWS.IAM(this.options)
+      const iam = new this.AWS.IAM(options)
       const getRole = await iam
         .getRole({
           RoleName: resourceId,
@@ -133,7 +136,8 @@ export default class PublicRole extends AWS {
         policyDocument: getRole.Role.AssumeRolePolicyDocument,
       })
     } else {
-      const roles = await this.listRoles()
+      const promise = new this.AWS.IAM(options).listRoles().promise()
+      const roles = await this.pager<Role>(promise, 'Roles')
 
       for (const role of roles) {
         assert(role.AssumeRolePolicyDocument, 'no trust doc found')

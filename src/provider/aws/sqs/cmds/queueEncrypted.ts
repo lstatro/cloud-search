@@ -76,7 +76,12 @@ export default class TopicEncrypted extends AWS {
     if (resourceId) {
       await this.audit({ resource: resourceId, region })
     } else {
-      const queues = await this.listQueues(region)
+      const options = this.getOptions()
+      options.region = region
+
+      const promise = new this.AWS.SQS(options).listQueues().promise()
+      const queues = await this.pager<string>(promise, 'QueueUrls')
+
       for (const queue of queues) {
         await this.audit({ resource: queue, region })
       }

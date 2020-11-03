@@ -64,7 +64,16 @@ export default class IgwAttachedToVpc extends AWS {
     region: string
     resourceId?: string
   }) => {
-    const igws = await this.listInternetGateways(region, resourceId)
+    const options = this.getOptions()
+    options.region = region
+
+    const promise = new this.AWS.EC2(options)
+      .describeInternetGateways({
+        InternetGatewayIds: resourceId ? [resourceId] : undefined,
+      })
+      .promise()
+
+    const igws = await this.pager<InternetGateway>(promise, 'InternetGateways')
     for (const igw of igws) {
       this.audit({ resource: igw, region })
     }

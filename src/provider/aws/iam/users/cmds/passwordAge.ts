@@ -2,6 +2,7 @@ import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import { AWS } from '../../../../../lib/aws/AWS'
 import { CommandBuilder } from 'yargs'
 import { assert } from 'console'
+import { User } from 'aws-sdk/clients/iam'
 
 const rule = 'PasswordAge'
 
@@ -40,7 +41,9 @@ export default class PasswordAge extends AWS {
   }
 
   async audit({ resource }: { resource: string }) {
-    const iam = new this.AWS.IAM(this.options)
+    const options = this.getOptions()
+
+    const iam = new this.AWS.IAM(options)
     let createDate
     try {
       const getLoginProfile = await iam
@@ -91,7 +94,10 @@ export default class PasswordAge extends AWS {
     if (resourceId) {
       await this.audit({ resource: resourceId })
     } else {
-      const users = await this.listUsers()
+      const options = this.getOptions()
+
+      const promise = new this.AWS.IAM(options).listUsers().promise()
+      const users = await this.pager<User>(promise, 'Users')
 
       for (const user of users) {
         await this.audit({ resource: user.UserName })

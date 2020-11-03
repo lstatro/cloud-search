@@ -1,3 +1,4 @@
+import { DetectorId } from 'aws-sdk/clients/guardduty'
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import { AWS } from '../../../../lib/aws/AWS'
 
@@ -62,7 +63,12 @@ export default class DetectorDataSources extends AWS {
     if (resourceId) {
       await this.audit({ resource: resourceId, region })
     } else {
-      const detectors = await this.listDetectors(region)
+      const options = this.getOptions()
+      options.region = region
+
+      const promise = new this.AWS.GuardDuty(options).listDetectors().promise()
+      const detectors = await this.pager<DetectorId>(promise, 'DetectorIds')
+
       for (const detector of detectors) {
         await this.audit({ resource: detector, region })
       }

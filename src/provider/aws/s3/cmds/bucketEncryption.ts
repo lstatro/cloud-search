@@ -1,9 +1,8 @@
 import { CommandBuilder } from 'yargs'
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
-
 import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
 import assert from 'assert'
-import { ServerSideEncryptionConfiguration } from 'aws-sdk/clients/s3'
+import { Bucket, ServerSideEncryptionConfiguration } from 'aws-sdk/clients/s3'
 
 const rule = 'BucketEncryption'
 
@@ -131,7 +130,12 @@ export default class TopicEncrypted extends AWS {
     if (resourceId) {
       await this.audit({ resource: resourceId, region })
     } else {
-      const buckets = await this.listBuckets()
+      const options = this.getOptions()
+      options.region = region
+
+      const promise = new this.AWS.S3(options).listBuckets().promise()
+      const buckets = await this.pager<Bucket>(promise, 'Buckets')
+
       for (const bucket of buckets) {
         assert(bucket.Name, 'bucket must have a name')
         await this.audit({ resource: bucket.Name, region })

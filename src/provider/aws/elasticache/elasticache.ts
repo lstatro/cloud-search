@@ -9,7 +9,7 @@ const opts = {
 
 export const builder = (yargs: Argv) => {
   return yargs
-    .commandDir('cmd', opts)
+    .commandDir('cmds', opts)
     .demandCommand(1)
     .example([
       [

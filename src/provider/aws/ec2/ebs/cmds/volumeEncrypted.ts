@@ -67,16 +67,22 @@ export default class VolumesEncrypted extends AWS {
     const options = this.getOptions()
     options.region = region
 
-    const volumes = await this.listVolumes(region, resourceId)
+    const promise = new this.AWS.EC2(options)
+      .describeVolumes({
+        VolumeIds: resourceId ? [resourceId] : undefined,
+      })
+      .promise()
+
+    const volumes = await this.pager<Volume>(promise, 'Volumes')
 
     for (const volume of volumes) {
-      this.audit({ resource: volume, region })
+      await this.audit({ resource: volume, region })
     }
   }
 }
 
 export const handler = async (args: AWSScannerInterface) => {
-  const scanner = await new VolumesEncrypted(args)
+  const scanner = new VolumesEncrypted(args)
   await scanner.start()
   scanner.output()
   return scanner.audits

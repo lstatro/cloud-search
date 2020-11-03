@@ -1,5 +1,6 @@
 /** TODO: this needs to support resource */
 
+import { AttachedPolicy, Group } from 'aws-sdk/clients/iam'
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import { AWS } from '../../../../../lib/aws/AWS'
 const rule = 'HasManagedAdmin'
@@ -38,7 +39,18 @@ export default class HasManagedAdmin extends AWS {
       region: this.region,
     })
 
-    const policies = await this.listAttachedGroupPolicies(resource)
+    const options = this.getOptions()
+
+    const promise = new this.AWS.IAM(options)
+      .listAttachedGroupPolicies({
+        GroupName: resource,
+      })
+      .promise()
+
+    const policies = await this.pager<AttachedPolicy>(
+      promise,
+      'AttachedPolicies'
+    )
 
     for (const policy of policies) {
       if (policy.PolicyName === 'AdministratorAccess') {
@@ -57,7 +69,10 @@ export default class HasManagedAdmin extends AWS {
     if (resourceId) {
       await this.audit({ resource: resourceId })
     } else {
-      const groups = await this.listGroups()
+      const options = this.getOptions()
+
+      const promise = new this.AWS.IAM(options).listGroups().promise()
+      const groups = await this.pager<Group>(promise, 'Groups')
 
       for (const group of groups) {
         await this.audit({ resource: group.GroupName })

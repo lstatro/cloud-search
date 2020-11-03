@@ -2,6 +2,7 @@ import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import assert from 'assert'
 
 import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
+import { TrailInfo } from 'aws-sdk/clients/cloudtrail'
 
 const rule = 'TrailEncrypted'
 
@@ -71,10 +72,17 @@ export default class TrailEncrypted extends AWS {
     if (resourceId) {
       await this.audit({ resource: resourceId, region })
     } else {
-      const trails = await this.listTrails(region)
+      const options = this.getOptions()
+      options.region = region
+
+      const promise = new this.AWS.CloudTrail(options).listTrails().promise()
+      const trails = await this.pager<TrailInfo>(promise, 'Trails')
+
       for (const trail of trails) {
-        assert(trail.TrailARN, 'trail does not have a ARN')
-        await this.audit({ resource: trail.TrailARN, region })
+        if (trail.HomeRegion === region) {
+          assert(trail.TrailARN, 'trail does not have a ARN')
+          await this.audit({ resource: trail.TrailARN, region })
+        }
       }
     }
   }

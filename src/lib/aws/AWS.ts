@@ -5,24 +5,10 @@ import {
   AWSParamsInterface,
   KeyType,
 } from 'cloud-search'
-import { Bucket } from 'aws-sdk/clients/s3'
-import {
-  InternetGateway,
-  SecurityGroup,
-  Snapshot,
-  Volume,
-} from 'aws-sdk/clients/ec2'
-import { KeyMetadata, KeyListEntry } from 'aws-sdk/clients/kms'
-import { AttachedPolicy, Group, Role, User } from 'aws-sdk/clients/iam'
-import { Topic } from 'aws-sdk/clients/sns'
-import { QueueUrlList } from 'aws-sdk/clients/sqs'
-import { DBCluster, DBInstance } from 'aws-sdk/clients/rds'
+import { KeyMetadata } from 'aws-sdk/clients/kms'
 import _AWS from 'aws-sdk'
 import Provider from '../Provider'
 import assert from 'assert'
-import { TrailInfo } from 'aws-sdk/clients/cloudtrail'
-import { CacheCluster } from 'aws-sdk/clients/elasticache'
-import { DetectorId } from 'aws-sdk/clients/guardduty'
 
 interface ScanInterface {
   region?: string
@@ -52,8 +38,6 @@ export const keyTypeArg: CommandBuilder = {
 export abstract class AWS extends Provider {
   abstract service: string
 
-  options: AWSClientOptionsInterface
-
   region: string
   regions: string[] = []
   global = false
@@ -75,8 +59,6 @@ export abstract class AWS extends Provider {
     })
 
     this.keyType = params.keyType
-
-    this.options = this.getOptions()
   }
 
   abstract async scan(params: ScanInterface): Promise<void>
@@ -191,202 +173,6 @@ export abstract class AWS extends Provider {
     }
   }
 
-  listInternetGateways = async (region: string, resourceId?: string) => {
-    const options = this.getOptions()
-    options.region = region
-
-    const ec2 = new this.AWS.EC2(options)
-
-    let nextToken: string | undefined
-
-    let igws: InternetGateway[] = []
-
-    do {
-      const describeInternetGateways = await ec2
-        .describeInternetGateways({
-          NextToken: nextToken,
-          InternetGatewayIds: resourceId ? [resourceId] : undefined,
-        })
-        .promise()
-
-      nextToken = describeInternetGateways.NextToken
-
-      if (describeInternetGateways.InternetGateways) {
-        igws = igws.concat(describeInternetGateways.InternetGateways)
-      }
-    } while (nextToken)
-
-    return igws
-  }
-
-  listBuckets = async () => {
-    /** no need to define a region, s3 endpoint is global */
-    const s3 = new this.AWS.S3(this.options)
-    let buckets: Bucket[] = []
-
-    const listBuckets = await s3.listBuckets().promise()
-
-    if (listBuckets.Buckets) {
-      buckets = buckets.concat(listBuckets.Buckets)
-    }
-
-    return buckets
-  }
-
-  listSecurityGroups = async (region: string, resourceId?: string) => {
-    const options = this.getOptions()
-    options.region = region
-
-    const ec2 = new this.AWS.EC2(options)
-
-    let nextToken: string | undefined
-
-    let groups: SecurityGroup[] = []
-
-    do {
-      const describeSecurityGroups = await ec2
-        .describeSecurityGroups({
-          NextToken: nextToken,
-          GroupIds: resourceId ? [resourceId] : undefined,
-        })
-        .promise()
-      nextToken = describeSecurityGroups.NextToken
-      if (describeSecurityGroups.SecurityGroups) {
-        groups = groups.concat(describeSecurityGroups.SecurityGroups)
-      }
-    } while (nextToken)
-
-    return groups
-  }
-
-  listVolumes = async (region: string, resourceId?: string) => {
-    const options = this.getOptions()
-    options.region = region
-
-    const ec2 = new this.AWS.EC2(options)
-
-    let nextToken: string | undefined
-
-    let volumes: Volume[] = []
-
-    do {
-      const describeVolumes = await ec2
-        .describeVolumes({
-          NextToken: nextToken,
-          VolumeIds: resourceId ? [resourceId] : undefined,
-        })
-        .promise()
-
-      nextToken = describeVolumes.NextToken
-
-      if (describeVolumes.Volumes) {
-        volumes = volumes.concat(describeVolumes.Volumes)
-      }
-    } while (nextToken)
-
-    return volumes
-  }
-
-  listKeys = async (region: string) => {
-    const options = this.getOptions()
-    options.region = region
-
-    const kms = new this.AWS.KMS(options)
-
-    let marker: string | undefined
-
-    let keys: KeyListEntry[] = []
-
-    do {
-      const listKeys = await kms
-        .listKeys({
-          Marker: marker,
-        })
-        .promise()
-      marker = listKeys.NextMarker
-      if (listKeys.Keys) {
-        keys = keys.concat(listKeys.Keys)
-      }
-    } while (marker)
-
-    return keys
-  }
-
-  listUsers = async () => {
-    /** no need to set a region iam is global */
-    const iam = new this.AWS.IAM(this.options)
-
-    let users: User[] = []
-
-    let marker: string | undefined
-
-    do {
-      const listUsers = await iam
-        .listUsers({
-          Marker: marker,
-        })
-        .promise()
-
-      marker = listUsers.Marker
-
-      if (listUsers.Users) {
-        users = users.concat(listUsers.Users)
-      }
-    } while (marker)
-
-    return users
-  }
-
-  listGroups = async () => {
-    /** no need to set a region iam is global */
-    const iam = new this.AWS.IAM(this.options)
-
-    let groups: Group[] = []
-
-    let marker: string | undefined
-
-    do {
-      const listGroups = await iam
-        .listGroups({
-          Marker: marker,
-        })
-        .promise()
-
-      marker = listGroups.Marker
-
-      if (listGroups.Groups) {
-        groups = groups.concat(listGroups.Groups)
-      }
-    } while (marker)
-
-    return groups
-  }
-
-  listTopics = async (region: string) => {
-    const options = this.getOptions()
-    options.region = region
-
-    const sns = new this.AWS.SNS(options)
-
-    let nextToken: string | undefined
-
-    let topics: Topic[] = []
-
-    do {
-      const listTopics = await sns
-        .listTopics({
-          NextToken: nextToken,
-        })
-        .promise()
-      nextToken = listTopics.NextToken
-      if (listTopics.Topics) {
-        topics = topics.concat(listTopics.Topics)
-      }
-    } while (nextToken)
-
-    return topics
-  }
-
   getKeyMetadata = async (keyId: string, region: string) => {
     const options = this.getOptions()
     try {
@@ -455,299 +241,51 @@ export abstract class AWS extends Provider {
     return trusted
   }
 
-  listQueues = async (region: string) => {
-    const options = this.getOptions()
-    options.region = region
-
-    const sqs = new this.AWS.SQS(options)
-
-    let nextToken: string | undefined
-
-    let queues: QueueUrlList = []
+  pager = async <R>(promise: Promise<unknown>, attribute: string) => {
+    let resources: R[] = []
+    let hasNextPage
 
     do {
-      const listQueues = await sqs
-        .listQueues({
-          NextToken: nextToken,
-        })
-        .promise()
-      nextToken = listQueues.NextToken
-      if (listQueues.QueueUrls) {
-        queues = queues.concat(listQueues.QueueUrls)
+      hasNextPage = false
+
+      /**
+       * - wait for the promise to finish
+       * - it pains me to use an "any", but we save a lot of pain by doing so
+       */
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const result = (await promise) as any
+
+      /** in the result did we find the target response key? */
+      if (result[attribute]) {
+        /** looks like we did, lets add it to our resource array and move on */
+        resources = resources.concat(result[attribute])
       }
-    } while (nextToken)
 
-    return queues
-  }
+      /**
+       * honestly AWS always returns a response, I'm checking this because
+       * I don't want to go back and update every test.
+       *
+       * Call me lazy.  I'm good with that.  I'll trade one if check to save
+       * possibly hundreds of mocks.  Sounds like a good deal to me.
+       */
 
-  listSnapshots = async (region: string, resourceId?: string) => {
-    const options = this.getOptions()
-    options.region = region
-
-    const ec2 = new this.AWS.EC2(options)
-
-    let nextToken: string | undefined
-
-    let snapshots: Snapshot[] = []
-
-    do {
-      const describeSnapshots = await ec2
-        .describeSnapshots({
-          NextToken: nextToken,
-          OwnerIds: ['self'],
-          SnapshotIds: resourceId ? [resourceId] : undefined,
-        })
-        .promise()
-      nextToken = describeSnapshots.NextToken
-      if (describeSnapshots.Snapshots) {
-        snapshots = snapshots.concat(describeSnapshots.Snapshots)
-      }
-    } while (nextToken)
-
-    return snapshots
-  }
-
-  listRoles = async () => {
-    /** no need to set a region iam is global */
-    const iam = new this.AWS.IAM(this.options)
-
-    let roles: Role[] = []
-
-    let marker: string | undefined
-
-    do {
-      const listRoles = await iam
-        .listRoles({
-          Marker: marker,
-        })
-        .promise()
-
-      marker = listRoles.Marker
-
-      if (listRoles.Roles) {
-        roles = roles.concat(listRoles.Roles)
-      }
-    } while (marker)
-
-    return roles
-  }
-
-  listDBInstances = async (region: string, dBInstanceIdentifier?: string) => {
-    const options = this.getOptions()
-    options.region = region
-
-    const rds = new this.AWS.RDS(options)
-
-    let marker: string | undefined
-
-    let dbInstances: DBInstance[] = []
-
-    do {
-      const describeDBInstances = await rds
-        .describeDBInstances({
-          DBInstanceIdentifier: dBInstanceIdentifier,
-          Marker: marker,
-        })
-        .promise()
-      marker = describeDBInstances.Marker
-      if (describeDBInstances.DBInstances) {
-        dbInstances = dbInstances.concat(describeDBInstances.DBInstances)
-      }
-    } while (marker)
-
-    return dbInstances
-  }
-
-  listDBClusters = async (region: string, dbClusterIdentifier?: string) => {
-    const options = this.getOptions()
-    options.region = region
-
-    const rds = new this.AWS.RDS(options)
-
-    let marker: string | undefined
-
-    let dbClusters: DBCluster[] = []
-
-    do {
-      const describeDBClusters = await rds
-        .describeDBClusters({
-          DBClusterIdentifier: dbClusterIdentifier,
-          Marker: marker,
-        })
-        .promise()
-      marker = describeDBClusters.Marker
-      if (describeDBClusters.DBClusters) {
-        dbClusters = dbClusters.concat(describeDBClusters.DBClusters)
-      }
-    } while (marker)
-
-    return dbClusters
-  }
-
-  listTrails = async (region: string) => {
-    const options = this.getOptions()
-    options.region = region
-
-    const cloudtrail = new this.AWS.CloudTrail(options)
-
-    let nextToken: string | undefined
-
-    const trails: TrailInfo[] = []
-
-    do {
-      const listTrails = await cloudtrail
-        .listTrails({
-          NextToken: nextToken,
-        })
-        .promise()
-      nextToken = listTrails.NextToken
-      if (listTrails.Trails) {
-        for (const trail of listTrails.Trails) {
+      /** was there an AWS response object returned with the request? */
+      if (result.$response) {
+        /** is there another page to the request? */
+        hasNextPage = result.$response.hasNextPage()
+        if (hasNextPage) {
           /**
-           * Weird, but global trails are returned in every listTrails api call.
-           * This is a little misleading as technically CT isn't a global service.
-           * To combat this oddness, we're going to only validate trails in the
-           * target region.  If it's global and it's not in this region we just
-           * ignore it.  If its then we'll audit it.  This allows us to also audit
-           * regional trails as false in all regions.  This used to be a global
-           * rules but the weirdness bit us in the long run.
+           * reset the promise to the next page and iterate.
+           * I am not entirely sure the sdk is setup to use .promise off the
+           * nextPage function, but it works!  If result wasn't any we would
+           * see an error indicating that .promise() is not a method off the
+           * nextPage function.
            */
-          if (trail.HomeRegion === region) {
-            trails.push(trail)
-          }
+          promise = result.$response.nextPage().promise()
         }
       }
-    } while (nextToken)
+    } while (hasNextPage)
 
-    return trails
-  }
-
-  listElastiCacheClusters = async (region: string, resourceId?: string) => {
-    const options = this.getOptions()
-    options.region = region
-
-    const ec = new this.AWS.ElastiCache(options)
-
-    let marker: string | undefined
-
-    let cacheCluster: CacheCluster[] = []
-
-    do {
-      const describeCacheClusters = await ec
-        .describeCacheClusters({
-          CacheClusterId: resourceId,
-          Marker: marker,
-        })
-        .promise()
-      marker = describeCacheClusters.Marker
-      if (describeCacheClusters.CacheClusters) {
-        cacheCluster = cacheCluster.concat(describeCacheClusters.CacheClusters)
-      }
-    } while (marker)
-
-    return cacheCluster
-  }
-
-  listAttachedUserPolicies = async (resourceId: string) => {
-    const options = this.getOptions()
-
-    const iam = new this.AWS.IAM(options)
-
-    let marker: string | undefined
-
-    let policies: AttachedPolicy[] = []
-
-    do {
-      const listAttachedUserPolicies = await iam
-        .listAttachedUserPolicies({
-          UserName: resourceId,
-          Marker: marker,
-        })
-        .promise()
-
-      marker = listAttachedUserPolicies.Marker
-      if (listAttachedUserPolicies.AttachedPolicies) {
-        policies = policies.concat(listAttachedUserPolicies.AttachedPolicies)
-      }
-    } while (marker)
-
-    return policies
-  }
-
-  listAttachedGroupPolicies = async (resourceId: string) => {
-    const options = this.getOptions()
-
-    const iam = new this.AWS.IAM(options)
-
-    let marker: string | undefined
-
-    let policies: AttachedPolicy[] = []
-
-    do {
-      const listAttachedGroupPolicies = await iam
-        .listAttachedGroupPolicies({
-          GroupName: resourceId,
-          Marker: marker,
-        })
-        .promise()
-
-      marker = listAttachedGroupPolicies.Marker
-      if (listAttachedGroupPolicies.AttachedPolicies) {
-        policies = policies.concat(listAttachedGroupPolicies.AttachedPolicies)
-      }
-    } while (marker)
-
-    return policies
-  }
-
-  listAttachedRolePolicies = async (resourceId: string) => {
-    const options = this.getOptions()
-
-    const iam = new this.AWS.IAM(options)
-
-    let marker: string | undefined
-
-    let policies: AttachedPolicy[] = []
-
-    do {
-      const listAttachedRolePolicies = await iam
-        .listAttachedRolePolicies({
-          RoleName: resourceId,
-          Marker: marker,
-        })
-        .promise()
-
-      marker = listAttachedRolePolicies.Marker
-      if (listAttachedRolePolicies.AttachedPolicies) {
-        policies = policies.concat(listAttachedRolePolicies.AttachedPolicies)
-      }
-    } while (marker)
-
-    return policies
-  }
-
-  listDetectors = async (region: string) => {
-    const options = this.getOptions()
-    options.region = region
-
-    const gd = new this.AWS.GuardDuty(options)
-
-    let nextToken: string | undefined
-
-    let detectors: DetectorId[] = []
-
-    do {
-      const listDetectors = await gd
-        .listDetectors({
-          NextToken: nextToken,
-        })
-        .promise()
-      nextToken = listDetectors.NextToken
-      if (listDetectors.DetectorIds) {
-        detectors = detectors.concat(listDetectors.DetectorIds)
-      }
-    } while (nextToken)
-
-    return detectors
+    return resources
   }
 }

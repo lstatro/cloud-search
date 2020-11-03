@@ -64,10 +64,21 @@ export default class TransitEncryptionEnabled extends AWS {
     region: string
   }) => {
     let clusters
+    const options = this.getOptions()
+    options.region = region
+
     if (resourceId) {
-      clusters = await this.listElastiCacheClusters(region, resourceId)
+      const promise = new this.AWS.ElastiCache(options)
+        .describeCacheClusters({
+          CacheClusterId: resourceId,
+        })
+        .promise()
+      clusters = await this.pager<CacheCluster>(promise, 'CacheClusters')
     } else {
-      clusters = await this.listElastiCacheClusters(region)
+      const promise = new this.AWS.ElastiCache(options)
+        .describeCacheClusters()
+        .promise()
+      clusters = await this.pager<CacheCluster>(promise, 'CacheClusters')
     }
 
     for (const cluster of clusters) {

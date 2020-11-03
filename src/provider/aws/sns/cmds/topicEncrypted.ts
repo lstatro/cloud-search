@@ -2,6 +2,7 @@ import { CommandBuilder } from 'yargs'
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import assert from 'assert'
 import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
+import { Topic } from 'aws-sdk/clients/sns'
 
 const rule = 'TopicEncrypted'
 
@@ -72,7 +73,12 @@ export default class TopicEncrypted extends AWS {
     if (resourceId) {
       await this.audit({ resource: resourceId, region })
     } else {
-      const topics = await this.listTopics(region)
+      const options = this.getOptions()
+      options.region = region
+
+      const promise = new this.AWS.SNS(options).listTopics().promise()
+      const topics = await this.pager<Topic>(promise, 'Topics')
+
       for (const topic of topics) {
         assert(topic.TopicArn, 'topic does not have an arn')
         await this.audit({ resource: topic.TopicArn, region })

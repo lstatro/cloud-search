@@ -69,10 +69,20 @@ export default class PublicInstance extends AWS {
     region: string
   }) => {
     let instances
+
+    const options = this.getOptions()
+    options.region = region
+
     if (resourceId) {
-      instances = await this.listDBInstances(region, resourceId)
+      const promise = new this.AWS.RDS(options)
+        .describeDBInstances({
+          DBInstanceIdentifier: resourceId,
+        })
+        .promise()
+      instances = await this.pager<DBInstance>(promise, 'DBInstances')
     } else {
-      instances = await this.listDBInstances(region)
+      const promise = new this.AWS.RDS(options).describeDBInstances().promise()
+      instances = await this.pager<DBInstance>(promise, 'DBInstances')
     }
 
     for (const instance of instances) {

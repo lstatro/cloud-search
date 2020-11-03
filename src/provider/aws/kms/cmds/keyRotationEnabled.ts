@@ -1,6 +1,7 @@
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import { AWS } from '../../../../lib/aws/AWS'
 import assert from 'assert'
+import { KeyListEntry } from 'aws-sdk/clients/kms'
 const rule = 'KeyRotationEnabled'
 
 export const command = `${rule} [args]`
@@ -64,7 +65,12 @@ export default class KeyRotationEnabled extends AWS {
     if (resourceId) {
       await this.audit({ resource: resourceId, region })
     } else {
-      const keys = await this.listKeys(region)
+      const options = this.getOptions()
+      options.region = region
+
+      const promise = new this.AWS.KMS(options).listKeys().promise()
+      const keys = await this.pager<KeyListEntry>(promise, 'Keys')
+
       for (const key of keys) {
         assert(key.KeyArn, 'key missing its key ARN')
         await this.audit({ resource: key.KeyArn, region })

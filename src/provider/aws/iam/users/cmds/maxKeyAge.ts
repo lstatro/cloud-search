@@ -43,7 +43,9 @@ export default class MaxKeyAge extends AWS {
   }
 
   async audit({ resource }: { resource: User }) {
-    const iam = new this.AWS.IAM(this.options)
+    const options = this.getOptions()
+
+    const iam = new this.AWS.IAM(options)
 
     let marker: string | undefined
 
@@ -103,7 +105,10 @@ export default class MaxKeyAge extends AWS {
    * this functionality
    */
   scan = async () => {
-    const users = await this.listUsers()
+    const options = this.getOptions()
+
+    const promise = new this.AWS.IAM(options).listUsers().promise()
+    const users = await this.pager<User>(promise, 'Users')
 
     for (const user of users) {
       await this.audit({ resource: user })

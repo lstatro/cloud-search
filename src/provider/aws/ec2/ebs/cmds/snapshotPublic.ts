@@ -2,6 +2,7 @@ import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import assert from 'assert'
 
 import { AWS } from '../../../../../lib/aws/AWS'
+import { Snapshot } from 'aws-sdk/clients/ec2'
 
 const rule = 'PublicSnapshot'
 
@@ -69,7 +70,18 @@ export default class PublicSnapshot extends AWS {
     if (resourceId) {
       await this.audit({ resource: resourceId, region })
     } else {
-      const snapshots = await this.listSnapshots(region)
+      const options = this.getOptions()
+      options.region = region
+
+      const promise = new this.AWS.EC2(options)
+        .describeSnapshots({
+          OwnerIds: ['self'],
+          SnapshotIds: resourceId ? [resourceId] : undefined,
+        })
+        .promise()
+
+      const snapshots = await this.pager<Snapshot>(promise, 'Snapshots')
+
       for (const snapshot of snapshots) {
         assert(snapshot.SnapshotId, 'does not have an id')
         await this.audit({ resource: snapshot.SnapshotId, region })

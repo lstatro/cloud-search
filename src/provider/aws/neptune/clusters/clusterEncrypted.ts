@@ -1,32 +1,27 @@
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
-import assert from 'assert'
 import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
-import { DBCluster } from 'aws-sdk/clients/rds'
-
+import { DBCluster } from 'aws-sdk/clients/neptune'
+import assert from 'assert'
 const rule = 'ClusterEncrypted'
 
+export const command = `${rule} [args]`
+
+export const desc = `Amazon Neptune graph cluster databases should have encryption at rest enabled
+
+  OK      - Neptune cluster encryption is encrypted at rest
+  UNKNOWN - Unable to determine if Neptune cluster encryption enabled
+  FAIL    - Neptune cluster is not encrypted at rest
+
+  resourceId: Database Identifier
+
+`
 export const builder = {
   ...keyTypeArg,
 }
 
-export const command = `${rule} [args]`
-
-export const desc = `RDS clusters must have their storage at rest encrypted
-
-  OK      - RDS cluster storage is encrypted at rest
-  UNKNOWN - Unable to determine if the storage is encrypted at rest
-  WARNING - RDS cluster storage is encrypted but not with the specified key type
-  FAIL    - RDS cluster storage is not encrypted at rest
-
-  resourceId: RDS clusters ARN
-
-  note: this rule targets DB Clusters not DB Instances' (MySQL, PostgreSQL, Oracle, MariaDB, MSSQL).
-
-`
-
 export default class ClusterEncrypted extends AWS {
   audits: AuditResultInterface[] = []
-  service = 'rds'
+  service = 'neptune'
   global = false
 
   constructor(public params: AWSScannerInterface) {
@@ -34,20 +29,18 @@ export default class ClusterEncrypted extends AWS {
   }
 
   async audit({ resource, region }: { resource: DBCluster; region: string }) {
-    assert(resource.DBClusterArn, 'cluster does not have a cluster ARN')
-
+    const options = this.getOptions()
+    options.region = region
+    assert(resource.DBClusterIdentifier, 'cluster missing its DB Identifier')
     const audit = this.getDefaultAuditObj({
-      resource: resource.DBClusterArn,
+      resource: resource.DBClusterIdentifier,
       region,
     })
-
-    if (typeof resource.KmsKeyId === 'string') {
-      /** if there is a key it should be encrypted, if not, something unexpected is going on */
+    if (resource.KmsKeyId) {
       assert(
-        resource.StorageEncrypted === true,
-        'key found, but rds instance is not encrypted'
+        this.keyType,
+        'Key type is required argument for isKeyTrusted check'
       )
-      assert(this.keyType, 'key type is required')
       audit.state = await this.isKeyTrusted(
         resource.KmsKeyId,
         this.keyType,
@@ -67,35 +60,29 @@ export default class ClusterEncrypted extends AWS {
     region: string
   }) => {
     let clusters
-
     const options = this.getOptions()
     options.region = region
-
     if (resourceId) {
-      const promise = new this.AWS.RDS(options)
+      const promise = new this.AWS.Neptune(options)
         .describeDBClusters({
           DBClusterIdentifier: resourceId,
         })
         .promise()
       clusters = await this.pager<DBCluster>(promise, 'DBClusters')
     } else {
-      const promise = new this.AWS.RDS(options).describeDBClusters().promise()
+      const promise = new this.AWS.Neptune(options)
+        .describeDBClusters()
+        .promise()
       clusters = await this.pager<DBCluster>(promise, 'DBClusters')
     }
-
     for (const cluster of clusters) {
-      assert(cluster.DBClusterArn, 'a cluster must have a ARN')
-      await this.audit({
-        resource: cluster,
-        region,
-      })
+      await this.audit({ resource: cluster, region })
     }
   }
 }
 
 export const handler = async (args: AWSScannerInterface) => {
   const scanner = new ClusterEncrypted(args)
-
   await scanner.start()
   scanner.output()
   return scanner.audits
