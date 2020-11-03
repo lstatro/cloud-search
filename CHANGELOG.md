@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - refactor resource listing
 - `package.json` `main` attribute outputs scan classes
+- adding neptune encrypted cluster audit
+- adding neptune encrypted instance audit
+- fixed bug with async/await in ebs volumeEncrypted
 
 ## [1.6.1] - 2020-10-27
 
