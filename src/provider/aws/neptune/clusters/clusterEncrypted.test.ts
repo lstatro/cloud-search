@@ -54,9 +54,7 @@ describe('neptune cluster storage is encrypted at rest', () => {
       ],
     })
 
-    let audits
-
-    audits = await handler({
+    const audits = await handler({
       region: 'test',
       profile: 'test',
       keyType: 'aws',
@@ -88,9 +86,7 @@ describe('neptune cluster storage is encrypted at rest', () => {
       ],
     })
 
-    let audits
-
-    audits = await handler({
+    const audits = await handler({
       region: 'test',
       profile: 'test',
       keyType: 'aws',
@@ -108,6 +104,7 @@ describe('neptune cluster storage is encrypted at rest', () => {
       },
     ])
   })
+
   it('should report WARNING when cluster is encrypted with an aws managed key', async () => {
     mock('KMS', 'describeKey', {
       KeyMetadata: { Arn: 'test', KeyManager: 'AWS' },
@@ -121,9 +118,7 @@ describe('neptune cluster storage is encrypted at rest', () => {
       ],
     })
 
-    let audits
-
-    audits = await handler({
+    const audits = await handler({
       resourceId: 'test',
       region: 'test',
       profile: 'test',
@@ -142,6 +137,7 @@ describe('neptune cluster storage is encrypted at rest', () => {
       },
     ])
   })
+
   it('should report OK when cluster is encrypted with a cmk', async () => {
     mock('KMS', 'describeKey', {
       KeyMetadata: { Arn: 'test', KeyManager: 'CUSTOMER' },
@@ -155,9 +151,7 @@ describe('neptune cluster storage is encrypted at rest', () => {
       ],
     })
 
-    let audits
-
-    audits = await handler({
+    const audits = await handler({
       resourceId: 'test',
       region: 'test',
       profile: 'test',

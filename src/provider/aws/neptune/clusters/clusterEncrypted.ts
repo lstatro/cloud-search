@@ -6,7 +6,7 @@ const rule = 'ClusterEncrypted'
 
 export const command = `${rule} [args]`
 
-export const desc = `Amazon Neptune graph databases should have encryption enabled
+export const desc = `Amazon Neptune graph databases should have encryption at rest enabled
 
   OK      - Neptune cluster encryption is encrypted at rest
   UNKNOWN - Unable to determine if Neptune cluster encryption enabled
@@ -40,7 +40,7 @@ export default class ClusterEncrypted extends AWS {
     if (resource.KmsKeyId) {
       assert(
         this.keyType,
-        'Key type is required arguement for isKeyTrusted check'
+        'Key type is required argument for isKeyTrusted check'
       )
       audit.state = await this.isKeyTrusted(
         resource.KmsKeyId,
