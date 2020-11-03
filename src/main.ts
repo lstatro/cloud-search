@@ -69,4 +69,7 @@ export const AWS = {
     ClusterEncrypted: require('./provider/aws/neptune/clusters/clusterEncrypted'),
     InstanceEncrypted: require('./provider/aws/neptune/instances/instanceEncrypted'),
   },
+  dynamo: {
+    EncryptionAtRest: require('./provider/aws/dynamo/cmds/encryptionAtRest'),
+  },
 }

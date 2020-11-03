@@ -59,6 +59,7 @@ export const builder = (yargs: Argv) => {
     .commandDir('./aws/elasticache', opts)
     .commandDir('./aws/guardduty', opts)
     .commandDir('./aws/neptune', opts)
+    .commandDir('./aws/dynamo', opts)
     .demandCommand(1)
     .option('region', {
       alias: 'r',
