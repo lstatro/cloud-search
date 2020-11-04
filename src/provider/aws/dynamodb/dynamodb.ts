@@ -1,6 +1,6 @@
 import { Argv } from 'yargs'
 
-export const command = 'dynamo'
+export const command = 'dynamodb'
 export const desc = 'Amazon DynamoDB'
 
 const opts = {
@@ -12,6 +12,6 @@ export const builder = (yargs: Argv) => {
     .commandDir('cmds', opts)
     .demandCommand(1)
     .example([
-      ['dynamo <rule>...', 'have the cli show you available dynamo rules'],
+      ['dynamodb <rule>...', 'have the cli show you available dynamodb rules'],
     ])
 }

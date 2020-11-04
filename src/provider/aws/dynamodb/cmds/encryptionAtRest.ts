@@ -1,7 +1,7 @@
 import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
 import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
 import { TableName } from 'aws-sdk/clients/dynamodb'
-// import assert from 'assert'
+import assert from 'assert'
 const rule = 'EncryptionAtRest'
 
 export const command = `${rule} [args]`
@@ -35,11 +35,26 @@ export default class EncryptionAtRest extends AWS {
       resource: resource,
       region,
     })
+    const describeTable = await new this.AWS.DynamoDB(options)
+      .describeTable({
+        TableName: resource,
+      })
+      .promise()
+    assert(describeTable.Table, 'Table should be returned from api call')
+    // assert(
+    //   describeTable.Table.SSEDescription,
+    //   'SSEDescription should be defined for the table'
+    // )
+    // TODO: Need to figure out how to split out keyId
+    console.log(
+      'this is the describeTable call in audit ...',
+      describeTable.Table
+    )
     this.audits.push(audit)
   }
 
   scan = async ({
-    // resourceId,
+    resourceId,
     region,
   }: {
     resourceId: string
@@ -47,21 +62,28 @@ export default class EncryptionAtRest extends AWS {
   }) => {
     const options = this.getOptions()
     options.region = region
-    // if (resourceId) {
-    //   const promise = new this.AWS.DynamoDB(options)
-    //     .describeTable({
-    //       TableName: resourceId,
-    //     })
-    //     .promise()
-    //   instances = await this.pager<DBInstance>(promise, 'DBInstances')
-    // } else {
-    const promise = new this.AWS.DynamoDB(options).listTables().promise()
-    let tables = await this.pager<TableName>(promise, 'TableNames')
-    console.log('these are tables ...', tables)
-    // }
-    // for (const instance of instances) {
-    //   await this.audit({ resource: instance, region })
-    // }
+    if (resourceId) {
+      const describeTable = await new this.AWS.DynamoDB(options)
+        .describeTable({
+          TableName: resourceId,
+        })
+        .promise()
+      assert(
+        describeTable.Table,
+        'There should be a table returned from api call'
+      )
+      assert(
+        describeTable.Table.TableName,
+        'The table returned from api should have a TableName defined'
+      )
+      await this.audit({ resource: describeTable.Table.TableName, region })
+    } else {
+      const promise = new this.AWS.DynamoDB(options).listTables().promise()
+      let tables = await this.pager<TableName>(promise, 'TableNames')
+      for (let table of tables) {
+        await this.audit({ resource: table, region })
+      }
+    }
   }
 }
 
