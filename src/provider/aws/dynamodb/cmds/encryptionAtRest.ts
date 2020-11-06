@@ -40,6 +40,7 @@ export default class EncryptionAtRest extends AWS {
         TableName: resource,
       })
       .promise()
+    console.log(describeTable)
     assert(describeTable.Table, 'Table should be returned from api call')
     let sseDescription = describeTable.Table.SSEDescription
     if (sseDescription) {
