@@ -41,15 +41,31 @@ export default class EncryptionAtRest extends AWS {
       })
       .promise()
     assert(describeTable.Table, 'Table should be returned from api call')
-    // assert(
-    //   describeTable.Table.SSEDescription,
-    //   'SSEDescription should be defined for the table'
-    // )
-    // TODO: Need to figure out how to split out keyId
-    console.log(
-      'this is the describeTable call in audit ...',
-      describeTable.Table
-    )
+    let sseDescription = describeTable.Table.SSEDescription
+    if (sseDescription) {
+      assert(
+        describeTable.Table.SSEDescription,
+        'Table should have SSEDescription by this point.'
+      )
+      assert(
+        describeTable.Table.SSEDescription.KMSMasterKeyArn,
+        'Table should have a kms key ARN by this point.'
+      )
+      let kmsKeyArn = describeTable.Table.SSEDescription.KMSMasterKeyArn
+      let splitKmsKeyArn = kmsKeyArn.split('/')
+      assert(
+        splitKmsKeyArn.length === 2,
+        'KMS key arn split by / should have 2 items in the resulting array'
+      )
+      let kmsKeyId = splitKmsKeyArn[1]
+      assert(
+        this.keyType,
+        'Key type is required argument for isKeyTrusted check'
+      )
+      audit.state = await this.isKeyTrusted(kmsKeyId, this.keyType, region)
+    } else {
+      audit.state = 'WARNING'
+    }
     this.audits.push(audit)
   }
 
