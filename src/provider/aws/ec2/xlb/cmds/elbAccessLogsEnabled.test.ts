@@ -1,7 +1,7 @@
 import 'mocha'
 import { useFakeTimers, SinonFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { handler } from './_elbAccessLogsEnabled'
+import { handler } from './elbAccessLogsEnabled'
 import { expect } from 'chai'
 
 describe('rds cluster storage is encrypted at rest', () => {
