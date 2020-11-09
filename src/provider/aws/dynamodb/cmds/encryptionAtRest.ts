@@ -41,7 +41,7 @@ export default class EncryptionAtRest extends AWS {
       })
       .promise()
     assert(describeTable.Table, 'Table should be returned from api call')
-    let sseDescription = describeTable.Table.SSEDescription
+    const sseDescription = describeTable.Table.SSEDescription
     if (sseDescription) {
       assert(
         describeTable.Table.SSEDescription,
@@ -51,13 +51,13 @@ export default class EncryptionAtRest extends AWS {
         describeTable.Table.SSEDescription.KMSMasterKeyArn,
         'Table should have a kms key ARN by this point.'
       )
-      let kmsKeyArn = describeTable.Table.SSEDescription.KMSMasterKeyArn
-      let splitKmsKeyArn = kmsKeyArn.split('/')
+      const kmsKeyArn = describeTable.Table.SSEDescription.KMSMasterKeyArn
+      const splitKmsKeyArn = kmsKeyArn.split('/')
       assert(
         splitKmsKeyArn.length === 2,
         'KMS key arn split by / should have 2 items in the resulting array'
       )
-      let kmsKeyId = splitKmsKeyArn[1]
+      const kmsKeyId = splitKmsKeyArn[1]
       assert(
         this.keyType,
         'Key type is required argument for isKeyTrusted check'
@@ -95,8 +95,8 @@ export default class EncryptionAtRest extends AWS {
       await this.audit({ resource: describeTable.Table.TableName, region })
     } else {
       const promise = new this.AWS.DynamoDB(options).listTables().promise()
-      let tables = await this.pager<TableName>(promise, 'TableNames')
-      for (let table of tables) {
+      const tables = await this.pager<TableName>(promise, 'TableNames')
+      for (const table of tables) {
         await this.audit({ resource: table, region })
       }
     }
