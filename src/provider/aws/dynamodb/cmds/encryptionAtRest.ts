@@ -8,11 +8,12 @@ export const command = `${rule} [args]`
 
 export const desc = `Amazon DynamoDB should have encryption at rest enabled
 
-  OK      - Neptune instance encryption is encrypted at rest
+  OK      - Table is encrypted at rest
+  WARNING - Table encrypted but not with the correct key type
   UNKNOWN - Unable to determine if Neptune instance encryption enabled
-  FAIL    - Neptune instance is not encrypted at rest
+  FAIL    - Table is not encrypted at rest
 
-  resourceId: Database Identifier
+  resourceId: Table Name
 
 `
 export const builder = {
