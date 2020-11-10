@@ -73,12 +73,8 @@ export default class ElbDesyncMode extends AWS {
       monitor: 'FAIL',
     }
 
-    if (mode) {
-      if (modeMap[mode]) {
-        audit.state = modeMap[mode]
-      }
-    } else {
-      audit.state = 'FAIL'
+    if (modeMap[mode]) {
+      audit.state = modeMap[mode]
     }
 
     this.audits.push(audit)

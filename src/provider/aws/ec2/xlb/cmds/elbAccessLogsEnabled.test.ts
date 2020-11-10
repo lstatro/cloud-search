@@ -4,7 +4,7 @@ import { mock, restore } from 'aws-sdk-mock'
 import { handler } from './elbAccessLogsEnabled'
 import { expect } from 'chai'
 
-describe('rds cluster storage is encrypted at rest', () => {
+describe('elbs should log connections', () => {
   const now = new Date(0)
   let clock: SinonFakeTimers
 
