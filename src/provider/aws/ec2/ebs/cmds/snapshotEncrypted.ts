@@ -1,6 +1,9 @@
 import { CommandBuilder } from 'yargs'
 import { Snapshot } from 'aws-sdk/clients/ec2'
-import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
+import {
+  AuditResultInterface,
+  AWSScannerInterface,
+} from '@lstatro/cloud-search'
 import assert from 'assert'
 import { AWS, keyTypeArg } from '../../../../../lib/aws/AWS'
 

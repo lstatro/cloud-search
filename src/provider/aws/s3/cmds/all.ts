@@ -1,5 +1,8 @@
 import PublicAccessBlocks from './publicAccessBlocks'
-import { AuditResultInterface, AWSScannerCliArgsInterface } from 'cloud-search'
+import {
+  AuditResultInterface,
+  AWSScannerCliArgsInterface,
+} from '@lstatro/cloud-search'
 
 export const command = 'PublicAccessBlocks [args]'
 export const desc = 'report on all four s3 public access blocks toggles'

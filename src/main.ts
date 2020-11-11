@@ -1,8 +1,12 @@
+import { MultiRegionTrailEnabled } from './provider/aws/cloudtrail/cmds/multiRegionTrailEnabled'
+import { TrailEncrypted } from './provider/aws/cloudtrail/cmds/trailEncrypted'
+import { TrailEvents } from './provider/aws/cloudtrail/cmds/trailEvents'
+
 export const AWS = {
   cloudtrail: {
-    MultiRegionTrailEnabled: require('./provider/aws/cloudtrail/cmds/multiRegionTrailEnabled'),
-    TrailEncrypted: require('./provider/aws/cloudtrail/cmds/trailEncrypted'),
-    TrailEvents: require('./provider/aws/cloudtrail/cmds/trailEvents'),
+    MultiRegionTrailEnabled,
+    TrailEncrypted,
+    TrailEvents,
   },
   ec2: {
     ebs: {

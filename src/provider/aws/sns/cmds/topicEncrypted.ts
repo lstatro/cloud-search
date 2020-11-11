@@ -1,5 +1,8 @@
 import { CommandBuilder } from 'yargs'
-import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
+import {
+  AuditResultInterface,
+  AWSScannerInterface,
+} from '@lstatro/cloud-search'
 import assert from 'assert'
 import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
 import { Topic } from 'aws-sdk/clients/sns'

@@ -1,5 +1,8 @@
 import { DetectorId } from 'aws-sdk/clients/guardduty'
-import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
+import {
+  AuditResultInterface,
+  AWSScannerInterface,
+} from '@lstatro/cloud-search'
 import { AWS } from '../../../../lib/aws/AWS'
 
 const rule = 'DetectorExists'

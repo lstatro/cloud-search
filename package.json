@@ -2,7 +2,7 @@
   "name": "@lstatro/cloud-search",
   "version": "1.7.0",
   "description": "cloud guardrail scanner",
-  "main": "build/cli.js",
+  "main": "build/main.js",
   "scripts": {
     "test": "mocha -r ts-node/register src/**/*.test.ts",
     "coverage": "nyc mocha -r ts-node/register src/**/*.test.ts",
