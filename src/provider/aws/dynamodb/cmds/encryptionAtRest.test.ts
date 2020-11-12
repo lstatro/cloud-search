@@ -168,7 +168,7 @@ describe('dynamodb table encrypted at rest', () => {
       },
     ])
   })
-  it('should report ok when passed a resourceId and that resource is encrypted with an AWS managed key', async () => {
+  it('should report OK when passed a resourceId and that resource is encrypted with an AWS managed key', async () => {
     mock('KMS', 'describeKey', {
       KeyMetadata: { ARN: 'test', KeyManager: 'AWS' },
     })
@@ -202,7 +202,7 @@ describe('dynamodb table encrypted at rest', () => {
       },
     ])
   })
-  it('should report ok when passed a resourceId and that resource is encrypted with a CUSTOMER managed key', async () => {
+  it('should report OK when passed a resourceId and that resource is encrypted with a CUSTOMER managed key', async () => {
     mock('KMS', 'describeKey', {
       KeyMetadata: { ARN: 'test', KeyManager: 'CUSTOMER' },
     })
@@ -261,6 +261,29 @@ describe('dynamodb table encrypted at rest', () => {
         rule: 'EncryptionAtRest',
         service: 'dynamodb',
         state: 'WARNING',
+        time: '1970-01-01T00:00:00.000Z',
+      },
+    ])
+  })
+  it('should return UNKNOWN when a table is encrypted with a CMK but does not have a KMSKeyARN ', async () => {
+    mock('DynamoDB', 'listTables', {
+      TableNames: ['test'],
+    })
+    mock('DynamoDB', 'describeTable', Promise.reject())
+    const audits = await handler({
+      region: 'test',
+      profile: 'test',
+      keyType: 'aws',
+    })
+    expect(audits).to.eql([
+      {
+        physicalId: 'test',
+        profile: 'test',
+        provider: 'aws',
+        region: 'test',
+        rule: 'EncryptionAtRest',
+        service: 'dynamodb',
+        state: 'UNKNOWN',
         time: '1970-01-01T00:00:00.000Z',
       },
     ])

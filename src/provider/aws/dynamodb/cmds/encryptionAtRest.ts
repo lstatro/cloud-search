@@ -36,36 +36,34 @@ export default class EncryptionAtRest extends AWS {
       resource: resource,
       region,
     })
-    const describeTable = await new this.AWS.DynamoDB(options)
-      .describeTable({
-        TableName: resource,
-      })
-      .promise()
-    assert(describeTable.Table, 'Table should be returned from api call')
-    const sseDescription = describeTable.Table.SSEDescription
-    if (sseDescription) {
-      assert(
-        describeTable.Table.SSEDescription,
-        'Table should have SSEDescription by this point.'
-      )
-      assert(
-        describeTable.Table.SSEDescription.KMSMasterKeyArn,
-        'Table should have a kms key ARN by this point.'
-      )
-      const kmsKeyArn = describeTable.Table.SSEDescription.KMSMasterKeyArn
-      const splitKmsKeyArn = kmsKeyArn.split('/')
-      assert(
-        splitKmsKeyArn.length === 2,
-        'KMS key arn split by / should have 2 items in the resulting array'
-      )
-      const kmsKeyId = splitKmsKeyArn[1]
-      assert(
-        this.keyType,
-        'Key type is required argument for isKeyTrusted check'
-      )
-      audit.state = await this.isKeyTrusted(kmsKeyId, this.keyType, region)
-    } else {
-      audit.state = 'WARNING'
+    try {
+      const describeTable = await new this.AWS.DynamoDB(options)
+        .describeTable({
+          TableName: resource,
+        })
+        .promise()
+      assert(describeTable.Table, 'Table should be returned from api call')
+      if (describeTable.Table.SSEDescription) {
+        assert(
+          describeTable.Table.SSEDescription.KMSMasterKeyArn,
+          'Table should have a kms key ARN by this point.'
+        )
+        const kmsKeyArn = describeTable.Table.SSEDescription.KMSMasterKeyArn
+        assert(
+          this.keyType,
+          'Key type is required argument for isKeyTrusted check'
+        )
+        audit.state = await this.isKeyTrusted(kmsKeyArn, this.keyType, region)
+      } else {
+        audit.state = 'WARNING'
+      }
+    } catch (error) {
+      /**
+       * We wanted to default to unknown because the table is always encrypted
+       * by default. Due to the nature of how compliance is determined we reach
+       * this catch while checking a table that was encrypted with cmk or aws
+       * managed key but were unable to determine compliance confidently.
+       */
     }
     this.audits.push(audit)
   }
