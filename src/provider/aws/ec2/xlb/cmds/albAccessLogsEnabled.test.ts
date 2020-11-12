@@ -70,7 +70,7 @@ describe('albs should log connections', () => {
     ])
   })
 
-  it('should report FAIL if the alb has no attributes', async () => {
+  it('should report UNKNOWN if the alb has no attributes', async () => {
     mock('ELBv2', 'describeLoadBalancers', {
       LoadBalancers: [
         {
