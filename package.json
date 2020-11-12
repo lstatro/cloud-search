@@ -30,6 +30,8 @@
   "author": "lstatro",
   "license": "MIT",
   "keywords": [
+    "dynamodb",
+    "neptune",
     "security",
     "guardrail",
     "guardduty",
