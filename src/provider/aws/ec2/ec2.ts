@@ -12,5 +12,6 @@ export const builder = (yargs: Argv) => {
     .commandDir('sg', opts)
     .commandDir('vpc', opts)
     .commandDir('ebs', opts)
+    .commandDir('xlb', opts)
     .demandCommand(1)
 }
