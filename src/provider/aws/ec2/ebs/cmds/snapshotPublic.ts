@@ -21,7 +21,7 @@ export const desc = `SQS topics must be encrypted
 
 `
 
-export default class PublicSnapshot extends AWS {
+export class PublicSnapshot extends AWS {
   audits: AuditResultInterface[] = []
   service = 'ebs'
   global = false

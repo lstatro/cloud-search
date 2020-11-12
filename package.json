@@ -3,6 +3,7 @@
   "version": "1.7.0",
   "description": "cloud guardrail scanner",
   "main": "build/main.js",
+  "types": "types.d.ts",
   "scripts": {
     "test": "mocha -r ts-node/register src/**/*.test.ts",
     "coverage": "nyc mocha -r ts-node/register src/**/*.test.ts",
@@ -16,7 +17,6 @@
   "bin": {
     "cloud-search": "build/cli.js"
   },
-  "types": "types.d.ts",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/lstatro/cloud-search.git"

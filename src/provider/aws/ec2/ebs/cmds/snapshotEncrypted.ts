@@ -26,7 +26,7 @@ export const desc = `EBS Snapshots should be encrypted
 
 `
 
-export default class SnapshotEncrypted extends AWS {
+export class SnapshotEncrypted extends AWS {
   audits: AuditResultInterface[] = []
   service = 'ebs'
 

@@ -26,7 +26,7 @@ export const desc = `EBS volumes should be encrypted at rest
 
 `
 
-export default class VolumesEncrypted extends AWS {
+export class VolumesEncrypted extends AWS {
   audits: AuditResultInterface[] = []
   service = 'ebs'
 
