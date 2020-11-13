@@ -37,7 +37,6 @@ Import the cloud provider's name off of the `@lstatro/cloud-search` package. See
   const main = async () => {
     const scan = new sns.TopicEncrypted({
       region: 'us-east-1',
-      profile: 'fluffy',
       keyType: 'aws',
     })
 
