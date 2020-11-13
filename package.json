@@ -15,7 +15,7 @@
   },
   "readme": "https://github.com/lstatro/cloud-search/blob/develop/README.md",
   "bin": {
-    "cloud-search": "build/cli.js"
+    "cloud-search": "cli.js"
   },
   "repository": {
     "type": "git",
