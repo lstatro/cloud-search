@@ -7,7 +7,7 @@ interface PublicAccessBlocksInterface extends AWSScannerInterface {
   rule: string
 }
 
-export default class PublicAccessBlocks extends AWS {
+export class PublicAccessBlocks extends AWS {
   service = 's3'
   global = true
 

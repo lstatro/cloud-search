@@ -22,7 +22,7 @@ export const builder = {
   ...keyTypeArg,
 }
 
-export default class InstanceEncrypted extends AWS {
+export class InstanceEncrypted extends AWS {
   audits: AuditResultInterface[] = []
   service = 'neptune'
   global = false

@@ -24,7 +24,7 @@ export const desc = `RDS instances must not have the PubliclyAccessible flag set
 
 `
 
-export default class PublicInstance extends AWS {
+export class PublicInstance extends AWS {
   audits: AuditResultInterface[] = []
   service = 'rds'
   global = false

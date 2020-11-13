@@ -21,7 +21,7 @@ show up in this scan.
   
 `
 
-export default class IgwAttachedToVpc extends AWS {
+export class IgwAttachedToVpc extends AWS {
   audits: AuditResultInterface[] = []
   service = 'ec2'
 

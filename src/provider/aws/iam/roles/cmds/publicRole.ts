@@ -37,7 +37,7 @@ type isPublic = boolean | 'WARNING'
 
 type PrincipalHandler = (params: TypeHandlerInterface) => isPublic[]
 
-export default class PublicRole extends AWS {
+export class PublicRole extends AWS {
   audits: AuditResultInterface[] = []
   service = 'iam'
   global = true

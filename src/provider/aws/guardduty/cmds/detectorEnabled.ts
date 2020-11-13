@@ -20,7 +20,7 @@ export const desc = `Existing GuardDuty detectors are enabled
         looking to see if a detector exists in the targeted region.
 `
 
-export default class DetectorEnabled extends AWS {
+export class DetectorEnabled extends AWS {
   audits: AuditResultInterface[] = []
   service = 'guardduty'
   global = false

@@ -12,7 +12,7 @@ export interface DetectorDataSourcesInterface extends AWSScannerInterface {
   rule: string
 }
 
-export default class DetectorDataSources extends AWS {
+export class DetectorDataSources extends AWS {
   audits: AuditResultInterface[] = []
   service = 'guardduty'
   global = false

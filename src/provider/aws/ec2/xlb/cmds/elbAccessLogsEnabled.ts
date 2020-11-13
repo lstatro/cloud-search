@@ -21,7 +21,7 @@ enabled
 
 `
 
-export default class ElbAccessLogsEnabled extends AWS {
+export class ElbAccessLogsEnabled extends AWS {
   audits: AuditResultInterface[] = []
   service = 'ec2'
 

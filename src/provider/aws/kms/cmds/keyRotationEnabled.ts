@@ -19,7 +19,7 @@ export const desc = `AWS managed customer keys (CMK's) should have yearly rotati
 
 `
 
-export default class KeyRotationEnabled extends AWS {
+export class KeyRotationEnabled extends AWS {
   audits: AuditResultInterface[] = []
   service = 'kms'
   global = false

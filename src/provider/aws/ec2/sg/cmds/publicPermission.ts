@@ -19,7 +19,7 @@ export const desc = `searches security groups for 0.0.0.0/0 or ::/0 on any port
 
 `
 
-export default class PublicPermission extends AWS {
+export class PublicPermission extends AWS {
   audits: AuditResultInterface[] = []
   service = 'ec2'
 

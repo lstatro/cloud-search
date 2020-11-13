@@ -7,7 +7,7 @@ import {
 import assert from 'assert'
 import { AWS, keyTypeArg } from '../../../../../lib/aws/AWS'
 
-const rule = 'VolumesEncrypted'
+const rule = 'VolumeEncrypted'
 
 export const command = `${rule} [args]`
 
@@ -26,7 +26,7 @@ export const desc = `EBS volumes should be encrypted at rest
 
 `
 
-export class VolumesEncrypted extends AWS {
+export class VolumeEncrypted extends AWS {
   audits: AuditResultInterface[] = []
   service = 'ebs'
 
@@ -85,7 +85,7 @@ export class VolumesEncrypted extends AWS {
 }
 
 export const handler = async (args: AWSScannerInterface) => {
-  const scanner = new VolumesEncrypted(args)
+  const scanner = new VolumeEncrypted(args)
   await scanner.start()
   scanner.output()
   return scanner.audits

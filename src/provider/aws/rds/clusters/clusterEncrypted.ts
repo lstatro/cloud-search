@@ -27,7 +27,7 @@ export const desc = `RDS clusters must have their storage at rest encrypted
 
 `
 
-export default class ClusterEncrypted extends AWS {
+export class ClusterEncrypted extends AWS {
   audits: AuditResultInterface[] = []
   service = 'rds'
   global = false

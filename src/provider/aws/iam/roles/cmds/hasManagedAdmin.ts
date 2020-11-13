@@ -23,7 +23,7 @@ could still have admin via an inline policy.
 
 `
 
-export default class HasManagedAdmin extends AWS {
+export class HasManagedAdmin extends AWS {
   audits: AuditResultInterface[] = []
   service = 'iam'
   global = true

@@ -7,7 +7,7 @@ import assert from 'assert'
 import { AWS } from '../../../../../lib/aws/AWS'
 import { Snapshot } from 'aws-sdk/clients/ec2'
 
-const rule = 'PublicSnapshot'
+const rule = 'SnapshotPublic'
 
 export const command = `${rule} [args]`
 
@@ -21,7 +21,7 @@ export const desc = `SQS topics must be encrypted
 
 `
 
-export class PublicSnapshot extends AWS {
+export class SnapshotPublic extends AWS {
   audits: AuditResultInterface[] = []
   service = 'ebs'
   global = false
@@ -94,7 +94,7 @@ export class PublicSnapshot extends AWS {
 }
 
 export const handler = async (args: AWSScannerInterface) => {
-  const scanner = new PublicSnapshot(args)
+  const scanner = new SnapshotPublic(args)
 
   await scanner.start()
   scanner.output()

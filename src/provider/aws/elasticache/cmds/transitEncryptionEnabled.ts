@@ -27,7 +27,7 @@ export const desc = `Elasticache instances should enforce encryption in flight
 
 `
 
-export default class TransitEncryptionEnabled extends AWS {
+export class TransitEncryptionEnabled extends AWS {
   audits: AuditResultInterface[] = []
   service = 'elasticache'
   global = false

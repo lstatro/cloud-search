@@ -1,4 +1,4 @@
-import PublicAccessBlocks from './publicAccessBlocks'
+import { PublicAccessBlocks } from './publicAccessBlocks'
 import {
   AuditResultInterface,
   AWSScannerCliArgsInterface,

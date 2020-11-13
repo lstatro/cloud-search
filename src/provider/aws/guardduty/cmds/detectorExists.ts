@@ -26,7 +26,7 @@ export const desc = `A GuardDuty detector exists for this region
         then one detector is found the rule returns WARNING.
 `
 
-export default class DetectorExists extends AWS {
+export class DetectorExists extends AWS {
   audits: AuditResultInterface[] = []
   service = 'guardduty'
   global = false

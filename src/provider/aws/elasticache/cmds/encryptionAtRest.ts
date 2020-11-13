@@ -28,7 +28,7 @@ export const desc = `Elasticache instances should have storage encrypted at rest
 
 `
 
-export default class AtRestEncryption extends AWS {
+export class EncryptionAtRest extends AWS {
   audits: AuditResultInterface[] = []
   service = 'elasticache'
   global = false
@@ -150,7 +150,7 @@ export default class AtRestEncryption extends AWS {
 }
 
 export const handler = async (args: AWSScannerInterface) => {
-  const scanner = new AtRestEncryption(args)
+  const scanner = new EncryptionAtRest(args)
 
   await scanner.start()
   scanner.output()

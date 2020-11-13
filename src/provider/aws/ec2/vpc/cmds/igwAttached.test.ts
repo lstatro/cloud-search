@@ -2,7 +2,7 @@ import 'mocha'
 import 'chai'
 import { useFakeTimers, SinonFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { handler } from './igwAttached'
+import { handler } from './igwAttachedToVpc'
 import { expect } from 'chai'
 
 describe('igw vpc attachment', () => {

@@ -26,7 +26,7 @@ export const desc = `SNS topics must be encrypted
 
 `
 
-export default class TopicEncrypted extends AWS {
+export class TopicEncrypted extends AWS {
   audits: AuditResultInterface[] = []
   service = 'sns'
   global = false

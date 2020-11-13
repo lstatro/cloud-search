@@ -34,7 +34,7 @@ interface MaxKeyAgeInterface extends AWSScannerInterface {
   maxAge: number
 }
 
-export default class MaxKeyAge extends AWS {
+export class MaxKeyAge extends AWS {
   audits: AuditResultInterface[] = []
   service = 'iam'
   global = true

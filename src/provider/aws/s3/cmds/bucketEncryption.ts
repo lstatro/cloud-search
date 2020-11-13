@@ -26,7 +26,7 @@ export const desc = `SQS topics must be encrypted
 
 `
 
-export default class TopicEncrypted extends AWS {
+export class BucketEncryption extends AWS {
   audits: AuditResultInterface[] = []
   service = 's3'
   global = true
@@ -148,7 +148,7 @@ export default class TopicEncrypted extends AWS {
 }
 
 export const handler = async (args: AWSScannerInterface) => {
-  const scanner = new TopicEncrypted(args)
+  const scanner = new BucketEncryption(args)
 
   await scanner.start()
   scanner.output()

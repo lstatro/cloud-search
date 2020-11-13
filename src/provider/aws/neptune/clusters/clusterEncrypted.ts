@@ -22,7 +22,7 @@ export const builder = {
   ...keyTypeArg,
 }
 
-export default class ClusterEncrypted extends AWS {
+export class ClusterEncrypted extends AWS {
   audits: AuditResultInterface[] = []
   service = 'neptune'
   global = false

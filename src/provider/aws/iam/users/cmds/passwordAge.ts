@@ -32,7 +32,7 @@ interface MaxPasswordAgeInterface extends AWSScannerInterface {
   maxAge: number
 }
 
-export default class PasswordAge extends AWS {
+export class PasswordAge extends AWS {
   audits: AuditResultInterface[] = []
   service = 'iam'
   global = true

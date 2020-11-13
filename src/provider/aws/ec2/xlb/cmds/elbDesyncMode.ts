@@ -21,7 +21,7 @@ enabled
 
 `
 
-export default class ElbDesyncMode extends AWS {
+export class ElbDesyncMode extends AWS {
   audits: AuditResultInterface[] = []
   service = 'ec2'
 
