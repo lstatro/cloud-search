@@ -1,4 +1,4 @@
-import { FlowLog, Vpc } from 'aws-sdk/clients/ec2'
+import { Vpc } from 'aws-sdk/clients/ec2'
 import {
   AuditResultInterface,
   AWSClientOptionsInterface,
@@ -32,11 +32,20 @@ export default class FlowlogsEnabled extends AWS {
   }
 
   async audit({ resource, region }: { resource: string; region: string }) {
+    const options = this.getOptions()
+    options.region = region
     const audit = this.getDefaultAuditObj({
       resource: resource,
       region,
     })
-    audit.state = 'OK'
+    let flowlogs = await this.getFlowLogs(options, resource)
+    console.log('this is flowlogs ...', flowlogs)
+    assert(flowlogs.FlowLogs)
+    if (flowlogs.FlowLogs.length > 0) {
+      audit.state = 'OK'
+    } else {
+      audit.state = 'FAIL'
+    }
     this.audits.push(audit)
   }
 
@@ -49,56 +58,25 @@ export default class FlowlogsEnabled extends AWS {
   }) => {
     const options = this.getOptions()
     options.region = region
-    let flowlogs
     if (resourceId) {
-      flowlogs = await this.getFlowLogs(flowlogs, options, resourceId)
-      if (flowlogs.length > 0) {
-        await this.audit({ resource: resourceId, region })
-      } else {
-        const audit = this.getDefaultAuditObj({
-          resource: resourceId,
-          region,
-        })
-        audit.state = 'FAIL'
-        this.audits.push(audit)
-      }
+      await this.audit({ resource: resourceId, region })
+      //
     } else {
       let promise = new this.AWS.EC2(options).describeVpcs().promise()
       const vpcs = await this.pager<Vpc>(promise, 'Vpcs')
+      let promises = []
       for (const vpc of vpcs) {
-        resourceId = vpc.VpcId
-        assert(resourceId, 'resourceId must exist')
-        flowlogs = new this.AWS.EC2(options)
-          .describeFlowLogs({
-            Filter: [
-              {
-                Name: 'resource-id',
-                Values: [resourceId],
-              },
-            ],
-          })
-          .promise()
-        flowlogs = await this.pager<FlowLog>(flowlogs, 'FlowLogs')
-        if (flowlogs.length > 0) {
-          await this.audit({ resource: resourceId, region })
-        } else {
-          const audit = this.getDefaultAuditObj({
-            resource: resourceId,
-            region,
-          })
-          audit.state = 'FAIL'
-          this.audits.push(audit)
-        }
+        assert(vpc.VpcId)
+        promises.push(this.audit({ resource: vpc.VpcId, region }))
       }
     }
   }
 
   private async getFlowLogs(
-    flowlogs: any,
     options: AWSClientOptionsInterface,
     resourceId: string
   ) {
-    flowlogs = new this.AWS.EC2(options)
+    let flowlogs = await new this.AWS.EC2(options)
       .describeFlowLogs({
         Filter: [
           {
@@ -108,7 +86,6 @@ export default class FlowlogsEnabled extends AWS {
         ],
       })
       .promise()
-    flowlogs = await this.pager<FlowLog>(flowlogs, 'FlowLogs')
     return flowlogs
   }
 }
