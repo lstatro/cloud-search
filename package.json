@@ -1,6 +1,6 @@
 {
   "name": "@lstatro/cloud-search",
-  "version": "1.7.0",
+  "version": "1.8.0",
   "description": "cloud guardrail scanner",
   "main": "build/main.js",
   "types": "types.d.ts",
@@ -30,6 +30,8 @@
   "author": "lstatro",
   "license": "MIT",
   "keywords": [
+    "dynamodb",
+    "neptune",
     "security",
     "guardrail",
     "guardduty",

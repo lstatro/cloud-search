@@ -7,10 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- AWS - EC2 - xLB - DesyncMitigationMode
+- AWS - EC2 - xLB - WafEnabled
+- AWS - EC2 - xLB - AccessLogsEnabled
+
+## [1.8.0] - 2020-11-11
+
+### Added
+
 - AWS - DynamoDB - EncryptedAtRest
-- AWS - EC2 - LB - DesyncMitigationMode
-- AWS - EC2 - LB - WafEnabled
-- AWS - EC2 - LB - AccessLogsEnabled
+- AWS - EC2 - ELB - DesyncMitigationMode
+- AWS - EC2 - ELB - AccessLogsEnabled
+- AWS - EC2 - ALB - AccessLogsEnabled
+
+### Changed
+
+### Removed
 
 ## [1.7.0] - 2020-11-2
 

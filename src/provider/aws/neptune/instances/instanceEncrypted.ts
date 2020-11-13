@@ -18,7 +18,6 @@ export const desc = `Amazon Neptune graph database instances should have encrypt
   resourceId: Database Identifier
 
 `
-//TODO: Figure out the resourceId for Neptune.
 export const builder = {
   ...keyTypeArg,
 }
