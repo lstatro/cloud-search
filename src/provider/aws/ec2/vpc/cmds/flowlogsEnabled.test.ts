@@ -18,17 +18,7 @@ describe('vpc flowlogs enabled', () => {
     restore()
   })
 
-  it('should return empty audits if no vpc instances are found ', async () => {
-    mock('EC2', 'describeFlowLogs', [])
-    let audits
-    audits = await handler({
-      region: 'test',
-      profile: 'test',
-    })
-    expect(audits).to.eql([])
-  })
-
-  it('should return OK audit flowlog is found', async () => {
+  it('should return OK when passed in a VpcId that has FlowLogs enabled ', async () => {
     mock('EC2', 'describeFlowLogs', {
       FlowLogs: [{ ResourceId: 'test' }],
     })
@@ -36,6 +26,7 @@ describe('vpc flowlogs enabled', () => {
     audits = await handler({
       region: 'test',
       profile: 'test',
+      resourceId: 'test',
     })
     expect(audits).to.eql([
       {
@@ -50,14 +41,15 @@ describe('vpc flowlogs enabled', () => {
       },
     ])
   })
-  it('should return OK if flowlog is found and active', async () => {
+  it('should return FAIL when passed a VPCId with no FlowLogs', async () => {
     mock('EC2', 'describeFlowLogs', {
-      FlowLogs: [{ FlowLogStatus: 'ACTIVE', ResourceId: 'test' }],
+      FlowLogs: [],
     })
     let audits
     audits = await handler({
       region: 'test',
       profile: 'test',
+      resourceId: 'test',
     })
     expect(audits).to.eql([
       {
@@ -67,14 +59,21 @@ describe('vpc flowlogs enabled', () => {
         region: 'test',
         rule: 'FlowlogsEnabled',
         service: 'ec2',
-        state: 'OK',
+        state: 'FAIL',
         time: '1970-01-01T00:00:00.000Z',
       },
     ])
   })
-  it('should return FAIL if flowlog is found and not in ACTIVE state', async () => {
+  it('should return OK for a VPC with FlowLogs Enabled', async () => {
+    mock('EC2', 'describeVpcs', {
+      Vpcs: [{ VpcId: 'test' }],
+    })
     mock('EC2', 'describeFlowLogs', {
-      FlowLogs: [{ FlowLogStatus: 'ACTIVE', ResourceId: 'test' }],
+      FlowLogs: [
+        {
+          ResourceId: 'test',
+        },
+      ],
     })
     let audits
     audits = await handler({
