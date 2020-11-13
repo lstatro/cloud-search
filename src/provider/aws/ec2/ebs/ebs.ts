@@ -13,19 +13,19 @@ export const builder = (yargs: Argv) => {
     .demandCommand(1)
     .example([
       [
-        'ebs VolumesEncrypted',
+        'ebs VolumeEncrypted',
         'check all volumes for default AWS managed key encryption',
       ],
       [
-        'ebs VolumesEncrypted -t cmk',
+        'ebs VolumeEncrypted -t cmk',
         'check all volumes for customer managed key (CMK) level encryption',
       ],
       [
-        'ebs VolumesEncrypted -a <key ARN>',
+        'ebs VolumeEncrypted -a <key ARN>',
         'check all volumes for encryption by a specific key',
       ],
       [
-        'ebs VolumesEncrypted -a <key ARN> -t cmk',
+        'ebs VolumeEncrypted -a <key ARN> -t cmk',
         'check all volumes for encryption by a specific key, report other volumes as warnings if encrypted',
       ],
     ])

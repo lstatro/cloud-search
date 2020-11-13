@@ -5,7 +5,10 @@
  *       rest as implied.
  */
 
-import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
+import {
+  AuditResultInterface,
+  AWSScannerInterface,
+} from '@lstatro/cloud-search'
 import { AWS } from '../../../../../lib/aws/AWS'
 import assert from 'assert'
 import { LoadBalancer, LoadBalancerAttribute } from 'aws-sdk/clients/elbv2'
@@ -25,7 +28,7 @@ enabled
 
 `
 
-export default class AlbAccessLogsEnabled extends AWS {
+export class AlbAccessLogsEnabled extends AWS {
   audits: AuditResultInterface[] = []
   service = 'ec2'
 

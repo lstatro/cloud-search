@@ -1,4 +1,8 @@
-import { AuditResultInterface, VerbosityType, FormatType } from 'cloud-search'
+import {
+  AuditResultInterface,
+  VerbosityType,
+  FormatType,
+} from '@lstatro/cloud-search'
 import chalk from 'chalk'
 import ora, { Ora } from 'ora'
 import { assert } from 'console'

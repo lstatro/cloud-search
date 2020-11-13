@@ -1,4 +1,7 @@
-import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
+import {
+  AuditResultInterface,
+  AWSScannerInterface,
+} from '@lstatro/cloud-search'
 import assert from 'assert'
 
 import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
@@ -23,7 +26,7 @@ export const desc = `a cloudtrail trail must be configured for encryption
 
 `
 
-export default class TrailEncrypted extends AWS {
+export class TrailEncrypted extends AWS {
   audits: AuditResultInterface[] = []
   service = 'cloudtrail'
   global = false

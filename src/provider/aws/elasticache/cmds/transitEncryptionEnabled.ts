@@ -1,4 +1,7 @@
-import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
+import {
+  AuditResultInterface,
+  AWSScannerInterface,
+} from '@lstatro/cloud-search'
 import assert from 'assert'
 import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
 import { CacheCluster } from 'aws-sdk/clients/elasticache'
@@ -24,7 +27,7 @@ export const desc = `Elasticache instances should enforce encryption in flight
 
 `
 
-export default class TransitEncryptionEnabled extends AWS {
+export class TransitEncryptionEnabled extends AWS {
   audits: AuditResultInterface[] = []
   service = 'elasticache'
   global = false

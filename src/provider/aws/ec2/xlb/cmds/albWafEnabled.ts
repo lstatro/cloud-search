@@ -1,4 +1,7 @@
-import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
+import {
+  AuditResultInterface,
+  AWSScannerInterface,
+} from '@lstatro/cloud-search'
 import { AWS } from '../../../../../lib/aws/AWS'
 import { LoadBalancer } from 'aws-sdk/clients/elbv2'
 import assert from 'assert'

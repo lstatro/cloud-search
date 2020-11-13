@@ -1,4 +1,7 @@
-import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
+import {
+  AuditResultInterface,
+  AWSScannerInterface,
+} from '@lstatro/cloud-search'
 import assert from 'assert'
 import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
 import { DBCluster } from 'aws-sdk/clients/rds'
@@ -24,7 +27,7 @@ export const desc = `RDS clusters must have their storage at rest encrypted
 
 `
 
-export default class ClusterEncrypted extends AWS {
+export class ClusterEncrypted extends AWS {
   audits: AuditResultInterface[] = []
   service = 'rds'
   global = false

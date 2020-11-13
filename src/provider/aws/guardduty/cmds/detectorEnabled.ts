@@ -1,5 +1,8 @@
 import { DetectorId } from 'aws-sdk/clients/guardduty'
-import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
+import {
+  AuditResultInterface,
+  AWSScannerInterface,
+} from '@lstatro/cloud-search'
 import { AWS } from '../../../../lib/aws/AWS'
 
 const rule = 'DetectorEnabled'
@@ -17,7 +20,7 @@ export const desc = `Existing GuardDuty detectors are enabled
         looking to see if a detector exists in the targeted region.
 `
 
-export default class DetectorEnabled extends AWS {
+export class DetectorEnabled extends AWS {
   audits: AuditResultInterface[] = []
   service = 'guardduty'
   global = false

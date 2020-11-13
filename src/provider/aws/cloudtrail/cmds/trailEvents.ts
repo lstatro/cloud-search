@@ -1,4 +1,7 @@
-import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
+import {
+  AuditResultInterface,
+  AWSScannerInterface,
+} from '@lstatro/cloud-search'
 import assert from 'assert'
 
 import { AWS } from '../../../../lib/aws/AWS'
@@ -24,7 +27,7 @@ export const desc = `a cloudtrail configuration must include:
 
 `
 
-export default class TrailEvents extends AWS {
+export class TrailEvents extends AWS {
   audits: AuditResultInterface[] = []
   service = 'cloudtrail'
   global = false
