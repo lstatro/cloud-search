@@ -8,17 +8,17 @@ import { WebACLSummary as WebACLSummaryV2 } from 'aws-sdk/clients/wafv2'
 const rule = 'AlbWafEnabled'
 
 export const command = `${rule} [args]`
-export const desc = `Verifies application load balancers has an attached v2 WAF 
-enabled
+export const desc = `Verifies application load balancers has an attached 
+regional WAF (v2 or classic) 
 
-  OK      - LB has logging enabled
-  WARNING - LB has logging enabled but does not have a target s3 bucket
-  UNKNOWN - Unable to determine if LB has logging enabled
-  FAIL    - LB does not have logging enabled
+  OK      - LB has a WAF attached
+  FAIL    - LB does not have a WAF attached
 
-  resourceId - load balancer name
+  resourceId - load balancer ARN
 
 `
+
+export type AclsType = (WebACLSummary | WebACLSummaryV2)[]
 
 export class AlbWafEnabled extends AWS {
   audits: AuditResultInterface[] = []
@@ -31,20 +31,47 @@ export class AlbWafEnabled extends AWS {
   async audit({
     resource,
     region,
-    acls,
   }: {
     resource: LoadBalancer
     region: string
-    acls: (WebACLSummary | WebACLSummaryV2)[]
   }) {
     assert(resource.LoadBalancerArn, 'load balancer must have a arn')
 
-    console.log(JSON.stringify({ acls }, null, 2))
+    const options = this.getOptions()
+    options.region = region
 
     const audit = this.getDefaultAuditObj({
       resource: resource.LoadBalancerArn,
       region: region,
     })
+
+    const getWebACLForResource = await new this.AWS.WAFV2(options)
+      .getWebACLForResource({
+        ResourceArn: resource.LoadBalancerArn,
+      })
+      .promise()
+
+    /**
+     * finding any v2 waf means this is compliant, but if we don't find anything
+     * we should fail back to looking at regional WAFs, and if we find anything
+     * there it is compliant.  If we don't find a v2 or regional waf it is
+     * non-compliant
+     */
+    if (getWebACLForResource.WebACL) {
+      audit.state = 'OK'
+    } else {
+      const getWebACLForResource = await new this.AWS.WAFRegional(options)
+        .getWebACLForResource({
+          ResourceArn: resource.LoadBalancerArn,
+        })
+        .promise()
+
+      if (getWebACLForResource.WebACLSummary) {
+        audit.state = 'OK'
+      } else {
+        audit.state = 'FAIL'
+      }
+    }
 
     this.audits.push(audit)
   }
@@ -76,26 +103,8 @@ export class AlbWafEnabled extends AWS {
       'LoadBalancers'
     )
 
-    // WebACLId: ResourceId;
-    await new this.AWS.WAFRegional().listResourcesForWebACL().promise()
-
-    // WebACLArn: ResourceArn;
-    await new this.AWS.WAFV2().listResourcesForWebACL().promise()
-
-    let acls: (WebACLSummary | WebACLSummaryV2)[]
-
-    promise = new this.AWS.WAFV2(options)
-      .listWebACLs({ Scope: 'REGIONAL' })
-      .promise()
-    const aclsV2 = await this.pager<WebACLSummaryV2>(promise, 'WebACLs')
-
-    promise = new this.AWS.WAFRegional(options).listWebACLs().promise()
-    acls = await this.pager<WebACLSummary>(promise, 'WebACLs')
-
-    acls = acls.concat(aclsV2)
-
     for (const loadbalancer of loadBalancers) {
-      await this.audit({ resource: loadbalancer, region, acls })
+      await this.audit({ resource: loadbalancer, region })
     }
   }
 }
