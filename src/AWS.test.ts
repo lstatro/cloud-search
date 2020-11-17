@@ -69,12 +69,14 @@ describe('AWS module', () => {
 
     it('should have all xlb rules', () => {
       const keys = Object.keys(ec2.xlb)
-      expect(ec2.xlb.AlbAccessLogsEnabled.name).to.eql('AlbAccessLogsEnabled')
+      expect(ec2.xlb.Elbv2AccessLogsEnabled.name).to.eql(
+        'Elbv2AccessLogsEnabled'
+      )
       expect(ec2.xlb.AlbWafEnabled.name).to.eql('AlbWafEnabled')
       expect(ec2.xlb.ElbAccessLogsEnabled.name).to.eql('ElbAccessLogsEnabled')
       expect(ec2.xlb.ElbDesyncMode.name).to.eql('ElbDesyncMode')
       expect(keys).to.eql([
-        'AlbAccessLogsEnabled',
+        'Elbv2AccessLogsEnabled',
         'AlbWafEnabled',
         'ElbAccessLogsEnabled',
         'ElbDesyncMode',

@@ -17,7 +17,7 @@ import { SnapshotPublic } from './provider/aws/ec2/ebs/cmds/snapshotPublic'
 import { VolumeEncrypted } from './provider/aws/ec2/ebs/cmds/volumeEncrypted'
 import { PublicPermission } from './provider/aws/ec2/sg/cmds/publicPermission'
 import { IgwAttachedToVpc } from './provider/aws/ec2/vpc/cmds/igwAttachedToVpc'
-import { AlbAccessLogsEnabled } from './provider/aws/ec2/xlb/cmds/albAccessLogsEnabled'
+import { Elbv2AccessLogsEnabled } from './provider/aws/ec2/xlb/cmds/elbv2AccessLogsEnabled'
 import { AlbWafEnabled } from './provider/aws/ec2/xlb/cmds/albWafEnabled'
 import { ElbAccessLogsEnabled } from './provider/aws/ec2/xlb/cmds/elbAccessLogsEnabled'
 import { ElbDesyncMode } from './provider/aws/ec2/xlb/cmds/elbDesyncMode'
@@ -34,7 +34,7 @@ export const ec2 = {
     IgwAttachedToVpc,
   },
   xlb: {
-    AlbAccessLogsEnabled,
+    Elbv2AccessLogsEnabled,
     AlbWafEnabled,
     ElbAccessLogsEnabled,
     ElbDesyncMode,
