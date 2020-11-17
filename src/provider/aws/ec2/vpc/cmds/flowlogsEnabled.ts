@@ -3,7 +3,7 @@ import {
   AuditResultInterface,
   AWSClientOptionsInterface,
   AWSScannerInterface,
-} from 'cloud-search'
+} from '@lstatro/cloud-search'
 import { AWS } from '../../../../../lib/aws/AWS'
 import assert from 'assert'
 
