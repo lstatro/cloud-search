@@ -14,7 +14,6 @@ export const command = `${rule} [args]`
 export const desc = `VPC Instances should have flowlogs enabled
 
   OK      - Flowlogs are enabled
-  WARNING - Not sure what would be warning yet
   UNKNOWN - Unable to determine flowlogs are enabled
   FAIL    - Flowlogs are not enabled
 
@@ -39,7 +38,7 @@ export default class FlowlogsEnabled extends AWS {
       region,
     })
     let flowlogs = await this.getFlowLogs(options, resource)
-    console.log('this is flowlogs ...', flowlogs)
+
     assert(flowlogs.FlowLogs)
     if (flowlogs.FlowLogs.length > 0) {
       audit.state = 'OK'
@@ -60,14 +59,12 @@ export default class FlowlogsEnabled extends AWS {
     options.region = region
     if (resourceId) {
       await this.audit({ resource: resourceId, region })
-      //
     } else {
       let promise = new this.AWS.EC2(options).describeVpcs().promise()
       const vpcs = await this.pager<Vpc>(promise, 'Vpcs')
-      let promises = []
       for (const vpc of vpcs) {
         assert(vpc.VpcId)
-        promises.push(this.audit({ resource: vpc.VpcId, region }))
+        await this.audit({ resource: vpc.VpcId, region })
       }
     }
   }

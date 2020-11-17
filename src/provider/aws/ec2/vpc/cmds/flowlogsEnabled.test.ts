@@ -18,7 +18,7 @@ describe('vpc flowlogs enabled', () => {
     restore()
   })
 
-  it('should return OK when passed in a VpcId that has FlowLogs enabled ', async () => {
+  it('should return OK when passed in a ResourceId that has FlowLogs enabled ', async () => {
     mock('EC2', 'describeFlowLogs', {
       FlowLogs: [{ ResourceId: 'test' }],
     })
@@ -41,7 +41,7 @@ describe('vpc flowlogs enabled', () => {
       },
     ])
   })
-  it('should return FAIL when passed a VPCId with no FlowLogs', async () => {
+  it('should return FAIL when passed a ResourceId with no FlowLogs', async () => {
     mock('EC2', 'describeFlowLogs', {
       FlowLogs: [],
     })
@@ -64,7 +64,7 @@ describe('vpc flowlogs enabled', () => {
       },
     ])
   })
-  it('should return OK for a VPC with FlowLogs Enabled', async () => {
+  it('should return OK after listing VPCs, then checking if flowlogs are enabled', async () => {
     mock('EC2', 'describeVpcs', {
       Vpcs: [{ VpcId: 'test' }],
     })
@@ -93,7 +93,7 @@ describe('vpc flowlogs enabled', () => {
       },
     ])
   })
-  it('should return FAIL for a VPC without FlowLogs Enabled', async () => {
+  it('should return FAIL after listing VPCs, then checking if flowlogs are enabled', async () => {
     mock('EC2', 'describeVpcs', {
       Vpcs: [
         {
