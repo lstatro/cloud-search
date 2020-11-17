@@ -1,4 +1,4 @@
-declare module 'cloud-search' {
+declare module '@lstatro/cloud-search' {
   import { Arguments } from 'yargs'
 
   /** the friendly name of the resource */

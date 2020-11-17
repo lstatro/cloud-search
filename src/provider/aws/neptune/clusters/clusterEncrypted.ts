@@ -1,4 +1,7 @@
-import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
+import {
+  AuditResultInterface,
+  AWSScannerInterface,
+} from '@lstatro/cloud-search'
 import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
 import { DBCluster } from 'aws-sdk/clients/neptune'
 import assert from 'assert'
@@ -19,7 +22,7 @@ export const builder = {
   ...keyTypeArg,
 }
 
-export default class ClusterEncrypted extends AWS {
+export class ClusterEncrypted extends AWS {
   audits: AuditResultInterface[] = []
   service = 'neptune'
   global = false

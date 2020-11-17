@@ -1,4 +1,5 @@
-import DetectorDataSources, {
+import {
+  DetectorDataSources,
   DetectorDataSourcesInterface,
 } from './detectorDataSources'
 

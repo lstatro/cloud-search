@@ -4,7 +4,7 @@ import {
   AWSClientOptionsInterface,
   AWSParamsInterface,
   KeyType,
-} from 'cloud-search'
+} from '@lstatro/cloud-search'
 import { KeyMetadata } from 'aws-sdk/clients/kms'
 import _AWS from 'aws-sdk'
 import Provider from '../Provider'

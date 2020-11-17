@@ -1,4 +1,7 @@
-import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
+import {
+  AuditResultInterface,
+  AWSScannerInterface,
+} from '@lstatro/cloud-search'
 import { InternetGateway } from 'aws-sdk/clients/ec2'
 import { AWS } from '../../../../../lib/aws/AWS'
 import assert from 'assert'
@@ -18,7 +21,7 @@ show up in this scan.
   
 `
 
-export default class IgwAttachedToVpc extends AWS {
+export class IgwAttachedToVpc extends AWS {
   audits: AuditResultInterface[] = []
   service = 'ec2'
 

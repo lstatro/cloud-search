@@ -1,5 +1,8 @@
 import { CommandBuilder } from 'yargs'
-import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
+import {
+  AuditResultInterface,
+  AWSScannerInterface,
+} from '@lstatro/cloud-search'
 import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
 import assert from 'assert'
 
@@ -22,7 +25,7 @@ export const desc = `SQS topics must be encrypted
 
 `
 
-export default class TopicEncrypted extends AWS {
+export class QueueEncrypted extends AWS {
   audits: AuditResultInterface[] = []
   service = 'sqs'
   global = false
@@ -90,7 +93,7 @@ export default class TopicEncrypted extends AWS {
 }
 
 export const handler = async (args: AWSScannerInterface) => {
-  const scanner = new TopicEncrypted(args)
+  const scanner = new QueueEncrypted(args)
 
   await scanner.start()
   scanner.output()

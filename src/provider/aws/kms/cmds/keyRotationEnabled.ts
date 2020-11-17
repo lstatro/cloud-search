@@ -1,4 +1,7 @@
-import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
+import {
+  AuditResultInterface,
+  AWSScannerInterface,
+} from '@lstatro/cloud-search'
 import { AWS } from '../../../../lib/aws/AWS'
 import assert from 'assert'
 import { KeyListEntry } from 'aws-sdk/clients/kms'
@@ -16,7 +19,7 @@ export const desc = `AWS managed customer keys (CMK's) should have yearly rotati
 
 `
 
-export default class KeyRotationEnabled extends AWS {
+export class KeyRotationEnabled extends AWS {
   audits: AuditResultInterface[] = []
   service = 'kms'
   global = false
