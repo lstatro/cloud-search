@@ -79,7 +79,6 @@ export class SnapshotPublic extends AWS {
       const promise = new this.AWS.EC2(options)
         .describeSnapshots({
           OwnerIds: ['self'],
-          SnapshotIds: resourceId ? [resourceId] : undefined,
         })
         .promise()
 
