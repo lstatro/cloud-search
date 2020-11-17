@@ -22,8 +22,7 @@ describe('vpc flowlogs enabled', () => {
     mock('EC2', 'describeFlowLogs', {
       FlowLogs: [{ ResourceId: 'test' }],
     })
-    let audits
-    audits = await handler({
+    const audits = await handler({
       region: 'test',
       profile: 'test',
       resourceId: 'test',
@@ -45,8 +44,7 @@ describe('vpc flowlogs enabled', () => {
     mock('EC2', 'describeFlowLogs', {
       FlowLogs: [],
     })
-    let audits
-    audits = await handler({
+    const audits = await handler({
       region: 'test',
       profile: 'test',
       resourceId: 'test',
@@ -75,8 +73,7 @@ describe('vpc flowlogs enabled', () => {
         },
       ],
     })
-    let audits
-    audits = await handler({
+    const audits = await handler({
       region: 'test',
       profile: 'test',
     })
@@ -104,8 +101,7 @@ describe('vpc flowlogs enabled', () => {
     mock('EC2', 'describeFlowLogs', {
       FlowLogs: [],
     })
-    let audits
-    audits = await handler({
+    const audits = await handler({
       region: 'test',
       profile: 'test',
     })

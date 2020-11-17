@@ -37,7 +37,7 @@ export default class FlowlogsEnabled extends AWS {
       resource: resource,
       region,
     })
-    let flowlogs = await this.getFlowLogs(options, resource)
+    const flowlogs = await this.getFlowLogs(options, resource)
 
     assert(flowlogs.FlowLogs)
     if (flowlogs.FlowLogs.length > 0) {
@@ -60,7 +60,7 @@ export default class FlowlogsEnabled extends AWS {
     if (resourceId) {
       await this.audit({ resource: resourceId, region })
     } else {
-      let promise = new this.AWS.EC2(options).describeVpcs().promise()
+      const promise = new this.AWS.EC2(options).describeVpcs().promise()
       const vpcs = await this.pager<Vpc>(promise, 'Vpcs')
       for (const vpc of vpcs) {
         assert(vpc.VpcId)
@@ -73,7 +73,7 @@ export default class FlowlogsEnabled extends AWS {
     options: AWSClientOptionsInterface,
     resourceId: string
   ) {
-    let flowlogs = await new this.AWS.EC2(options)
+    const flowlogs = await new this.AWS.EC2(options)
       .describeFlowLogs({
         Filter: [
           {
