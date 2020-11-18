@@ -1,10 +1,13 @@
 import { CommandBuilder } from 'yargs'
 import { Volume } from 'aws-sdk/clients/ec2'
-import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
+import {
+  AuditResultInterface,
+  AWSScannerInterface,
+} from '@lstatro/cloud-search'
 import assert from 'assert'
 import { AWS, keyTypeArg } from '../../../../../lib/aws/AWS'
 
-const rule = 'VolumesEncrypted'
+const rule = 'VolumeEncrypted'
 
 export const command = `${rule} [args]`
 
@@ -23,7 +26,7 @@ export const desc = `EBS volumes should be encrypted at rest
 
 `
 
-export default class VolumesEncrypted extends AWS {
+export class VolumeEncrypted extends AWS {
   audits: AuditResultInterface[] = []
   service = 'ebs'
 
@@ -82,7 +85,7 @@ export default class VolumesEncrypted extends AWS {
 }
 
 export const handler = async (args: AWSScannerInterface) => {
-  const scanner = new VolumesEncrypted(args)
+  const scanner = new VolumeEncrypted(args)
   await scanner.start()
   scanner.output()
   return scanner.audits

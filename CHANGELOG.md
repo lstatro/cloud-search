@@ -7,9 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- AWS - EC2 - VPC - FlowLogsEnabled
+
+## [1.9.0] - 2020-11-17
+
+### Added
+
 - AWS - EC2 - xLB - DesyncMitigationMode
 - AWS - EC2 - xLB - WafEnabled
 - AWS - EC2 - xLB - AccessLogsEnabled
+- AWS exports module
+
+### Changed
+
+- module names now consistent with ambient module naming, done to support type definition exports
+- updated npm keywords with alb, elb, waf
+
+### Removed
 
 ## [1.8.0] - 2020-11-11
 
@@ -154,7 +168,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactored the AWS module to export more then just the AWS class
 - Refactored all functions and tests to honor resourceId and resource level scans
 - Refactored all functions to use audit instead of auditObject
-- Refactored VolumesEncrypted scan to use centralized KMS trust system
+- Refactored VolumeEncrypted scan to use centralized KMS trust system
 - Refactored various functions to remove the need to manually define the handler arguments type
 - Refactored the spinner and cli output to terminal to account for silent scans mainly to benefit testing
 - New scans will now release as minor updates

@@ -1,5 +1,8 @@
 import { DetectorId } from 'aws-sdk/clients/guardduty'
-import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
+import {
+  AuditResultInterface,
+  AWSScannerInterface,
+} from '@lstatro/cloud-search'
 import { AWS } from '../../../../lib/aws/AWS'
 
 export type SourceType = 'CloudTrail' | 'DNSLogs' | 'FlowLogs' | 'S3Logs'
@@ -9,7 +12,7 @@ export interface DetectorDataSourcesInterface extends AWSScannerInterface {
   rule: string
 }
 
-export default class DetectorDataSources extends AWS {
+export class DetectorDataSources extends AWS {
   audits: AuditResultInterface[] = []
   service = 'guardduty'
   global = false

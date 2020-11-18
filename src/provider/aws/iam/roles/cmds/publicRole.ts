@@ -1,6 +1,9 @@
 /** TODO: can this be handled by iam.simulatePrincipalPolicy? */
 
-import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
+import {
+  AuditResultInterface,
+  AWSScannerInterface,
+} from '@lstatro/cloud-search'
 import assert from 'assert'
 import { AWS } from '../../../../../lib/aws/AWS'
 import { Role } from 'aws-sdk/clients/iam'
@@ -34,7 +37,7 @@ type isPublic = boolean | 'WARNING'
 
 type PrincipalHandler = (params: TypeHandlerInterface) => isPublic[]
 
-export default class PublicRole extends AWS {
+export class PublicRole extends AWS {
   audits: AuditResultInterface[] = []
   service = 'iam'
   global = true

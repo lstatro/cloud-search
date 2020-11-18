@@ -1,10 +1,13 @@
-import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
+import {
+  AuditResultInterface,
+  AWSScannerInterface,
+} from '@lstatro/cloud-search'
 import assert from 'assert'
 
 import { AWS } from '../../../../../lib/aws/AWS'
 import { Snapshot } from 'aws-sdk/clients/ec2'
 
-const rule = 'PublicSnapshot'
+const rule = 'SnapshotPublic'
 
 export const command = `${rule} [args]`
 
@@ -18,7 +21,7 @@ export const desc = `SQS topics must be encrypted
 
 `
 
-export default class PublicSnapshot extends AWS {
+export class SnapshotPublic extends AWS {
   audits: AuditResultInterface[] = []
   service = 'ebs'
   global = false
@@ -76,7 +79,6 @@ export default class PublicSnapshot extends AWS {
       const promise = new this.AWS.EC2(options)
         .describeSnapshots({
           OwnerIds: ['self'],
-          SnapshotIds: resourceId ? [resourceId] : undefined,
         })
         .promise()
 
@@ -91,7 +93,7 @@ export default class PublicSnapshot extends AWS {
 }
 
 export const handler = async (args: AWSScannerInterface) => {
-  const scanner = new PublicSnapshot(args)
+  const scanner = new SnapshotPublic(args)
 
   await scanner.start()
   scanner.output()

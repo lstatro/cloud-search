@@ -1,6 +1,9 @@
 /** TODO: this needs to support resource */
 
-import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
+import {
+  AuditResultInterface,
+  AWSScannerInterface,
+} from '@lstatro/cloud-search'
 import { AWS } from '../../../../../lib/aws/AWS'
 import { AccessKeyMetadata, User } from 'aws-sdk/clients/iam'
 import { CommandBuilder } from 'yargs'
@@ -31,7 +34,7 @@ interface MaxKeyAgeInterface extends AWSScannerInterface {
   maxAge: number
 }
 
-export default class MaxKeyAge extends AWS {
+export class MaxKeyAge extends AWS {
   audits: AuditResultInterface[] = []
   service = 'iam'
   global = true

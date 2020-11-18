@@ -1,4 +1,7 @@
-import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
+import {
+  AuditResultInterface,
+  AWSScannerInterface,
+} from '@lstatro/cloud-search'
 import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
 import { TableName } from 'aws-sdk/clients/dynamodb'
 import assert from 'assert'
@@ -20,7 +23,7 @@ export const builder = {
   ...keyTypeArg,
 }
 
-export default class EncryptionAtRest extends AWS {
+export class EncryptionAtRest extends AWS {
   audits: AuditResultInterface[] = []
   service = 'dynamodb'
   global = false

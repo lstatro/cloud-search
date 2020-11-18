@@ -1,5 +1,8 @@
 import { CommandBuilder } from 'yargs'
-import { AuditResultInterface, AWSScannerInterface } from 'cloud-search'
+import {
+  AuditResultInterface,
+  AWSScannerInterface,
+} from '@lstatro/cloud-search'
 import assert from 'assert'
 import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
 import { DBInstance } from 'aws-sdk/clients/rds'
@@ -12,19 +15,20 @@ export const builder: CommandBuilder = {
 
 export const command = `${rule} [args]`
 
-export const desc = `RDS instances must not have the PubliclyAccessible flag set to true
+export const desc = `RDS instances must have its storage encrypted at rest
 
-  OK      - The RDS instance has PubliclyAccessible set to false
-  UNKNOWN - Unable to verify the public state of the instance
-  FAIL    - The RDS instance has PubliclyAccessible set to true, meaning it's public
+  OK      - The RDS instance has its storage encrypted at rest
+  WARNING - The RDS instance has its storage encrypted with the wrong key type
+  UNKNOWN - Unable to verify the instance has its storage encrypted at rest
+  FAIL    - The RDS instance does not have its storage encrypted at rest
 
-  resourceId: RDS instance ARN
+  resourceId: DB instance identifier
 
   note: this rule targets DB Instances not DB Cluster's (Aurora clusters).
 
 `
 
-export default class PublicInstance extends AWS {
+export class InstanceEncrypted extends AWS {
   audits: AuditResultInterface[] = []
   service = 'rds'
   global = false
@@ -96,7 +100,7 @@ export default class PublicInstance extends AWS {
 }
 
 export const handler = async (args: AWSScannerInterface) => {
-  const scanner = new PublicInstance(args)
+  const scanner = new InstanceEncrypted(args)
 
   await scanner.start()
   scanner.output()
