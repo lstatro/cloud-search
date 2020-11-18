@@ -1,6 +1,6 @@
 {
   "name": "@lstatro/cloud-search",
-  "version": "1.8.0",
+  "version": "1.9.1",
   "description": "cloud guardrail scanner",
   "types": "types.d.ts",
   "scripts": {
@@ -36,6 +36,9 @@
     "guardduty",
     "amazon",
     "aws",
+    "alb",
+    "elb",
+    "waf",
     "ec2",
     "s3",
     "sqs",

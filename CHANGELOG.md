@@ -7,10 +7,23 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- AWS - EC2 - VPC - FlowLogsEnabled
+
+## [1.9.0] - 2020-11-17
+
+### Added
+
 - AWS - EC2 - xLB - DesyncMitigationMode
 - AWS - EC2 - xLB - WafEnabled
 - AWS - EC2 - xLB - AccessLogsEnabled
 - AWS exports module
+
+### Changed
+
+- module names now consistent with ambient module naming, done to support type definition exports
+- updated npm keywords with alb, elb, waf
+
+### Removed
 
 ## [1.8.0] - 2020-11-11
 
