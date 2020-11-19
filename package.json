@@ -12,7 +12,7 @@
     "format": "prettier --check .",
     "preversion": "npm run build && npm run lint && npm run format && npm run test"
   },
-  "readme": "https://github.com/lstatro/cloud-search/blob/develop/README.md",
+  "readme": "README.md",
   "bin": {
     "cloud-search": "cli.js"
   },
