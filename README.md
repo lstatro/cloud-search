@@ -18,16 +18,16 @@ It should go without saying, that passing scans do not mean resources are secure
 
 Oh, one last note, **this is a scanning and reporting tool, no write actions are taken on target accounts.**
 
-# Install the CLI and use globally
+# Install CLI and use globally
 
 `npm install -g @lstatro/cloud-search`
 
-# Install locally and use as a package for scripting'
+# Install module and use locally as a package
 
-Import the cloud provider's name off of the `@lstatro/cloud-search` package. See the examples below.
+Import a cloud provider's name off of `@lstatro/cloud-search`. See examples below.
 
-- Most of the supported scans are also exported as modules, and follow the cli's nesting structure.
-  > **note** some cli commands are abstractions on a larger class and are not exported. For example, `BlockPublicAcls` is an abstraction on `PublicAccessBlocks`. If you want to discover that do not have the block public acl toggle turned on you'll need to call `PublicAccessBlocks` with its desired parameters.
+- Most cli scans are also exported as modules, follow the cli's nesting structure to tease out specifics
+  > **note** some scans are abstractions on largers classes and are not exported. For example, `BlockPublicAcls` is an abstraction on `PublicAccessBlocks`
 
 * AWS - `@lstatro/cloud-search/AWS`
 
@@ -57,6 +57,27 @@ Use `--help` at any CLI level, it will contain information about the control and
 
 - The list of services changes often, `cloud-search --help`
 - tease though the cli, it should tell you what it wants
+
+```shell
+lst@atro:[~]: cloud-search aws --help
+cli.js aws
+
+aws cloud provider
+
+Commands:
+  cli.js aws ec2          Elastic Cloud Compute (EC2)
+  cli.js aws s3           Simple Storage Service (S3)
+  cli.js aws iam          Identity and Access Management (IAM)
+  cli.js aws sns          Simple Notification Service (SNS)
+  cli.js aws sqs          Simple Queuing Service (SQS)
+  cli.js aws rds          Relational Database Service (RDS)
+  cli.js aws kms          Key Management Service (KMS)
+  cli.js aws cloudtrail   CloudTrail
+  cli.js aws elasticache  ElastiCache clusters
+  cli.js aws guardduty    GuardDuty
+  cli.js aws neptune      Amazon Neptune
+  cli.js aws dynamodb     Amazon DynamoDB
+```
 
 # outputs and formatting
 
