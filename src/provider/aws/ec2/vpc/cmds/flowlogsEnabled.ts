@@ -31,28 +31,31 @@ export default class FlowlogsEnabled extends AWS {
   }
 
   async audit({ resource, region }: { resource: string; region: string }) {
+    const options = this.getOptions()
+    options.region = region
+
+    const audit = this.getDefaultAuditObj({
+      resource: resource,
+      region,
+    })
+
     try {
-      const options = this.getOptions()
-      options.region = region
-      const audit = this.getDefaultAuditObj({
-        resource: resource,
-        region,
-      })
       const flowlogs = await this.getFlowLogs(options, resource)
 
       assert(flowlogs.FlowLogs)
+
       if (flowlogs.FlowLogs.length > 0) {
         audit.state = 'OK'
       } else {
         audit.state = 'FAIL'
       }
-      this.audits.push(audit)
     } catch (error) {
       /**
        * This check should return state of UNKNOWN if we pop the assert.
        * This is because we are not confident in the state of resource
        */
     }
+    this.audits.push(audit)
   }
 
   scan = async ({
