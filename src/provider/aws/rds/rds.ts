@@ -12,10 +12,4 @@ export const builder = (yargs: Argv) => {
     .commandDir('clusters', opts)
     .commandDir('instances', opts)
     .demandCommand(1)
-    .example([
-      [
-        'rds instances <rule>...',
-        'have the cli show you available instance rule',
-      ],
-    ])
 }
