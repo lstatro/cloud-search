@@ -47,13 +47,12 @@ export class RotationEnabled extends AWS {
       region,
     })
 
-    console.log(resource)
-
     if (resource.RotationEnabled === true) {
       audit.state = 'OK'
-    } else if (resource.RotationEnabled === false) {
+    } else {
       audit.state = 'FAIL'
     }
+
     this.audits.push(audit)
   }
 
