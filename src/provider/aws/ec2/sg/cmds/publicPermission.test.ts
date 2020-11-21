@@ -1,4 +1,3 @@
-import 'mocha'
 import 'chai'
 import { useFakeTimers, SinonFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
