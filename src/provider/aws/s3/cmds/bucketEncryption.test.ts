@@ -1,4 +1,3 @@
-import 'mocha'
 import { mock, restore } from 'aws-sdk-mock'
 import { useFakeTimers, SinonFakeTimers } from 'sinon'
 import { handler } from './bucketEncryption'

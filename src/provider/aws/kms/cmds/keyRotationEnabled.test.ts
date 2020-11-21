@@ -1,4 +1,3 @@
-import 'mocha'
 import { useFakeTimers, SinonFakeTimers } from 'sinon'
 import { restore, mock } from 'aws-sdk-mock'
 import { handler } from './keyRotationEnabled'
