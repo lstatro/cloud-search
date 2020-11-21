@@ -73,5 +73,32 @@ declare module '@lstatro/cloud-search' {
     format?: FormatType
   }
 
-  interface AWSScannerCliArgsInterface extends AWSScannerInterface, Arguments {}
+  export interface AWSScannerCliArgsInterface
+    extends AWSScannerInterface,
+      Arguments {}
+
+  export interface UserReportJson {
+    user: string
+    arn: string
+    user_creation_time: string
+    password_enabled: string
+    password_last_used: string
+    password_last_changed: string
+    password_next_rotation: string
+    mfa_active: string
+    access_key_1_active: string
+    access_key_1_last_rotated: string
+    access_key_1_last_used_date: string
+    access_key_1_last_used_region: string
+    access_key_1_last_used_service: string
+    access_key_2_active: string
+    access_key_2_last_rotated: string
+    access_key_2_last_used_date: string
+    access_key_2_last_used_region: string
+    access_key_2_last_used_service: string
+    cert_1_active: string
+    cert_1_last_rotated: string
+    cert_2_active: string
+    cert_2_last_rotated: string
+  }
 }
