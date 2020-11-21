@@ -28,10 +28,13 @@ export default abstract class Provider {
   //   return 100 * (modifier + Math.random()) ** 2
   // }
 
-  // sleep = async (attempt: number) => {
-  //   const timer = this.getBackOff(attempt)
-  //   await new Promise((resolve) => setTimeout(resolve, this.getBackOff(timer)))
-  // }
+  sleep = async (ms: number) => {
+    await new Promise((resolve) => setTimeout(resolve, ms))
+  }
+
+  addDays = (date: Date, days: number) => {
+    return new Date(new Date().setDate(date.getDate() + days))
+  }
 
   handleSpinnerStatus = ({
     method,
