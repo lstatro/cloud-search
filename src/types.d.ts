@@ -77,7 +77,7 @@ declare module '@lstatro/cloud-search' {
     extends AWSScannerInterface,
       Arguments {}
 
-  export interface UserReportJson {
+  export interface UserReportJsonInterface {
     user: string
     arn: string
     user_creation_time: string
