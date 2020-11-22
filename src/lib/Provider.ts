@@ -29,7 +29,11 @@ export default abstract class Provider {
   // }
 
   sleep = async (ms: number) => {
-    return new Promise((resolve) => setTimeout(resolve, ms))
+    let promise = Promise.resolve()
+    if (process.env.NODE_ENV !== 'test') {
+      promise = new Promise((resolve) => setTimeout(resolve, ms))
+    }
+    return promise
   }
 
   addDays = (date: Date, days: number) => {

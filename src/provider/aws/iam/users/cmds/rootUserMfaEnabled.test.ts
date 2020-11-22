@@ -225,6 +225,8 @@ describe('rootUserMfaEnabled', () => {
     const err = new Error('test') as AWSError
     err.code = 'ReportNotPresent'
 
+    process.env.NODE_ENV = 'test'
+
     mock('IAM', 'getCredentialReport', Promise.reject(err))
     mock('IAM', 'generateCredentialReport', {})
 
