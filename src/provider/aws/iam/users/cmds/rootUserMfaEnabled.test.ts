@@ -1,4 +1,5 @@
 import { mock, restore } from 'aws-sdk-mock'
+import AWS from 'aws-sdk'
 import { expect } from 'chai'
 import { handler } from './rootUserMfaEnabled'
 import {
@@ -222,22 +223,36 @@ describe('rootUserMfaEnabled', () => {
   })
 
   it('should attempt to get the generate the credential report if it is not found', async () => {
+    process.env.NODE_ENV = 'test'
+
     const err = new Error('test') as AWSError
     err.code = 'ReportNotPresent'
 
-    process.env.NODE_ENV = 'test'
+    const getCredentialReportStub = stub()
+    const generateCredentialReportStub = stub()
 
-    mock('IAM', 'getCredentialReport', Promise.reject(err))
-    mock('IAM', 'generateCredentialReport', {})
+    getCredentialReportStub.onCall(0).throws(err)
+    getCredentialReportStub.onCall(1).returns({
+      GeneratedTime: new Date(0).toISOString(),
+      Content: csv_pass,
+    })
 
-    let result
-    try {
-      await handler({ region: 'all' })
-    } catch (err) {
-      result = err
-    }
+    stub(AWS, 'IAM').returns({
+      getCredentialReport: () => {
+        return {
+          promise: getCredentialReportStub,
+        }
+      },
+      generateCredentialReport: () => {
+        return {
+          promise: generateCredentialReportStub,
+        }
+      },
+    })
 
-    expect(errStub.args[0][0].code).to.eql(err.code)
-    expect(result).to.be.instanceOf(Error)
-  }).timeout(10000)
+    await handler({ region: 'all' })
+
+    expect(getCredentialReportStub.callCount).to.eql(2)
+    expect(generateCredentialReportStub.callCount).to.eql(1)
+  })
 })
