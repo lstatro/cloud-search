@@ -63,6 +63,7 @@ import { PublicRole } from './provider/aws/iam/roles/cmds/publicRole'
 import { HasManagedAdmin as users_HasManagedAdmin } from './provider/aws/iam/users/cmds/hasManagedAdmin'
 import { MaxKeyAge } from './provider/aws/iam/users/cmds/maxKeyAge'
 import { PasswordAge } from './provider/aws/iam/users/cmds/passwordAge'
+import { RootUserMfaEnabled } from './provider/aws/iam/users/cmds/rootUserMfaEnabled'
 export const iam = {
   groups: {
     HasManagedAdmin: groups_HasManagedAdmin,
@@ -75,6 +76,7 @@ export const iam = {
     HasManagedAdmin: users_HasManagedAdmin,
     MaxKeyAge,
     PasswordAge,
+    RootUserMfaEnabled,
   },
 }
 
