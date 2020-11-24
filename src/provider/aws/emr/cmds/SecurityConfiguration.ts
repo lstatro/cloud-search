@@ -9,7 +9,7 @@ const rule = 'SecurityConfiguration'
 
 export const command = `${rule} [args]`
 
-export const desc = `EMR clusters should be launched with a security
+export const desc = `EMR clusters should launch with a security
 configuration group
 
   OK      - Cluster launched with group
