@@ -37,6 +37,23 @@ describe('cloudtrail events must be configured correctly', () => {
     expect(audits).to.eql([])
   })
 
+  it('should return nothing if the trail is not in the targeted region', async () => {
+    mock('CloudTrail', 'listTrails', {
+      Trails: [
+        {
+          TrailARN: 'test',
+          HomeRegion: 'test',
+        },
+      ],
+    })
+
+    const audits = await handler({
+      region: 'us-east-2',
+    })
+
+    expect(audits).to.eql([])
+  })
+
   it('should return OK if the trail is configured correctly', async () => {
     mock('CloudTrail', 'listTrails', {
       Trails: [
