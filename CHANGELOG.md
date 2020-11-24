@@ -13,10 +13,28 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - AWS - EMR - ClusterSecurityConfiguration
 - AWS - EMR - MERLoggingEnabled
 - AWS - EMR - SecurityConfigDiskEncryption
+- various test coverage im improvements
+
+## [1.10.1] - 2020-11-18
+
+### Added
+
+### Changed
+
+- package.json readme reference update
+- force npm to correctly display cloud-search's README.md
+
+### Removed
 
 ## [1.10.0] - 2020-11-18
 
+### Added
+
 - AWS - EC2 - VPC - FlowLogsEnabled
+
+### Changed
+
+### Removed
 
 ## [1.9.0] - 2020-11-17
 
