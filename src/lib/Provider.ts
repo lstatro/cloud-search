@@ -30,14 +30,8 @@ export default abstract class Provider {
 
   sleep = async (ms: number) => {
     let promise = Promise.resolve()
-    if (process.env.NODE_ENV !== 'test') {
-      promise = new Promise((resolve) => setTimeout(resolve, ms))
-    }
+    promise = new Promise((resolve) => setTimeout(resolve, ms))
     return promise
-  }
-
-  addDays = (date: Date, days: number) => {
-    return new Date(new Date().setDate(date.getDate() + days))
   }
 
   handleSpinnerStatus = ({
@@ -106,9 +100,7 @@ export default abstract class Provider {
 
     assert(methods[this.format], `unsupported format ${this.format}`)
 
-    if (methods[this.format]) {
-      methods[this.format]()
-    }
+    methods[this.format]()
   }
 
   handleSilentOutput = () => {

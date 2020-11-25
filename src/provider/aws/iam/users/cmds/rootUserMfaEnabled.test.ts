@@ -254,5 +254,5 @@ describe('rootUserMfaEnabled', () => {
 
     expect(getCredentialReportStub.callCount).to.eql(2)
     expect(generateCredentialReportStub.callCount).to.eql(1)
-  })
+  }).timeout(10000)
 })

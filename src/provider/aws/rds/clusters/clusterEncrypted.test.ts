@@ -237,13 +237,11 @@ describe('rds cluster storage is encrypted at rest', () => {
       },
     })
 
-    const audits = await handler({
+    await handler({
       region: 'test',
       profile: 'test',
       keyType: 'cmk',
     })
-
-    console.log(audits)
 
     expect(describeKey.callCount).to.eql(2)
   })

@@ -1,4 +1,9 @@
-import { useFakeTimers, SinonFakeTimers } from 'sinon'
+import {
+  useFakeTimers,
+  SinonFakeTimers,
+  stub,
+  restore as sinonRestore,
+} from 'sinon'
 import { restore, mock } from 'aws-sdk-mock'
 import { handler } from './keyRotationEnabled'
 import { expect } from 'chai'
@@ -7,14 +12,18 @@ describe('cmk rotation enabled', () => {
   const now = new Date(0)
   let clock: SinonFakeTimers
 
+  const { log } = console
+
   beforeEach(() => {
     clock = useFakeTimers(now)
     mock('EC2', 'describeRegions', { Regions: [{ RegionName: 'us-east-1' }] })
+    console.log = log
   })
 
   afterEach(() => {
     clock.restore()
     restore()
+    sinonRestore()
   })
 
   it('should report nothing if no "Keys" are returned', async () => {
@@ -80,6 +89,28 @@ describe('cmk rotation enabled', () => {
     ])
   })
 
+  it('should console log the json output', async () => {
+    const logStub = stub(console, 'log')
+
+    mock('KMS', 'listKeys', { Keys: [{ KeyArn: 'test' }] })
+    mock('KMS', 'describeKey', {
+      KeyMetadata: {
+        KeyManager: 'CUSTOMER',
+      },
+    })
+    mock('KMS', 'getKeyRotationStatus', { KeyRotationEnabled: true })
+
+    await handler({
+      region: 'all',
+      profile: 'test',
+      verbosity: 'normal',
+      format: 'json',
+    })
+
+    expect(logStub.args.length).to.eql(1)
+    expect(logStub.args[0].length).to.eql(1)
+  })
+
   it('should report FAIL if key rotation is not enabled', async () => {
     mock('KMS', 'listKeys', { Keys: [{ KeyArn: 'test' }] })
     mock('KMS', 'describeKey', {
@@ -92,6 +123,7 @@ describe('cmk rotation enabled', () => {
     const audits = await handler({
       region: 'all',
       profile: 'test',
+      verbosity: 'normal',
     })
     expect(audits).to.eql([
       {
@@ -120,6 +152,7 @@ describe('cmk rotation enabled', () => {
       region: 'test',
       resourceId: 'test',
       profile: 'test',
+      verbosity: 'normal',
     })
     expect(audits).to.eql([
       {
@@ -147,6 +180,7 @@ describe('cmk rotation enabled', () => {
     const audits = await handler({
       region: 'all',
       profile: 'test',
+      verbosity: 'normal',
     })
     expect(audits).to.eql([
       {
