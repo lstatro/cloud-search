@@ -27,6 +27,9 @@ export const desc = `A root user should had MFA enabled
         is not found the service will request a new report and wait a few
         seconds and try again.
 
+        The wait period configurable- by default the CLI sets it to 5 seconds. 
+        Consider increasing it if there are a large number of users.
+
 `
 
 export interface RootUserMfaEnabledInterface extends AWSScannerInterface {
