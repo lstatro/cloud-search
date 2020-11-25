@@ -46,7 +46,7 @@ describe('rootUserMfaEnabled', () => {
   it('should UNKNOWN if an unexpected getReport call is returned', async () => {
     mock('IAM', 'getCredentialReport', undefined)
 
-    const audits = await handler({ region: 'all' })
+    const audits = await handler({ region: 'all', wait: 0 })
 
     expect(audits).to.eql([
       {
@@ -67,7 +67,7 @@ describe('rootUserMfaEnabled', () => {
       GeneratedTime: new Date(0).toISOString(),
     })
 
-    const audits = await handler({ region: 'all' })
+    const audits = await handler({ region: 'all', wait: 0 })
 
     expect(errStub.args[0][0].message).to.eql('missing report data')
     expect(audits).to.eql([
@@ -89,7 +89,7 @@ describe('rootUserMfaEnabled', () => {
       GeneratedTime: new Date(0).toISOString(),
     })
 
-    const audits = await handler({ region: 'all' })
+    const audits = await handler({ region: 'all', wait: 0 })
 
     expect(errStub.args[0][0].message).to.eql('missing report data')
     expect(audits).to.eql([
@@ -116,7 +116,7 @@ describe('rootUserMfaEnabled', () => {
 
     stub(papa, 'parse').throws(new Error(err))
 
-    const audits = await handler({ region: 'all' })
+    const audits = await handler({ region: 'all', wait: 0 })
 
     expect(errStub.args[0][0].message).to.eql(err)
     expect(audits).to.eql([
@@ -139,7 +139,7 @@ describe('rootUserMfaEnabled', () => {
       Content: csv_fail,
     })
 
-    const audits = await handler({ region: 'all' })
+    const audits = await handler({ region: 'all', wait: 0 })
 
     expect(audits).to.eql([
       {
@@ -161,7 +161,7 @@ describe('rootUserMfaEnabled', () => {
       Content: csv_pass,
     })
 
-    const audits = await handler({ region: 'all' })
+    const audits = await handler({ region: 'all', wait: 0 })
 
     expect(audits).to.eql([
       {
@@ -183,7 +183,7 @@ describe('rootUserMfaEnabled', () => {
       Content: csv_not_found,
     })
 
-    const audits = await handler({ region: 'all' })
+    const audits = await handler({ region: 'all', wait: 0 })
 
     expect(audits).to.eql([
       {
@@ -206,7 +206,7 @@ describe('rootUserMfaEnabled', () => {
     mock('IAM', 'getCredentialReport', Promise.reject(err))
     mock('IAM', 'generateCredentialReport', {})
 
-    const audits = await handler({ region: 'all' })
+    const audits = await handler({ region: 'all', wait: 0 })
 
     expect(audits).to.eql([
       {
@@ -223,8 +223,6 @@ describe('rootUserMfaEnabled', () => {
   })
 
   it('should attempt to get the generate the credential report if it is not found', async () => {
-    process.env.NODE_ENV = 'test'
-
     const err = new Error('test') as AWSError
     err.code = 'ReportNotPresent'
 
@@ -250,7 +248,7 @@ describe('rootUserMfaEnabled', () => {
       },
     })
 
-    await handler({ region: 'all' })
+    await handler({ region: 'all', wait: 0 })
 
     expect(getCredentialReportStub.callCount).to.eql(2)
     expect(generateCredentialReportStub.callCount).to.eql(1)

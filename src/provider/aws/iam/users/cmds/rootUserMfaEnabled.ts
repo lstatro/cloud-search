@@ -5,10 +5,14 @@ import {
 } from '@lstatro/cloud-search'
 import { GetCredentialReportResponse } from 'aws-sdk/clients/iam'
 import assert from 'assert'
-import { AWS } from '../../../../../lib/aws/AWS'
+import { AWS, sleepArg } from '../../../../../lib/aws/AWS'
 import { parse } from 'papaparse'
 
 const rule = 'RootUserMfaEnabled'
+
+export const builder = {
+  ...sleepArg,
+}
 
 export const command = `${rule} [args]`
 
@@ -25,12 +29,18 @@ export const desc = `A root user should had MFA enabled
 
 `
 
+export interface RootUserMfaEnabledInterface extends AWSScannerInterface {
+  wait: number
+}
+
 export class RootUserMfaEnabled extends AWS {
   service = 'iam'
   global = true
+  wait: number
 
-  constructor(public params: AWSScannerInterface) {
+  constructor(public params: RootUserMfaEnabledInterface) {
     super({ ...params, rule })
+    this.wait = params.wait
   }
 
   startReview = ({
@@ -80,7 +90,8 @@ export class RootUserMfaEnabled extends AWS {
       console.error(err)
       if (err.code === 'ReportNotPresent') {
         await new this.AWS.IAM(options).generateCredentialReport().promise()
-        await this.sleep(5000)
+
+        await this.sleep(this.wait)
         report = await new this.AWS.IAM(options).getCredentialReport().promise()
       }
     }
@@ -98,7 +109,7 @@ export class RootUserMfaEnabled extends AWS {
   }
 }
 
-export const handler = async (args: AWSScannerInterface) => {
+export const handler = async (args: RootUserMfaEnabledInterface) => {
   const scanner = new RootUserMfaEnabled(args)
 
   await scanner.start()

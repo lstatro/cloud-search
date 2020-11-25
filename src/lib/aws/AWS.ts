@@ -35,6 +35,15 @@ export const keyTypeArg: CommandBuilder = {
   },
 }
 
+export const sleepArg: CommandBuilder = {
+  sleep: {
+    alias: 's',
+    describe: 'the number of ms to wait',
+    type: 'number',
+    default: '5000',
+  },
+}
+
 export abstract class AWS extends Provider {
   abstract service: string
 
