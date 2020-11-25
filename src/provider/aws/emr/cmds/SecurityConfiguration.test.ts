@@ -1,6 +1,6 @@
 import { mock, restore } from 'aws-sdk-mock'
 import { useFakeTimers, SinonFakeTimers } from 'sinon'
-import { handler } from './SecurityConfiguration'
+import { handler } from './_securityConfiguration'
 import { expect } from 'chai'
 
 describe('emr clusters should launch with a security configuration group', () => {
