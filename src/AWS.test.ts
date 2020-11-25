@@ -1,4 +1,3 @@
-import 'mocha'
 import { expect } from 'chai'
 import {
   cloudtrail,
@@ -13,6 +12,7 @@ import {
   s3,
   sns,
   sqs,
+  emr,
 } from './AWS'
 
 describe('AWS module', () => {
@@ -129,7 +129,13 @@ describe('AWS module', () => {
       expect(iam.users.HasManagedAdmin.name).to.eql('HasManagedAdmin')
       expect(iam.users.MaxKeyAge.name).to.eql('MaxKeyAge')
       expect(iam.users.PasswordAge.name).to.eql('PasswordAge')
-      expect(keys).to.eql(['HasManagedAdmin', 'MaxKeyAge', 'PasswordAge'])
+      expect(iam.users.RootUserMfaEnabled.name).to.eql('RootUserMfaEnabled')
+      expect(keys).to.eql([
+        'HasManagedAdmin',
+        'MaxKeyAge',
+        'PasswordAge',
+        'RootUserMfaEnabled',
+      ])
     })
   })
 
@@ -175,5 +181,11 @@ describe('AWS module', () => {
     const keys = Object.keys(sqs)
     expect(sqs.QueueEncrypted.name).to.eql('QueueEncrypted')
     expect(keys).to.eql(['QueueEncrypted'])
+  })
+
+  it('should have all emr rules', () => {
+    const keys = Object.keys(emr)
+    expect(emr.EmrCluster.name).to.eql('EmrCluster')
+    expect(keys).to.eql(['EmrCluster'])
   })
 })

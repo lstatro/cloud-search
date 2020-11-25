@@ -15,7 +15,7 @@ export const builder: CommandBuilder = {
   ...keyTypeArg,
 }
 
-export const desc = `SNS topics must be encrypted
+export const desc = `SNS topics must have encryption at rest enabled
 
   OK      - Topic is encrypted
   UNKNOWN - Unable to determine topic encryption

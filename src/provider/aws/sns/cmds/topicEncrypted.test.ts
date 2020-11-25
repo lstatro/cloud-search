@@ -1,6 +1,11 @@
-import 'mocha'
-import { useFakeTimers, SinonFakeTimers } from 'sinon'
+import {
+  useFakeTimers,
+  SinonFakeTimers,
+  stub,
+  restore as sinonRestore,
+} from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
+import AWS from 'aws-sdk'
 import { handler } from './topicEncrypted'
 import { expect } from 'chai'
 
@@ -16,6 +21,7 @@ describe('sns topic encryption', () => {
   afterEach(() => {
     clock.restore()
     restore()
+    sinonRestore()
   })
 
   it('should report nothing if no topics are found', async () => {
@@ -302,5 +308,77 @@ describe('sns topic encryption', () => {
       keyType: 'aws',
     })
     expect(audits).to.eql([])
+  })
+
+  it('should page though all topics via the pager function', async () => {
+    const listTopics = stub()
+
+    const finalPage = stub().returns(false)
+
+    listTopics.onCall(0).returns({
+      $response: {
+        hasNextPage: () => true,
+        nextPage: () => {
+          return {
+            promise: () => {
+              return {
+                $response: {
+                  hasNextPage: finalPage,
+                },
+                Topics: [
+                  {
+                    TopicArn: 'test-2',
+                  },
+                ],
+              }
+            },
+          }
+        },
+      },
+      Topics: [
+        {
+          TopicArn: 'test-1',
+        },
+      ],
+    })
+
+    stub(AWS, 'SNS').returns({
+      listTopics: () => {
+        return {
+          promise: listTopics,
+        }
+      },
+      getTopicAttributes: () => {
+        return {
+          promise: () => {
+            return {
+              Attributes: {
+                KmsMasterKeyId: 'test',
+              },
+            }
+          },
+        }
+      },
+    })
+
+    const describeKey = stub().returns({
+      KeyMetadata: { Arn: 'test-1', KeyManager: 'CUSTOMER' },
+    })
+
+    stub(AWS, 'KMS').returns({
+      describeKey: () => {
+        return {
+          promise: describeKey,
+        }
+      },
+    })
+
+    await handler({
+      region: 'us-east-1',
+      profile: 'test',
+      keyType: 'cmk',
+    })
+
+    expect(finalPage.callCount).to.eql(1)
   })
 })

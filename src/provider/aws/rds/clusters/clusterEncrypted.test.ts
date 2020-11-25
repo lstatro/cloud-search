@@ -1,6 +1,11 @@
-import 'mocha'
-import { useFakeTimers, SinonFakeTimers } from 'sinon'
+import {
+  useFakeTimers,
+  SinonFakeTimers,
+  stub,
+  restore as sinonRestore,
+} from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
+import AWS from 'aws-sdk'
 import { handler } from './clusterEncrypted'
 import { expect } from 'chai'
 
@@ -16,6 +21,7 @@ describe('rds cluster storage is encrypted at rest', () => {
   afterEach(() => {
     clock.restore()
     restore()
+    sinonRestore()
   })
 
   it('should report nothing if no clusters are found', async () => {
@@ -179,5 +185,64 @@ describe('rds cluster storage is encrypted at rest', () => {
         time: '1970-01-01T00:00:00.000Z',
       },
     ])
+  })
+
+  /**
+   * this test is not so much for RDS as it is for the kms sub service used by
+   * most of the other encrypted at controls
+   */
+  it('should check the key cache for known keys and look new keys up if they are not already cached', async () => {
+    const describeDbClusters = stub()
+    describeDbClusters.returns({
+      DBClusters: [
+        {
+          DBClusterArn: 'test-1',
+          KmsKeyId: 'test-1',
+          StorageEncrypted: true,
+        },
+        {
+          DBClusterArn: 'test-2',
+          KmsKeyId: 'test-2',
+          StorageEncrypted: true,
+        },
+        {
+          DBClusterArn: 'test-3',
+          KmsKeyId: 'test-1',
+          StorageEncrypted: true,
+        },
+      ],
+    })
+
+    const describeKey = stub()
+    describeKey.onCall(0).returns({
+      KeyMetadata: { Arn: 'test-1', KeyManager: 'CUSTOMER' },
+    })
+    describeKey.onCall(1).returns({
+      KeyMetadata: { Arn: 'test-2', KeyManager: 'CUSTOMER' },
+    })
+
+    stub(AWS, 'RDS').returns({
+      describeDBClusters: () => {
+        return {
+          promise: describeDbClusters,
+        }
+      },
+    })
+
+    stub(AWS, 'KMS').returns({
+      describeKey: () => {
+        return {
+          promise: describeKey,
+        }
+      },
+    })
+
+    await handler({
+      region: 'test',
+      profile: 'test',
+      keyType: 'cmk',
+    })
+
+    expect(describeKey.callCount).to.eql(2)
   })
 })

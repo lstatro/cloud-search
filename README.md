@@ -27,7 +27,7 @@ Oh, one last note, **this is a scanning and reporting tool, no write actions are
 Import a cloud provider's name off of `@lstatro/cloud-search`. See examples below.
 
 - Most cli scans are also exported as modules, follow the cli's nesting structure to tease out specifics
-  > **note** some scans are abstractions on largers classes and are not exported. For example, `BlockPublicAcls` is an abstraction on `PublicAccessBlocks`
+  > **note** some scans are instances of a generic scan class. For example, `BlockPublicAcls` is a specific instance of the `PublicAccessBlocks`
 
 * AWS - `@lstatro/cloud-search/AWS`
 
@@ -88,7 +88,8 @@ Commands:
 
 ## How can I save a point in time report?
 
-Pipe terminal to a file for later post processing. If necessary change the format to JSON to make post processing easier.
+- Pipe terminal to a file for later post processing. If necessary change the format to JSON
+- Install cloud-search as a package use the necessary scan to generate a report
 
 ## My newly developed commands are not showing up in the CLI what gives?
 
