@@ -117,3 +117,8 @@ import { QueueEncrypted } from './provider/aws/sqs/cmds/queueEncrypted'
 export const sqs = {
   QueueEncrypted,
 }
+
+import { EmrCluster } from './provider/aws/emr/cmds/emrCluster'
+export const emr = {
+  EmrCluster,
+}

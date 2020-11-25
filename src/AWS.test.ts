@@ -12,6 +12,7 @@ import {
   s3,
   sns,
   sqs,
+  emr,
 } from './AWS'
 
 describe('AWS module', () => {
@@ -180,5 +181,11 @@ describe('AWS module', () => {
     const keys = Object.keys(sqs)
     expect(sqs.QueueEncrypted.name).to.eql('QueueEncrypted')
     expect(keys).to.eql(['QueueEncrypted'])
+  })
+
+  it('should have all emr rules', () => {
+    const keys = Object.keys(emr)
+    expect(emr.EmrCluster.name).to.eql('EmrCluster')
+    expect(keys).to.eql(['EmrCluster'])
   })
 })
