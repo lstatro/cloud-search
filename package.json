@@ -46,7 +46,8 @@
     "rds",
     "iam",
     "ebs",
-    "vpc"
+    "vpc",
+    "efs"
   ],
   "bugs": {
     "url": "https://github.com/lstatro/cloud-search/issues"
