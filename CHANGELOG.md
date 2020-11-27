@@ -13,6 +13,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - AWS - EMR - SecurityConfiguration
 - AWS - EMR - LoggingEnabled
 - AWS - EMR - SecurityConfigDiskEncryption
+- AWS - EMR - SecurityConfigS3Encryption
+- AWS - EMR - SecurityConfigTransitEncryption
 - various test coverage im improvements
 
 ## [1.10.1] - 2020-11-18
