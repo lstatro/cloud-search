@@ -29,23 +29,30 @@ export default class BucketVersioningEnabled extends AWS {
   }
 
   async audit({ resource, region }: { resource: string; region: string }) {
-    const options = this.getOptions()
-    const s3 = new this.AWS.S3(options)
-    options.region = region
-    const audit = this.getDefaultAuditObj({
+    let audit = this.getDefaultAuditObj({
       resource: resource,
       region,
     })
-    const getBucketVersioning = await s3
-      .getBucketVersioning({ Bucket: resource })
-      .promise()
-    const isVersioning = getBucketVersioning.Status === 'Enabled'
-    if (isVersioning) {
-      audit.state = 'OK'
-    } else {
-      audit.state = 'FAIL'
+    try {
+      const options = this.getOptions()
+      const s3 = new this.AWS.S3(options)
+      options.region = region
+      const getBucketVersioning = await s3
+        .getBucketVersioning({ Bucket: resource })
+        .promise()
+      const isVersioning = getBucketVersioning.Status === 'Enabled'
+      if (isVersioning) {
+        audit.state = 'OK'
+      } else {
+        audit.state = 'FAIL'
+      }
+    } catch (error) {
+      /**
+       * If we make it this far we still want to return an audit.
+       * The state of the audit will be UNKNOWN because we were unable
+       * to determine the versioning status on the bucket.
+       */
     }
-
     this.audits.push(audit)
   }
 
