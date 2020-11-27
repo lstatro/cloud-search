@@ -130,11 +130,13 @@ describe('AWS module', () => {
       expect(iam.users.MaxKeyAge.name).to.eql('MaxKeyAge')
       expect(iam.users.PasswordAge.name).to.eql('PasswordAge')
       expect(iam.users.RootUserMfaEnabled.name).to.eql('RootUserMfaEnabled')
+      expect(iam.users.UserMfaEnabled.name).to.eql('UserMfaEnabled')
       expect(keys).to.eql([
         'HasManagedAdmin',
         'MaxKeyAge',
         'PasswordAge',
         'RootUserMfaEnabled',
+        'UserMfaEnabled',
       ])
     })
   })
