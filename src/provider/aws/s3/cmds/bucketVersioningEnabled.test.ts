@@ -54,7 +54,7 @@ describe('S3 Bucket Versioning Enabled', () => {
       },
     ])
   })
-  it('should return fail if versioning is suspended', async () => {
+  it('should return FAIL if versioning is suspended', async () => {
     mock('S3', 'listBuckets', {
       Buckets: [
         {
@@ -80,7 +80,7 @@ describe('S3 Bucket Versioning Enabled', () => {
       },
     ])
   })
-  it('should return an audit when a resourceId is passed in', async () => {
+  it('should return OK when a resourceId is passed in and versioning is enabled', async () => {
     mock('S3', 'getBucketVersioning', { Status: 'Enabled' })
     const audits = await handler({
       region: 'test',
@@ -96,6 +96,25 @@ describe('S3 Bucket Versioning Enabled', () => {
         rule: 'BucketVersioningEnabled',
         service: 's3',
         state: 'OK',
+        time: '1970-01-01T00:00:00.000Z',
+      },
+    ])
+  })
+  it('should return UNKNOWN when a fault is caught in the audit function', async () => {
+    const audits = await handler({
+      region: 'test',
+      profile: 'test',
+      resourceId: 'test',
+    })
+    expect(audits).to.eql([
+      {
+        physicalId: 'test',
+        profile: 'test',
+        provider: 'aws',
+        region: 'test',
+        rule: 'BucketVersioningEnabled',
+        service: 's3',
+        state: 'UNKNOWN',
         time: '1970-01-01T00:00:00.000Z',
       },
     ])
