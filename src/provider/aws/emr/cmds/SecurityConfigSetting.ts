@@ -8,7 +8,12 @@ import { AWS } from '../../../../lib/aws/AWS'
 export type ClusterAttributeType = 'SecurityConfiguration' | 'LogUri'
 
 export interface SecurityConfigSettingInterface extends AWSScannerInterface {
-  rule: 'S3Encryption'
+  rule: 'S3Encryption' | 'DiskEncryption'
+}
+
+export interface ConfigHandlerInterface {
+  securityConfiguration: string
+  audit: AuditResultInterface
 }
 
 export class SecurityConfigSetting extends AWS {
@@ -18,6 +23,56 @@ export class SecurityConfigSetting extends AWS {
 
   constructor(public params: SecurityConfigSettingInterface) {
     super({ ...params })
+  }
+
+  handleS3Encryption = (params: ConfigHandlerInterface) => {
+    let found = false
+    const config = JSON.parse(params.securityConfiguration)
+    if (config.EncryptionConfiguration) {
+      if (config.EncryptionConfiguration.AtRestEncryptionConfiguration) {
+        if (
+          config.EncryptionConfiguration.AtRestEncryptionConfiguration
+            .S3EncryptionConfiguration
+        ) {
+          if (
+            config.EncryptionConfiguration.AtRestEncryptionConfiguration
+              .S3EncryptionConfiguration.EncryptionMode
+          ) {
+            found = true
+          }
+        }
+      }
+    }
+    if (found) {
+      params.audit.state = 'OK'
+    } else {
+      params.audit.state = 'FAIL'
+    }
+  }
+
+  handleDiskEncryption = (params: ConfigHandlerInterface) => {
+    let found = false
+    const config = JSON.parse(params.securityConfiguration)
+    if (config.EncryptionConfiguration) {
+      if (config.EncryptionConfiguration.AtRestEncryptionConfiguration) {
+        if (
+          config.EncryptionConfiguration.AtRestEncryptionConfiguration
+            .LocalDiskEncryptionConfiguration
+        ) {
+          if (
+            config.EncryptionConfiguration.AtRestEncryptionConfiguration
+              .LocalDiskEncryptionConfiguration.EnableEbsEncryption
+          ) {
+            found = true
+          }
+        }
+      }
+    }
+    if (found) {
+      params.audit.state = 'OK'
+    } else {
+      params.audit.state = 'FAIL'
+    }
   }
 
   async audit({ resource, region }: { resource: string; region: string }) {
@@ -32,29 +87,19 @@ export class SecurityConfigSetting extends AWS {
       })
       .promise()
 
-    let found = false
-
     try {
       if (configuration.SecurityConfiguration) {
-        const config = JSON.parse(configuration.SecurityConfiguration)
-        if (config.EncryptionConfiguration) {
-          if (config.EncryptionConfiguration.AtRestEncryptionConfiguration) {
-            if (
-              config.EncryptionConfiguration.AtRestEncryptionConfiguration
-                .S3EncryptionConfiguration
-            ) {
-              if (
-                config.EncryptionConfiguration.AtRestEncryptionConfiguration
-                  .S3EncryptionConfiguration.EncryptionMode
-              ) {
-                found = true
-              }
-            }
-          }
+        const types: {
+          [key: string]: (params: ConfigHandlerInterface) => void
+        } = {
+          S3Encryption: this.handleS3Encryption,
+          DiskEncryption: this.handleDiskEncryption,
         }
-      }
-      if (found) {
-        audit.state = 'OK'
+
+        types[this.rule]({
+          securityConfiguration: configuration.SecurityConfiguration,
+          audit,
+        })
       } else {
         audit.state = 'FAIL'
       }
