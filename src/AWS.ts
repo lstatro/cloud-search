@@ -119,6 +119,8 @@ export const sqs = {
 }
 
 import { EmrCluster } from './provider/aws/emr/cmds/emrCluster'
+import { SecurityConfigSetting } from './provider/aws/emr/cmds/securityConfigSetting'
 export const emr = {
   EmrCluster,
+  SecurityConfigSetting,
 }

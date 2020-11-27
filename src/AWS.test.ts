@@ -186,6 +186,7 @@ describe('AWS module', () => {
   it('should have all emr rules', () => {
     const keys = Object.keys(emr)
     expect(emr.EmrCluster.name).to.eql('EmrCluster')
-    expect(keys).to.eql(['EmrCluster'])
+    expect(emr.SecurityConfigSetting.name).to.eql('SecurityConfigSetting')
+    expect(keys).to.eql(['EmrCluster', 'SecurityConfigSetting'])
   })
 })

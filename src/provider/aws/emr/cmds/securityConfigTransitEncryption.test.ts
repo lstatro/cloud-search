@@ -1,9 +1,9 @@
 import { mock, restore } from 'aws-sdk-mock'
 import { useFakeTimers, SinonFakeTimers } from 'sinon'
-import { handler } from './securityConfigDiskEncryption'
+import { handler } from './securityConfigTransitEncryption'
 import { expect } from 'chai'
 
-describe('emr cluster security configurations should have disk encryption', () => {
+describe('emr cluster security configurations should have transit encryption', () => {
   const now = new Date(0)
   let clock: SinonFakeTimers
 
@@ -33,7 +33,7 @@ describe('emr cluster security configurations should have disk encryption', () =
     expect(audits).to.eql([])
   })
 
-  it('should report OK if the security config has disk encryption set', async () => {
+  it('should report OK if the security config has transit encryption set', async () => {
     mock('EMR', 'listSecurityConfigurations', {
       SecurityConfigurations: [{ Name: 'test' }],
     })
@@ -41,11 +41,7 @@ describe('emr cluster security configurations should have disk encryption', () =
     mock('EMR', 'describeSecurityConfiguration', {
       SecurityConfiguration: JSON.stringify({
         EncryptionConfiguration: {
-          AtRestEncryptionConfiguration: {
-            LocalDiskEncryptionConfiguration: {
-              EnableEbsEncryption: true,
-            },
-          },
+          EnableInTransitEncryption: true,
         },
       }),
     })
@@ -58,7 +54,7 @@ describe('emr cluster security configurations should have disk encryption', () =
         profile: undefined,
         provider: 'aws',
         region: 'us-east-1',
-        rule: 'DiskEncryption',
+        rule: 'TransitEncryption',
         service: 'emr',
         state: 'OK',
         time: '1970-01-01T00:00:00.000Z',
@@ -81,7 +77,7 @@ describe('emr cluster security configurations should have disk encryption', () =
         profile: undefined,
         provider: 'aws',
         region: 'us-east-1',
-        rule: 'DiskEncryption',
+        rule: 'TransitEncryption',
         service: 'emr',
         state: 'FAIL',
         time: '1970-01-01T00:00:00.000Z',
@@ -106,7 +102,7 @@ describe('emr cluster security configurations should have disk encryption', () =
         profile: undefined,
         provider: 'aws',
         region: 'us-east-1',
-        rule: 'DiskEncryption',
+        rule: 'TransitEncryption',
         service: 'emr',
         state: 'FAIL',
         time: '1970-01-01T00:00:00.000Z',
@@ -114,7 +110,7 @@ describe('emr cluster security configurations should have disk encryption', () =
     ])
   })
 
-  it('should report FAIL if the security config does not have a AtRestEncryptionConfiguration attribute', async () => {
+  it('should report FAIL if the security config does not have a EnableInTransitEncryption attribute', async () => {
     mock('EMR', 'listSecurityConfigurations', {
       SecurityConfigurations: [{ Name: 'test' }],
     })
@@ -131,7 +127,7 @@ describe('emr cluster security configurations should have disk encryption', () =
         profile: undefined,
         provider: 'aws',
         region: 'us-east-1',
-        rule: 'DiskEncryption',
+        rule: 'TransitEncryption',
         service: 'emr',
         state: 'FAIL',
         time: '1970-01-01T00:00:00.000Z',
@@ -139,16 +135,14 @@ describe('emr cluster security configurations should have disk encryption', () =
     ])
   })
 
-  it('should report FAIL if the security config does not have a LocalDiskEncryptionConfiguration attribute', async () => {
+  it('should report FAIL if the security config EnableInTransitEncryption attribute is false', async () => {
     mock('EMR', 'listSecurityConfigurations', {
       SecurityConfigurations: [{ Name: 'test' }],
     })
 
     mock('EMR', 'describeSecurityConfiguration', {
       SecurityConfiguration: JSON.stringify({
-        EncryptionConfiguration: {
-          AtRestEncryptionConfiguration: {},
-        },
+        EncryptionConfiguration: { EnableInTransitEncryption: false },
       }),
     })
 
@@ -160,38 +154,7 @@ describe('emr cluster security configurations should have disk encryption', () =
         profile: undefined,
         provider: 'aws',
         region: 'us-east-1',
-        rule: 'DiskEncryption',
-        service: 'emr',
-        state: 'FAIL',
-        time: '1970-01-01T00:00:00.000Z',
-      },
-    ])
-  })
-
-  it('should report FAIL if the security config does not have a EnableEbsEncryption attribute', async () => {
-    mock('EMR', 'listSecurityConfigurations', {
-      SecurityConfigurations: [{ Name: 'test' }],
-    })
-
-    mock('EMR', 'describeSecurityConfiguration', {
-      SecurityConfiguration: JSON.stringify({
-        EncryptionConfiguration: {
-          AtRestEncryptionConfiguration: {
-            LocalDiskEncryptionConfiguration: {},
-          },
-        },
-      }),
-    })
-
-    const audits = await handler({ region: 'all' })
-
-    expect(audits).to.eql([
-      {
-        physicalId: 'test',
-        profile: undefined,
-        provider: 'aws',
-        region: 'us-east-1',
-        rule: 'DiskEncryption',
+        rule: 'TransitEncryption',
         service: 'emr',
         state: 'FAIL',
         time: '1970-01-01T00:00:00.000Z',
@@ -216,7 +179,7 @@ describe('emr cluster security configurations should have disk encryption', () =
         profile: undefined,
         provider: 'aws',
         region: 'us-east-1',
-        rule: 'DiskEncryption',
+        rule: 'TransitEncryption',
         service: 'emr',
         state: 'WARNING',
         time: '1970-01-01T00:00:00.000Z',

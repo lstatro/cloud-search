@@ -1,5 +1,5 @@
 import { AWSScannerInterface } from '@lstatro/cloud-search'
-import { SecurityConfigSetting } from './SecurityConfigSetting'
+import { SecurityConfigSetting } from './securityConfigSetting'
 
 const rule = 'SecurityConfigDiskEncryption'
 

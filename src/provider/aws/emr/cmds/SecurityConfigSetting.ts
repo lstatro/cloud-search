@@ -8,7 +8,7 @@ import { AWS } from '../../../../lib/aws/AWS'
 export type ClusterAttributeType = 'SecurityConfiguration' | 'LogUri'
 
 export interface SecurityConfigSettingInterface extends AWSScannerInterface {
-  rule: 'S3Encryption' | 'DiskEncryption'
+  rule: 'S3Encryption' | 'DiskEncryption' | 'TransitEncryption'
 }
 
 export interface ConfigHandlerInterface {
@@ -75,6 +75,22 @@ export class SecurityConfigSetting extends AWS {
     }
   }
 
+  handleTransitEncryption = (params: ConfigHandlerInterface) => {
+    let found = false
+    const config = JSON.parse(params.securityConfiguration)
+    if (config.EncryptionConfiguration) {
+      if (config.EncryptionConfiguration.EnableInTransitEncryption) {
+        found = true
+      }
+    }
+
+    if (found) {
+      params.audit.state = 'OK'
+    } else {
+      params.audit.state = 'FAIL'
+    }
+  }
+
   async audit({ resource, region }: { resource: string; region: string }) {
     const options = this.getOptions()
     options.region = region
@@ -94,6 +110,7 @@ export class SecurityConfigSetting extends AWS {
         } = {
           S3Encryption: this.handleS3Encryption,
           DiskEncryption: this.handleDiskEncryption,
+          TransitEncryption: this.handleTransitEncryption,
         }
 
         types[this.rule]({
