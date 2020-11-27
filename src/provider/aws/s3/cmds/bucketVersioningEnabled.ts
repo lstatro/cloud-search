@@ -29,7 +29,7 @@ export default class BucketVersioningEnabled extends AWS {
   }
 
   async audit({ resource, region }: { resource: string; region: string }) {
-    let audit = this.getDefaultAuditObj({
+    const audit = this.getDefaultAuditObj({
       resource: resource,
       region,
     })
