@@ -24,11 +24,47 @@ describe('efs encryption enabled', () => {
     expect(audits).to.eql([])
   })
   it('should return OK if encryption is enabled', async () => {
-    mock('EFS', 'describeFileSystems', { FileSystems: [{ Encrypted: true }] })
+    mock('EFS', 'describeFileSystems', {
+      FileSystems: [{ Encrypted: true, FileSystemId: 'test' }],
+    })
     const audits = await handler({
       region: 'test',
       profile: 'test',
+      resourceId: 'test',
     })
-    expect(audits).to.eql([])
+    expect(audits).to.eql([
+      {
+        physicalId: 'test',
+        profile: 'test',
+        provider: 'aws',
+        region: 'test',
+        rule: 'EncryptionEnabled',
+        service: 'efs',
+        state: 'OK',
+        time: '1970-01-01T00:00:00.000Z',
+      },
+    ])
+  })
+  it('should return FAIL if encryption is NOT enabled', async () => {
+    mock('EFS', 'describeFileSystems', {
+      FileSystems: [{ Encrypted: false, FileSystemId: 'test' }],
+    })
+    const audits = await handler({
+      region: 'test',
+      profile: 'test',
+      resourceId: 'test',
+    })
+    expect(audits).to.eql([
+      {
+        physicalId: 'test',
+        profile: 'test',
+        provider: 'aws',
+        region: 'test',
+        rule: 'EncryptionEnabled',
+        service: 'efs',
+        state: 'FAIL',
+        time: '1970-01-01T00:00:00.000Z',
+      },
+    ])
   })
 })
