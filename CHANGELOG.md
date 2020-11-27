@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - AWS - S3 - VersioningEnabled
 - AWS - SecretsManager - RotationEnabled
-- AWS - IAM (root user) - MFA enabled
+- AWS - IAM - user - RootUserMfaEnabled
+- AWS - IAM - user - UserMfaEnabled
 - AWS - EMR - SecurityConfiguration
 - AWS - EMR - LoggingEnabled
 - AWS - EMR - SecurityConfigDiskEncryption
