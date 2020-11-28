@@ -39,17 +39,23 @@ export class EFSEncryption extends AWS {
     region: string
     resource: FileSystemDescription
   }) {
-    console.log('audit')
-
     const audit = this.getDefaultAuditObj({
       region,
       resource: resource.FileSystemId,
     })
-    const isEncryptionEnabled = resource.Encrypted === true
-    if (isEncryptionEnabled) {
-      audit.state = 'OK'
-    } else {
-      audit.state = 'FAIL'
+    try {
+      const isEncryptionEnabled = resource.Encrypted === true
+      if (isEncryptionEnabled) {
+        audit.state = 'OK'
+      } else {
+        audit.state = 'FAIL'
+      }
+    } catch (error) {
+      /**
+       * If a fault is encountered we still want to return an audit to the user.
+       * We return an audit state of UNKNOWN if any fault is encountered during
+       * the audit phase.
+       */
     }
     this.audits.push(audit)
   }
@@ -60,9 +66,7 @@ export class EFSEncryption extends AWS {
     region: string
     resourceId: string
   }) => {
-    let params = {
-      FileSystemId: '',
-    }
+    let params: { FileSystemId?: string } = {}
     if (resourceId) {
       params.FileSystemId = resourceId
     }
@@ -75,10 +79,7 @@ export class EFSEncryption extends AWS {
       promise,
       'FileSystems'
     )
-    console.log('scan')
-    console.log('these are fileSystems ..', fileSystems)
     for (const fileSystem of fileSystems) {
-      console.log('this is fileSystem...', fileSystem)
       await this.audit({ region, resource: fileSystem })
     }
   }
