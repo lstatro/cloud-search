@@ -7,6 +7,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- AWS - EFS - EncryptionEnabled
+
+## [1.11.0] - 2020-11-28
+
+### Added
+
 - AWS - S3 - VersioningEnabled
 - AWS - SecretsManager - RotationEnabled
 - AWS - IAM - user - RootUserMfaEnabled
@@ -16,7 +22,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - AWS - EMR - SecurityConfigDiskEncryption
 - AWS - EMR - SecurityConfigS3Encryption
 - AWS - EMR - SecurityConfigTransitEncryption
-- various test coverage im improvements
+
+### Changed
+
+- various test coverage improvements
+
+### Removed
 
 ## [1.10.1] - 2020-11-18
 
