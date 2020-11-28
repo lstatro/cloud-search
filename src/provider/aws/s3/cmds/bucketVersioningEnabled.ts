@@ -52,6 +52,7 @@ export default class BucketVersioningEnabled extends AWS {
        * The state of the audit will be UNKNOWN because we were unable
        * to determine the versioning status on the bucket.
        */
+      console.error('There was an issue auditing', error)
     }
     this.audits.push(audit)
   }
