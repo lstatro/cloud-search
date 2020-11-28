@@ -35,8 +35,8 @@ export default class BucketVersioningEnabled extends AWS {
     })
     try {
       const options = this.getOptions()
-      const s3 = new this.AWS.S3(options)
       options.region = region
+      const s3 = new this.AWS.S3(options)
       const getBucketVersioning = await s3
         .getBucketVersioning({ Bucket: resource })
         .promise()
