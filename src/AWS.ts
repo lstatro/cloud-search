@@ -64,6 +64,7 @@ import { HasManagedAdmin as users_HasManagedAdmin } from './provider/aws/iam/use
 import { MaxKeyAge } from './provider/aws/iam/users/cmds/maxKeyAge'
 import { PasswordAge } from './provider/aws/iam/users/cmds/passwordAge'
 import { RootUserMfaEnabled } from './provider/aws/iam/users/cmds/rootUserMfaEnabled'
+import { UserMfaEnabled } from './provider/aws/iam/users/cmds/userMfaEnabled'
 export const iam = {
   groups: {
     HasManagedAdmin: groups_HasManagedAdmin,
@@ -77,6 +78,7 @@ export const iam = {
     MaxKeyAge,
     PasswordAge,
     RootUserMfaEnabled,
+    UserMfaEnabled,
   },
 }
 
@@ -119,6 +121,8 @@ export const sqs = {
 }
 
 import { EmrCluster } from './provider/aws/emr/cmds/emrCluster'
+import { SecurityConfigSetting } from './provider/aws/emr/cmds/securityConfigSetting'
 export const emr = {
   EmrCluster,
+  SecurityConfigSetting,
 }

@@ -38,6 +38,7 @@
     "aws",
     "alb",
     "elb",
+    "emr",
     "waf",
     "ec2",
     "s3",
