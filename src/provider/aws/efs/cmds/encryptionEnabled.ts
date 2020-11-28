@@ -55,6 +55,7 @@ export class EFSEncryption extends AWS {
        * We return an audit state of UNKNOWN if any fault is encountered during
        * the audit phase.
        */
+      console.error('There was an issue auditing', error)
     }
     this.audits.push(audit)
   }
