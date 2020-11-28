@@ -5,7 +5,6 @@ import {
 } from '@lstatro/cloud-search'
 import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
 import { FileSystemDescription } from 'aws-sdk/clients/efs'
-import assert from 'assert'
 const rule = 'EncryptionEnabled'
 
 export const command = `${rule} [args]`
@@ -42,25 +41,13 @@ export class EFSEncryption extends AWS {
       region,
       resource: resource.FileSystemId,
     })
-    try {
-      assert(
-        resource.hasOwnProperty('Encrypted'),
-        'encrypted attribute must exist for auditing to continue'
-      )
-      const isEncryptionEnabled = resource.Encrypted === true
-      if (isEncryptionEnabled) {
-        audit.state = 'OK'
-      } else {
-        audit.state = 'FAIL'
-      }
-    } catch (error) {
-      /**
-       * If a fault is encountered we still want to return an audit to the user.
-       * We return an audit state of UNKNOWN if any fault is encountered during
-       * the audit phase.
-       */
-      console.error('There was an issue auditing', error)
+    const isEncryptionEnabled = resource.Encrypted === true
+    if (isEncryptionEnabled) {
+      audit.state = 'OK'
+    } else {
+      audit.state = 'FAIL'
     }
+
     this.audits.push(audit)
   }
   scan = async ({
