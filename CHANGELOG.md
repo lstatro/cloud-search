@@ -7,12 +7,48 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- AWS - EFS - EncryptionEnabled
+
+## [1.11.0] - 2020-11-28
+
+### Added
+
 - AWS - S3 - VersioningEnabled
 - AWS - SecretsManager - RotationEnabled
+- AWS - IAM - user - RootUserMfaEnabled
+- AWS - IAM - user - UserMfaEnabled
+- AWS - EMR - SecurityConfiguration
+- AWS - EMR - LoggingEnabled
+- AWS - EMR - SecurityConfigDiskEncryption
+- AWS - EMR - SecurityConfigS3Encryption
+- AWS - EMR - SecurityConfigTransitEncryption
+
+### Changed
+
+- various test coverage improvements
+
+### Removed
+
+## [1.10.1] - 2020-11-18
+
+### Added
+
+### Changed
+
+- package.json readme reference update
+- force npm to correctly display cloud-search's README.md
+
+### Removed
 
 ## [1.10.0] - 2020-11-18
 
+### Added
+
 - AWS - EC2 - VPC - FlowLogsEnabled
+
+### Changed
+
+### Removed
 
 ## [1.9.0] - 2020-11-17
 

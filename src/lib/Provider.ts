@@ -28,10 +28,11 @@ export default abstract class Provider {
   //   return 100 * (modifier + Math.random()) ** 2
   // }
 
-  // sleep = async (attempt: number) => {
-  //   const timer = this.getBackOff(attempt)
-  //   await new Promise((resolve) => setTimeout(resolve, this.getBackOff(timer)))
-  // }
+  sleep = async (ms: number) => {
+    let promise = Promise.resolve()
+    promise = new Promise((resolve) => setTimeout(resolve, ms))
+    return promise
+  }
 
   handleSpinnerStatus = ({
     method,
@@ -99,9 +100,7 @@ export default abstract class Provider {
 
     assert(methods[this.format], `unsupported format ${this.format}`)
 
-    if (methods[this.format]) {
-      methods[this.format]()
-    }
+    methods[this.format]()
   }
 
   handleSilentOutput = () => {

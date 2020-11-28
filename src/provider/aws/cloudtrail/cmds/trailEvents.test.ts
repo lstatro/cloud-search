@@ -1,4 +1,3 @@
-import 'mocha'
 import { useFakeTimers, SinonFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
 import { handler } from './trailEvents'
@@ -33,6 +32,23 @@ describe('cloudtrail events must be configured correctly', () => {
 
     const audits = await handler({
       region: 'all',
+    })
+
+    expect(audits).to.eql([])
+  })
+
+  it('should return nothing if the trail is not in the targeted region', async () => {
+    mock('CloudTrail', 'listTrails', {
+      Trails: [
+        {
+          TrailARN: 'test',
+          HomeRegion: 'test',
+        },
+      ],
+    })
+
+    const audits = await handler({
+      region: 'us-east-2',
     })
 
     expect(audits).to.eql([])

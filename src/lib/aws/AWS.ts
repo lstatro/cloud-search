@@ -35,6 +35,15 @@ export const keyTypeArg: CommandBuilder = {
   },
 }
 
+export const sleepArg: CommandBuilder = {
+  sleep: {
+    alias: 's',
+    describe: 'the number of ms to wait',
+    type: 'number',
+    default: '5000',
+  },
+}
+
 export abstract class AWS extends Provider {
   abstract service: string
 
@@ -250,7 +259,7 @@ export abstract class AWS extends Provider {
 
       /**
        * - wait for the promise to finish
-       * - it pains me to use an "any", but we save a lot of pain by doing so
+       * - it pains me to use an "any", but we save a lot of blood by doing so
        */
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
       const result = (await promise) as any

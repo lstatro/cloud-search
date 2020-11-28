@@ -1,4 +1,3 @@
-import 'mocha'
 import { mock, restore } from 'aws-sdk-mock'
 import { handler } from './passwordAge'
 import { expect } from 'chai'
