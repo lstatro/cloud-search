@@ -5,7 +5,6 @@ import {
 } from '@lstatro/cloud-search'
 import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
 import { FileSystemDescription } from 'aws-sdk/clients/efs'
-// import assert from 'assert'
 
 const rule = 'EncryptionEnabled'
 
