@@ -5,7 +5,7 @@ import {
 } from '@lstatro/cloud-search'
 import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
 import { FileSystemDescription } from 'aws-sdk/clients/efs'
-
+import assert from 'assert'
 const rule = 'EncryptionEnabled'
 
 export const command = `${rule} [args]`
@@ -43,6 +43,10 @@ export class EFSEncryption extends AWS {
       resource: resource.FileSystemId,
     })
     try {
+      assert(
+        resource.hasOwnProperty('Encrypted'),
+        'encrypted attribute must exist for auditing to continue'
+      )
       const isEncryptionEnabled = resource.Encrypted === true
       if (isEncryptionEnabled) {
         audit.state = 'OK'

@@ -67,4 +67,26 @@ describe('efs encryption enabled', () => {
       },
     ])
   })
+  it('should return UNKNOWN if a fault is encountered', async () => {
+    mock('EFS', 'describeFileSystems', {
+      FileSystems: [{ FileSystemId: 'test' }],
+    })
+    const audits = await handler({
+      region: 'test',
+      profile: 'test',
+      resourceId: 'test',
+    })
+    expect(audits).to.eql([
+      {
+        physicalId: 'test',
+        profile: 'test',
+        provider: 'aws',
+        region: 'test',
+        rule: 'EncryptionEnabled',
+        service: 'efs',
+        state: 'UNKNOWN',
+        time: '1970-01-01T00:00:00.000Z',
+      },
+    ])
+  })
 })
