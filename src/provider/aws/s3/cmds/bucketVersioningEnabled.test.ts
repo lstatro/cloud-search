@@ -1,5 +1,5 @@
 import 'mocha'
-import { useFakeTimers, SinonFakeTimers } from 'sinon'
+import { useFakeTimers, SinonFakeTimers, SinonStub, stub } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
 import { handler } from './bucketVersioningEnabled'
 import { expect } from 'chai'
@@ -8,13 +8,17 @@ describe('S3 Bucket Versioning Enabled', () => {
   const now = new Date(0)
   let clock: SinonFakeTimers
 
+  let errStub: SinonStub
+
   beforeEach(() => {
     clock = useFakeTimers(now)
+    errStub = stub(console, 'error')
     mock('EC2', 'describeRegions', { Regions: [{ RegionName: 'us-east-1' }] })
   })
 
   afterEach(() => {
     clock.restore()
+    errStub.restore()
     restore()
   })
   it('should return empty audit if no buckets found', async () => {
@@ -101,11 +105,15 @@ describe('S3 Bucket Versioning Enabled', () => {
     ])
   })
   it('should return UNKNOWN when a fault is caught in the audit function', async () => {
+    mock('S3', 'getBucketVersioning', Promise.reject(new Error('test')))
+
     const audits = await handler({
       region: 'test',
       profile: 'test',
       resourceId: 'test',
     })
+
+    expect(errStub.args[0][0].message).to.eql('test')
     expect(audits).to.eql([
       {
         physicalId: 'test',

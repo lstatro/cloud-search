@@ -15,7 +15,7 @@ export const desc = `S3 Buckets should have versioning enabled.
   UNKNOWN - Unable to determine if versioning is enabled
   FAIL    - Versioning is not enabled
 
-  resourceId: BucketName
+  resourceId: bucket name
 
 `
 
@@ -52,7 +52,7 @@ export default class BucketVersioningEnabled extends AWS {
        * The state of the audit will be UNKNOWN because we were unable
        * to determine the versioning status on the bucket.
        */
-      console.error('There was an issue auditing', error)
+      console.error(error)
     }
     this.audits.push(audit)
   }
