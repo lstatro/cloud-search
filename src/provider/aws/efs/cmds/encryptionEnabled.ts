@@ -65,7 +65,7 @@ export class EFSEncryption extends AWS {
     region: string
     resourceId: string
   }) => {
-    let params: { FileSystemId?: string } = {}
+    const params: { FileSystemId?: string } = {}
     if (resourceId) {
       params.FileSystemId = resourceId
     }
