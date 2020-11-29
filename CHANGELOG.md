@@ -7,8 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-- EFS - EncryptionEnabled
-- Cloudwatch Logs - EncryptionEnabled
+- AWS - EFS - EncryptionEnabled
+- AWS - Cloudwatch - logs - EncryptionEnabled
 
 - AWS - EFS - EncryptionEnabled
 
