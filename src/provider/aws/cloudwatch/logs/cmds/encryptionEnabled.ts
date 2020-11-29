@@ -17,7 +17,7 @@ CMK
   WARNING - The log group is encrypted with a AWS managed KMS key (this should never happen)
   FAIL    - The log group is not encrypted at rest (AWS default encryption)
 
-  resourceId - log group name (full path)
+  resourceId - log group name
 
   note: AWS encrypts log groups by default using internal keys that the customer
         has no insight or control over.  This is unlike other AWS managed keys
@@ -29,6 +29,9 @@ CMK
         For some reason AWS has used a AWS managed account key to encrypt the
         group.  This at the time of writing this scan is unsupported.
 
+  note: If running from gitbash, you may need to escape log groups with '/' in
+        the name.  Use CMD or PowerShell if having issues running this specific
+        scan.
 `
 
 export class SnapshotEncrypted extends AWS {
