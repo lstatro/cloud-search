@@ -24,7 +24,7 @@ customer1,arn:aws:iam::test:user/customer1,2019-12-28T20:00:51+00:00,false,N/A,N
 const csv_not_found = `user,arn,user_creation_time,password_enabled,password_last_used,password_last_changed,password_next_rotation,mfa_active,access_key_1_active,access_key_1_last_rotated,access_key_1_last_used_date,access_key_1_last_used_region,access_key_1_last_used_service,access_key_2_active,access_key_2_last_rotated,access_key_2_last_used_date,access_key_2_last_used_region,access_key_2_last_used_service,cert_1_active,cert_1_last_rotated,cert_2_active,cert_2_last_rotated
 customer1,arn:aws:iam::test:user/customer1,2019-12-28T20:00:51+00:00,false,N/A,N/A,N/A,false,true,2019-12-28T20:00:51+00:00,2020-11-21T20:38:00+00:00,us-east-1,iam,true,2020-09-25T03:06:58+00:00,N/A,N/A,N/A,false,N/A,false,N/A`
 
-describe('rootUserMfaEnabled', () => {
+describe('MfaEnabled', () => {
   const now = new Date(0)
   let clock: SinonFakeTimers
 
@@ -46,14 +46,18 @@ describe('rootUserMfaEnabled', () => {
   it('should UNKNOWN if an unexpected getReport call is returned', async () => {
     mock('IAM', 'getCredentialReport', undefined)
 
-    const audits = await handler({ region: 'all', wait: 0 })
+    const audits = await handler({
+      region: 'all',
+      sleep: 0,
+      rule: 'MfaEnabled',
+    })
 
     expect(audits).to.eql([
       {
         provider: 'aws',
         physicalId: 'root-user',
         service: 'iam',
-        rule: 'RootUserMfaEnabled',
+        rule: 'MfaEnabled',
         region: 'global',
         state: 'UNKNOWN',
         profile: undefined,
@@ -67,7 +71,11 @@ describe('rootUserMfaEnabled', () => {
       GeneratedTime: new Date(0).toISOString(),
     })
 
-    const audits = await handler({ region: 'all', wait: 0 })
+    const audits = await handler({
+      region: 'all',
+      sleep: 0,
+      rule: 'MfaEnabled',
+    })
 
     expect(errStub.args[0][0].message).to.eql('missing report data')
     expect(audits).to.eql([
@@ -75,7 +83,7 @@ describe('rootUserMfaEnabled', () => {
         provider: 'aws',
         physicalId: 'root-user',
         service: 'iam',
-        rule: 'RootUserMfaEnabled',
+        rule: 'MfaEnabled',
         region: 'global',
         state: 'UNKNOWN',
         profile: undefined,
@@ -89,7 +97,11 @@ describe('rootUserMfaEnabled', () => {
       GeneratedTime: new Date(0).toISOString(),
     })
 
-    const audits = await handler({ region: 'all', wait: 0 })
+    const audits = await handler({
+      region: 'all',
+      sleep: 0,
+      rule: 'MfaEnabled',
+    })
 
     expect(errStub.args[0][0].message).to.eql('missing report data')
     expect(audits).to.eql([
@@ -97,7 +109,7 @@ describe('rootUserMfaEnabled', () => {
         provider: 'aws',
         physicalId: 'root-user',
         service: 'iam',
-        rule: 'RootUserMfaEnabled',
+        rule: 'MfaEnabled',
         region: 'global',
         state: 'UNKNOWN',
         profile: undefined,
@@ -116,7 +128,11 @@ describe('rootUserMfaEnabled', () => {
 
     stub(papa, 'parse').throws(new Error(err))
 
-    const audits = await handler({ region: 'all', wait: 0 })
+    const audits = await handler({
+      region: 'all',
+      sleep: 0,
+      rule: 'MfaEnabled',
+    })
 
     expect(errStub.args[0][0].message).to.eql(err)
     expect(audits).to.eql([
@@ -124,7 +140,7 @@ describe('rootUserMfaEnabled', () => {
         provider: 'aws',
         physicalId: 'root-user',
         service: 'iam',
-        rule: 'RootUserMfaEnabled',
+        rule: 'MfaEnabled',
         region: 'global',
         state: 'UNKNOWN',
         profile: undefined,
@@ -139,14 +155,18 @@ describe('rootUserMfaEnabled', () => {
       Content: csv_fail,
     })
 
-    const audits = await handler({ region: 'all', wait: 0 })
+    const audits = await handler({
+      region: 'all',
+      sleep: 0,
+      rule: 'MfaEnabled',
+    })
 
     expect(audits).to.eql([
       {
         provider: 'aws',
         physicalId: 'root-user',
         service: 'iam',
-        rule: 'RootUserMfaEnabled',
+        rule: 'MfaEnabled',
         region: 'global',
         state: 'FAIL',
         profile: undefined,
@@ -161,14 +181,18 @@ describe('rootUserMfaEnabled', () => {
       Content: csv_pass,
     })
 
-    const audits = await handler({ region: 'all', wait: 0 })
+    const audits = await handler({
+      region: 'all',
+      sleep: 0,
+      rule: 'MfaEnabled',
+    })
 
     expect(audits).to.eql([
       {
         provider: 'aws',
         physicalId: 'root-user',
         service: 'iam',
-        rule: 'RootUserMfaEnabled',
+        rule: 'MfaEnabled',
         region: 'global',
         state: 'OK',
         profile: undefined,
@@ -183,14 +207,18 @@ describe('rootUserMfaEnabled', () => {
       Content: csv_not_found,
     })
 
-    const audits = await handler({ region: 'all', wait: 0 })
+    const audits = await handler({
+      region: 'all',
+      sleep: 0,
+      rule: 'MfaEnabled',
+    })
 
     expect(audits).to.eql([
       {
         provider: 'aws',
         physicalId: 'root-user',
         service: 'iam',
-        rule: 'RootUserMfaEnabled',
+        rule: 'MfaEnabled',
         region: 'global',
         state: 'WARNING',
         profile: undefined,
@@ -206,14 +234,18 @@ describe('rootUserMfaEnabled', () => {
     mock('IAM', 'getCredentialReport', Promise.reject(err))
     mock('IAM', 'generateCredentialReport', {})
 
-    const audits = await handler({ region: 'all', wait: 0 })
+    const audits = await handler({
+      region: 'all',
+      sleep: 0,
+      rule: 'MfaEnabled',
+    })
 
     expect(audits).to.eql([
       {
         provider: 'aws',
         physicalId: 'root-user',
         service: 'iam',
-        rule: 'RootUserMfaEnabled',
+        rule: 'MfaEnabled',
         region: 'global',
         state: 'UNKNOWN',
         profile: undefined,
@@ -248,7 +280,7 @@ describe('rootUserMfaEnabled', () => {
       },
     })
 
-    await handler({ region: 'all', wait: 0 })
+    await handler({ region: 'all', sleep: 0, rule: 'MfaEnabled' })
 
     expect(getCredentialReportStub.callCount).to.eql(2)
     expect(generateCredentialReportStub.callCount).to.eql(1)
