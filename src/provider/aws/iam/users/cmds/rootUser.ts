@@ -34,19 +34,20 @@ export class RootUser extends AWS {
   }
 
   apiKeys = (user: UserReportJsonInterface, audit: AuditResultInterface) => {
-    console.log('yeahhhhhhhhhh', user)
-
-    const active = [0, 0]
+    const active = []
     if (user.access_key_1_active === 'true') {
-      active[0] = 1
+      active.push('access_key_1_active')
     }
 
     if (user.access_key_2_active === 'true') {
-      active[1] = 1
+      active.push('access_key_2_active')
     }
 
-    if (active.includes(1)) {
+    if (active.length > 0) {
       audit.state = 'FAIL'
+      audit.comment = active.join()
+    } else {
+      audit.state = 'OK'
     }
   }
 
