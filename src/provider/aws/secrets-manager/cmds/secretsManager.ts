@@ -44,8 +44,6 @@ export class SecretsManager extends AWS {
     audit: AuditResultInterface
     region: string
   }) => {
-    console.log(resource)
-
     if (resource.KmsKeyId) {
       audit.state = await this.isKeyTrusted(resource.KmsKeyId, 'cmk', region)
     } else {
@@ -84,9 +82,7 @@ export class SecretsManager extends AWS {
       SecretEncryptedWithCmk: this.handleSecretEncryptedWithCmk,
     }
 
-    if (rules[this.rule]) {
-      await rules[this.rule]({ resource, audit, region })
-    }
+    await rules[this.rule]({ resource, audit, region })
   }
 
   scan = async ({
