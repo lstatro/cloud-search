@@ -6,6 +6,7 @@ import {
 import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
 import { FileSystemDescription } from 'aws-sdk/clients/efs'
 const rule = 'EncryptionEnabled'
+import assert from 'assert'
 
 export const command = `${rule} [args]`
 export const builder: CommandBuilder = {
@@ -37,13 +38,21 @@ export class EFSEncryption extends AWS {
     region: string
     resource: FileSystemDescription
   }) {
+    console.log(resource)
     const audit = this.getDefaultAuditObj({
       region,
       resource: resource.FileSystemId,
     })
-    const isEncryptionEnabled = resource.Encrypted === true
-    if (isEncryptionEnabled) {
-      audit.state = 'OK'
+    if (resource.KmsKeyId) {
+      assert(
+        this.keyType,
+        'Key type is required arguement for isKeyTrusted check'
+      )
+      audit.state = await this.isKeyTrusted(
+        resource.KmsKeyId,
+        this.keyType,
+        region
+      )
     } else {
       audit.state = 'FAIL'
     }
