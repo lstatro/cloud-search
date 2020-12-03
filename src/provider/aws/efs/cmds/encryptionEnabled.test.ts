@@ -23,14 +23,48 @@ describe('efs encryption enabled', () => {
     })
     expect(audits).to.eql([])
   })
-  it('should return OK if encryption is enabled', async () => {
+  it('should return OK if encryption is enabled with default AWS key', async () => {
+    mock('KMS', 'describeKey', {
+      KeyMetadata: { Arn: 'test', KeyManager: 'AWS' },
+    })
     mock('EFS', 'describeFileSystems', {
-      FileSystems: [{ Encrypted: true, FileSystemId: 'test' }],
+      FileSystems: [
+        { Encrypted: true, FileSystemId: 'test', KmsKeyId: 'test' },
+      ],
     })
     const audits = await handler({
       region: 'test',
       profile: 'test',
       resourceId: 'test',
+      keyType: 'aws',
+    })
+    expect(audits).to.eql([
+      {
+        physicalId: 'test',
+        profile: 'test',
+        provider: 'aws',
+        region: 'test',
+        rule: 'EncryptionEnabled',
+        service: 'efs',
+        state: 'OK',
+        time: '1970-01-01T00:00:00.000Z',
+      },
+    ])
+  })
+  it('should return OK if encryption is enabled with CMK', async () => {
+    mock('KMS', 'describeKey', {
+      KeyMetadata: { Arn: 'test', KeyManager: 'CUSTOMER' },
+    })
+    mock('EFS', 'describeFileSystems', {
+      FileSystems: [
+        { Encrypted: true, FileSystemId: 'test', KmsKeyId: 'test' },
+      ],
+    })
+    const audits = await handler({
+      region: 'test',
+      profile: 'test',
+      resourceId: 'test',
+      keyType: 'cmk',
     })
     expect(audits).to.eql([
       {

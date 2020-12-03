@@ -38,7 +38,6 @@ export class EFSEncryption extends AWS {
     region: string
     resource: FileSystemDescription
   }) {
-    console.log(resource)
     const audit = this.getDefaultAuditObj({
       region,
       resource: resource.FileSystemId,
