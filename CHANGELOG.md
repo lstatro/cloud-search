@@ -9,8 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - AWS - EFS - EncryptionEnabled
 - AWS - Cloudwatch - logs - EncryptionEnabled
-
 - AWS - EFS - EncryptionEnabled
+- dependency version bump
 
 ## [1.11.0] - 2020-11-28
 
