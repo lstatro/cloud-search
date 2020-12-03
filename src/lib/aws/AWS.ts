@@ -70,7 +70,7 @@ export abstract class AWS extends Provider {
     this.keyType = params.keyType
   }
 
-  abstract async scan(params: ScanInterface): Promise<void>
+  abstract scan(params: ScanInterface): Promise<void>
 
   abstract audit(params: AuditInterface): Promise<void>
 

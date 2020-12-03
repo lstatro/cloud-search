@@ -7,13 +7,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- AWS - EFS - EncryptionEnabled
+- AWS - Cloudwatch - logs - EncryptionEnabled
+- AWS - EFS - EncryptionEnabled
+- dependency version bump
+
+## [1.11.0] - 2020-11-28
+
+### Added
+
 - AWS - S3 - VersioningEnabled
 - AWS - SecretsManager - RotationEnabled
-- AWS - IAM (root user) - MFA enabled
+- AWS - IAM - user - RootUserMfaEnabled
+- AWS - IAM - user - UserMfaEnabled
 - AWS - EMR - SecurityConfiguration
 - AWS - EMR - LoggingEnabled
 - AWS - EMR - SecurityConfigDiskEncryption
-- various test coverage im improvements
+- AWS - EMR - SecurityConfigS3Encryption
+- AWS - EMR - SecurityConfigTransitEncryption
+
+### Changed
+
+- various test coverage improvements
+
+### Removed
 
 ## [1.10.1] - 2020-11-18
 

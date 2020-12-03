@@ -129,12 +129,14 @@ describe('AWS module', () => {
       expect(iam.users.HasManagedAdmin.name).to.eql('HasManagedAdmin')
       expect(iam.users.MaxKeyAge.name).to.eql('MaxKeyAge')
       expect(iam.users.PasswordAge.name).to.eql('PasswordAge')
-      expect(iam.users.RootUserMfaEnabled.name).to.eql('RootUserMfaEnabled')
+      expect(iam.users.RootUser.name).to.eql('RootUser')
+      expect(iam.users.UserMfaEnabled.name).to.eql('UserMfaEnabled')
       expect(keys).to.eql([
         'HasManagedAdmin',
         'MaxKeyAge',
         'PasswordAge',
-        'RootUserMfaEnabled',
+        'RootUser',
+        'UserMfaEnabled',
       ])
     })
   })
@@ -186,6 +188,7 @@ describe('AWS module', () => {
   it('should have all emr rules', () => {
     const keys = Object.keys(emr)
     expect(emr.EmrCluster.name).to.eql('EmrCluster')
-    expect(keys).to.eql(['EmrCluster'])
+    expect(emr.SecurityConfigSetting.name).to.eql('SecurityConfigSetting')
+    expect(keys).to.eql(['EmrCluster', 'SecurityConfigSetting'])
   })
 })

@@ -1,5 +1,5 @@
 import { AWSScannerInterface } from '@lstatro/cloud-search'
-import { SecurityConfigSetting } from './SecurityConfigSetting'
+import { SecurityConfigSetting } from './securityConfigSetting'
 
 const rule = 'SecurityConfigS3Encryption'
 
@@ -14,9 +14,8 @@ enabled
 
   resourceId - security configuration name
 
-  note: this rule check to see if it's set not what the setting is.  Use rules
-        related to bucket configurations to sanity check if the encryption is
-        of the right type.
+  note: this rule checks to see if any value is set.  Use bucket scans to audit
+        a bucket's encryption level.
 
 `
 
