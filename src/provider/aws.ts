@@ -63,6 +63,7 @@ export const builder = (yargs: Argv) => {
     .commandDir('./aws/secrets-manager', opts)
     .commandDir('./aws/emr', opts)
     .commandDir('./aws/cloudwatch', opts)
+    .commandDir('./aws/eks', opts)
     .demandCommand(1)
     .option('region', {
       alias: 'r',
