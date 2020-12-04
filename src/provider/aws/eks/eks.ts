@@ -1,7 +1,7 @@
 import { Argv } from 'yargs'
 
 export const command = 'eks'
-export const desc = ' Elastic Kubernetes Service (EKS)'
+export const desc = 'Elastic Kubernetes Service (EKS)'
 
 const opts = {
   exclude: /.*.test.js/,
