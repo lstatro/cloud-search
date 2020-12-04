@@ -3,7 +3,7 @@ import { mock, restore } from 'aws-sdk-mock'
 import { handler } from './secretsEncryption'
 import { expect } from 'chai'
 
-describe.only('eks secrets encryption', () => {
+describe('eks secrets encryption', () => {
   const now = new Date(0)
   let clock: SinonFakeTimers
 
@@ -40,13 +40,124 @@ describe.only('eks secrets encryption', () => {
     expect(audits).to.eql([])
   })
 
-  it('should report FAIL if the cluster does not encrypt secrets', async () => {
+  it('should report FAIL if the cluster fails to describe', async () => {
+    mock('EKS', 'listClusters', { clusters: ['test'] })
+    mock('EKS', 'describeCluster', {})
+
+    const audits = await handler({
+      region: 'us-east-1',
+      profile: 'test',
+      keyType: 'aws',
+    })
+
+    expect(audits).to.eql([
+      {
+        physicalId: 'test',
+        profile: 'test',
+        provider: 'aws',
+        region: 'us-east-1',
+        rule: 'SecretsEncryption',
+        service: 'eks',
+        state: 'FAIL',
+        time: '1970-01-01T00:00:00.000Z',
+      },
+    ])
+  })
+
+  it('should report FAIL if the cluster does not have an encryption config', async () => {
+    mock('EKS', 'listClusters', { clusters: ['test'] })
+    mock('EKS', 'describeCluster', {
+      cluster: {},
+    })
+
+    const audits = await handler({
+      region: 'us-east-1',
+      profile: 'test',
+      keyType: 'aws',
+    })
+
+    expect(audits).to.eql([
+      {
+        physicalId: 'test',
+        profile: 'test',
+        provider: 'aws',
+        region: 'us-east-1',
+        rule: 'SecretsEncryption',
+        service: 'eks',
+        state: 'FAIL',
+        time: '1970-01-01T00:00:00.000Z',
+      },
+    ])
+  })
+
+  it('should report FAIL if the cluster encryption config does not have a resources array', async () => {
+    mock('EKS', 'listClusters', { clusters: ['test'] })
+    mock('EKS', 'describeCluster', {
+      cluster: {
+        encryptionConfig: [{}],
+      },
+    })
+
+    const audits = await handler({
+      region: 'us-east-1',
+      profile: 'test',
+      keyType: 'aws',
+    })
+
+    expect(audits).to.eql([
+      {
+        physicalId: 'test',
+        profile: 'test',
+        provider: 'aws',
+        region: 'us-east-1',
+        rule: 'SecretsEncryption',
+        service: 'eks',
+        state: 'FAIL',
+        time: '1970-01-01T00:00:00.000Z',
+      },
+    ])
+  })
+
+  it('should report FAIL if the clusters encryption resources config does not include secrets', async () => {
     mock('EKS', 'listClusters', { clusters: ['test'] })
     mock('EKS', 'describeCluster', {
       cluster: {
         encryptionConfig: [
           {
             resources: ['test'],
+          },
+        ],
+      },
+    })
+
+    const audits = await handler({
+      region: 'us-east-1',
+      profile: 'test',
+      resourceId: 'test',
+      keyType: 'aws',
+    })
+
+    expect(audits).to.eql([
+      {
+        physicalId: 'test',
+        profile: 'test',
+        provider: 'aws',
+        region: 'us-east-1',
+        rule: 'SecretsEncryption',
+        service: 'eks',
+        state: 'FAIL',
+        time: '1970-01-01T00:00:00.000Z',
+      },
+    ])
+  })
+
+  it('should report FAIL the clusters encryption does not have a provider', async () => {
+    mock('EKS', 'listClusters', { clusters: ['test'] })
+    mock('EKS', 'describeCluster', {
+      cluster: {
+        encryptionConfig: [
+          {
+            resources: ['secrets'],
           },
         ],
       },
@@ -67,6 +178,147 @@ describe.only('eks secrets encryption', () => {
         rule: 'SecretsEncryption',
         service: 'eks',
         state: 'FAIL',
+        time: '1970-01-01T00:00:00.000Z',
+      },
+    ])
+  })
+
+  it('should report FAIL the clusters encryption provider does not have a a key arn', async () => {
+    mock('EKS', 'listClusters', { clusters: ['test'] })
+    mock('EKS', 'describeCluster', {
+      cluster: {
+        encryptionConfig: [
+          {
+            resources: ['secrets'],
+            provider: {},
+          },
+        ],
+      },
+    })
+
+    const audits = await handler({
+      region: 'us-east-1',
+      profile: 'test',
+      keyType: 'aws',
+    })
+
+    expect(audits).to.eql([
+      {
+        physicalId: 'test',
+        profile: 'test',
+        provider: 'aws',
+        region: 'us-east-1',
+        rule: 'SecretsEncryption',
+        service: 'eks',
+        state: 'FAIL',
+        time: '1970-01-01T00:00:00.000Z',
+      },
+    ])
+  })
+
+  it('should report OK the clusters encryption provider provides an AWS managed key arn when looking for any key', async () => {
+    mock('KMS', 'describeKey', {
+      KeyMetadata: { Arn: 'test', KeyManager: 'AWS' },
+    })
+    mock('EKS', 'listClusters', { clusters: ['test'] })
+    mock('EKS', 'describeCluster', {
+      cluster: {
+        encryptionConfig: [
+          {
+            resources: ['secrets'],
+            provider: { keyArn: 'test' },
+          },
+        ],
+      },
+    })
+
+    const audits = await handler({
+      region: 'us-east-1',
+      profile: 'test',
+      keyType: 'aws',
+    })
+
+    expect(audits).to.eql([
+      {
+        physicalId: 'test',
+        profile: 'test',
+        provider: 'aws',
+        region: 'us-east-1',
+        rule: 'SecretsEncryption',
+        service: 'eks',
+        state: 'OK',
+        time: '1970-01-01T00:00:00.000Z',
+      },
+    ])
+  })
+
+  it('should report WARNING if the clusters encryption provider provides a AWS managed key arn', async () => {
+    mock('KMS', 'describeKey', {
+      KeyMetadata: { Arn: 'test', KeyManager: 'AWS' },
+    })
+    mock('EKS', 'listClusters', { clusters: ['test'] })
+    mock('EKS', 'describeCluster', {
+      cluster: {
+        encryptionConfig: [
+          {
+            resources: ['secrets'],
+            provider: { keyArn: 'test' },
+          },
+        ],
+      },
+    })
+
+    const audits = await handler({
+      region: 'us-east-1',
+      profile: 'test',
+      keyType: 'cmk',
+    })
+
+    expect(audits).to.eql([
+      {
+        physicalId: 'test',
+        profile: 'test',
+        provider: 'aws',
+        region: 'us-east-1',
+        rule: 'SecretsEncryption',
+        service: 'eks',
+        state: 'WARNING',
+        time: '1970-01-01T00:00:00.000Z',
+      },
+    ])
+  })
+
+  it('should report OK if the clusters encryption provider provides a customer managed key arn', async () => {
+    mock('KMS', 'describeKey', {
+      KeyMetadata: { Arn: 'test', KeyManager: 'CUSTOMER' },
+    })
+    mock('EKS', 'listClusters', { clusters: ['test'] })
+    mock('EKS', 'describeCluster', {
+      cluster: {
+        encryptionConfig: [
+          {
+            resources: ['secrets'],
+            provider: { keyArn: 'test' },
+          },
+        ],
+      },
+    })
+
+    const audits = await handler({
+      region: 'us-east-1',
+      profile: 'test',
+      keyType: 'cmk',
+    })
+
+    expect(audits).to.eql([
+      {
+        physicalId: 'test',
+        profile: 'test',
+        provider: 'aws',
+        region: 'us-east-1',
+        rule: 'SecretsEncryption',
+        service: 'eks',
+        state: 'OK',
         time: '1970-01-01T00:00:00.000Z',
       },
     ])
