@@ -62,6 +62,7 @@ export const builder = (yargs: Argv) => {
     .commandDir('./aws/dynamodb', opts)
     .commandDir('./aws/secrets-manager', opts)
     .commandDir('./aws/emr', opts)
+    .commandDir('./aws/efs', opts)
     .commandDir('./aws/cloudwatch', opts)
     .commandDir('./aws/eks', opts)
     .demandCommand(1)
