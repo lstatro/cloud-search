@@ -25,6 +25,7 @@ describe('eks secrets encryption', () => {
       region: 'us-east-1',
       profile: 'test',
       keyType: 'aws',
+      rule: 'SecretsEncryption',
     })
     expect(audits).to.eql([])
   })
@@ -36,11 +37,12 @@ describe('eks secrets encryption', () => {
       region: 'us-east-1',
       profile: 'test',
       keyType: 'aws',
+      rule: 'SecretsEncryption',
     })
     expect(audits).to.eql([])
   })
 
-  it('should report FAIL if the cluster fails to describe', async () => {
+  it('should report UNKNOWN if the cluster fails to describe', async () => {
     mock('EKS', 'listClusters', { clusters: ['test'] })
     mock('EKS', 'describeCluster', {})
 
@@ -48,6 +50,7 @@ describe('eks secrets encryption', () => {
       region: 'us-east-1',
       profile: 'test',
       keyType: 'aws',
+      rule: 'SecretsEncryption',
     })
 
     expect(audits).to.eql([
@@ -58,7 +61,7 @@ describe('eks secrets encryption', () => {
         region: 'us-east-1',
         rule: 'SecretsEncryption',
         service: 'eks',
-        state: 'FAIL',
+        state: 'UNKNOWN',
         time: '1970-01-01T00:00:00.000Z',
       },
     ])
@@ -74,6 +77,7 @@ describe('eks secrets encryption', () => {
       region: 'us-east-1',
       profile: 'test',
       keyType: 'aws',
+      rule: 'SecretsEncryption',
     })
 
     expect(audits).to.eql([
@@ -102,6 +106,7 @@ describe('eks secrets encryption', () => {
       region: 'us-east-1',
       profile: 'test',
       keyType: 'aws',
+      rule: 'SecretsEncryption',
     })
 
     expect(audits).to.eql([
@@ -135,6 +140,7 @@ describe('eks secrets encryption', () => {
       profile: 'test',
       resourceId: 'test',
       keyType: 'aws',
+      rule: 'SecretsEncryption',
     })
 
     expect(audits).to.eql([
@@ -167,6 +173,7 @@ describe('eks secrets encryption', () => {
       region: 'us-east-1',
       profile: 'test',
       keyType: 'aws',
+      rule: 'SecretsEncryption',
     })
 
     expect(audits).to.eql([
@@ -200,6 +207,7 @@ describe('eks secrets encryption', () => {
       region: 'us-east-1',
       profile: 'test',
       keyType: 'aws',
+      rule: 'SecretsEncryption',
     })
 
     expect(audits).to.eql([
@@ -236,6 +244,7 @@ describe('eks secrets encryption', () => {
       region: 'us-east-1',
       profile: 'test',
       keyType: 'aws',
+      rule: 'SecretsEncryption',
     })
 
     expect(audits).to.eql([
@@ -272,6 +281,7 @@ describe('eks secrets encryption', () => {
       region: 'us-east-1',
       profile: 'test',
       keyType: 'cmk',
+      rule: 'SecretsEncryption',
     })
 
     expect(audits).to.eql([
@@ -308,6 +318,7 @@ describe('eks secrets encryption', () => {
       region: 'us-east-1',
       profile: 'test',
       keyType: 'cmk',
+      rule: 'SecretsEncryption',
     })
 
     expect(audits).to.eql([
