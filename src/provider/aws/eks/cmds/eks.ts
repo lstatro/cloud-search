@@ -6,20 +6,70 @@ import assert from 'assert'
 import { Cluster } from 'aws-sdk/clients/eks'
 import { AWS } from '../../../../lib/aws/AWS'
 
+export type LoggingType =
+  | 'api'
+  | 'audit'
+  | 'authenticator'
+  | 'controllerManager'
+  | 'scheduler'
+
 export interface EksInterface extends AWSScannerInterface {
-  rule: 'SecretsEncryption' | 'PublicAccess'
+  rule: 'SecretsEncryption' | 'PublicAccess' | 'AuditLogging'
 }
 
 export class Eks extends AWS {
   audits: AuditResultInterface[] = []
   service = 'eks'
   global = false
+  loggingType?: LoggingType
 
   constructor(public params: EksInterface) {
     super({ ...params })
+    const types: { [key: string]: LoggingType } = {
+      AuditLogging: 'audit',
+    }
+    this.loggingType = types[params.rule]
   }
 
-  handlePublicAccess = (cluster: Cluster, audit: AuditResultInterface) => {
+  handleLogging = ({
+    cluster,
+    audit,
+  }: {
+    cluster: Cluster
+    audit: AuditResultInterface
+  }) => {
+    let found = false
+
+    assert(this.loggingType, 'eks log type is required')
+
+    if (cluster.logging) {
+      if (cluster.logging.clusterLogging) {
+        for (const logging of cluster.logging.clusterLogging) {
+          if (logging.enabled === true) {
+            if (logging.types) {
+              if (logging.types.includes(this.loggingType)) {
+                found = true
+              }
+            }
+          }
+        }
+      }
+    }
+
+    if (found === true) {
+      audit.state = 'OK'
+    } else {
+      audit.state = 'FAIL'
+    }
+  }
+
+  handlePublicAccess = ({
+    cluster,
+    audit,
+  }: {
+    cluster: Cluster
+    audit: AuditResultInterface
+  }) => {
     if (cluster.resourcesVpcConfig) {
       if (cluster.resourcesVpcConfig.endpointPublicAccess === false) {
         audit.state = 'OK'
@@ -29,11 +79,15 @@ export class Eks extends AWS {
     }
   }
 
-  handleSecretsEncryption = async (
-    cluster: Cluster,
-    audit: AuditResultInterface,
+  handleSecretsEncryption = async ({
+    cluster,
+    audit,
+    region,
+  }: {
+    cluster: Cluster
+    audit: AuditResultInterface
     region?: string
-  ) => {
+  }) => {
     let key
 
     if (cluster.encryptionConfig) {
@@ -79,18 +133,27 @@ export class Eks extends AWS {
       .promise()
 
     const types: {
-      [key: string]: (
-        cluster: Cluster,
-        audit: AuditResultInterface,
+      [key: string]: ({
+        cluster,
+        audit,
+        region,
+      }: {
+        cluster: Cluster
+        audit: AuditResultInterface
         region?: string
-      ) => void
+      }) => void
     } = {
       PublicAccess: this.handlePublicAccess,
       SecretsEncryption: this.handleSecretsEncryption,
+      AuditLogging: this.handleLogging,
     }
 
     if (describeCluster.cluster) {
-      await types[this.rule](describeCluster.cluster, audit, region)
+      await types[this.rule]({
+        cluster: describeCluster.cluster,
+        audit,
+        region,
+      })
     }
 
     this.audits.push(audit)
