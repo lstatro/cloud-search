@@ -126,3 +126,7 @@ export const emr = {
   EmrCluster,
   SecurityConfigSetting,
 }
+import { Eks } from './provider/aws/eks/cmds/eks'
+export const eks = {
+  Eks,
+}

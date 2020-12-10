@@ -14,7 +14,12 @@ export type LoggingType =
   | 'scheduler'
 
 export interface EksInterface extends AWSScannerInterface {
-  rule: 'SecretsEncryption' | 'PublicAccess' | 'AuditLogging'
+  rule:
+    | 'SecretsEncryption'
+    | 'PublicAccess'
+    | 'AuditLogging'
+    | 'ApiLogging'
+    | 'AuthenticatorLogging'
 }
 
 export class Eks extends AWS {
@@ -27,6 +32,8 @@ export class Eks extends AWS {
     super({ ...params })
     const types: { [key: string]: LoggingType } = {
       AuditLogging: 'audit',
+      ApiLogging: 'api',
+      AuthenticatorLogging: 'authenticator',
     }
     this.loggingType = types[params.rule]
   }
@@ -146,6 +153,8 @@ export class Eks extends AWS {
       PublicAccess: this.handlePublicAccess,
       SecretsEncryption: this.handleSecretsEncryption,
       AuditLogging: this.handleLogging,
+      ApiLogging: this.handleLogging,
+      AuthenticatorLogging: this.handleLogging,
     }
 
     if (describeCluster.cluster) {

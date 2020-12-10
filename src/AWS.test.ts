@@ -13,6 +13,7 @@ import {
   sns,
   sqs,
   emr,
+  eks,
 } from './AWS'
 
 describe('AWS module', () => {
@@ -190,5 +191,12 @@ describe('AWS module', () => {
     expect(emr.EmrCluster.name).to.eql('EmrCluster')
     expect(emr.SecurityConfigSetting.name).to.eql('SecurityConfigSetting')
     expect(keys).to.eql(['EmrCluster', 'SecurityConfigSetting'])
+  })
+
+  it('should have all eks rules', () => {
+    const keys = Object.keys(eks)
+    expect(eks.Eks.name).to.eql('Eks')
+    expect(eks.Eks.name).to.eql('Eks')
+    expect(keys).to.eql(['Eks'])
   })
 })

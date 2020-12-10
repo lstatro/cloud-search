@@ -1,14 +1,14 @@
 import { Eks, EksInterface } from './eks'
 
-const rule = 'AuditLogging'
+const rule = 'ApiLogging'
 
 export const command = `${rule} [args]`
 
-export const desc = `EKS Clusters should have audit logging enabled
+export const desc = `EKS Clusters should have API logging enabled
 
-  OK      - Cluster has audit logging enabled
-  UNKNOWN - Unable to determine if cluster has audit logging enabled
-  FAIL    - Cluster does not have audit logging enabled
+  OK      - Cluster has API logging enabled
+  UNKNOWN - Unable to determine if cluster has API logging enabled
+  FAIL    - Cluster does not have API logging enabled
 
   resourceId - cluster name
 
