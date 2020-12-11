@@ -7,7 +7,37 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+- AWS - ElasticSearch - PublicDomain
+
+## [1.12.0] - 2020-12-11
+
+### Added
+
 - AWS - EFS - EncryptionEnabled
+- AWS - Cloudwatch - logs - EncryptionEnabled
+- AWS - EKS - SecretsEncryption
+- AWS - EKS - PublicAccess
+- AWS - EKS - AuditLogging
+- AWS - EKS - ApiLogging
+- AWS - EKS - ControllerManagerLogging
+- AWS - EKS - SchedulerLogging
+- AWS - EKS - AuthenticationLogging
+- AWS - SecretsManager - SecretEncryptedWithCmk
+
+### Changed
+
+- dependency version bump
+- updated change log to reflect `Fixed` for bugs
+
+### Removed
+
+- removed unused headers from change log
+
+## [1.11.1] - 2020-11-28
+
+### Fixed
+
+- force npm to correctly display cloud-search's README.md
 
 ## [1.11.0] - 2020-11-28
 
@@ -27,28 +57,21 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - various test coverage improvements
 
-### Removed
-
 ## [1.10.1] - 2020-11-18
-
-### Added
 
 ### Changed
 
 - package.json readme reference update
-- force npm to correctly display cloud-search's README.md
 
-### Removed
+### Fixed
+
+- force npm to correctly display cloud-search's README.md
 
 ## [1.10.0] - 2020-11-18
 
 ### Added
 
 - AWS - EC2 - VPC - FlowLogsEnabled
-
-### Changed
-
-### Removed
 
 ## [1.9.0] - 2020-11-17
 
@@ -64,8 +87,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - module names now consistent with ambient module naming, done to support type definition exports
 - updated npm keywords with alb, elb, waf
 
-### Removed
-
 ## [1.8.0] - 2020-11-11
 
 ### Added
@@ -74,10 +95,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - AWS - EC2 - ELB - DesyncMitigationMode
 - AWS - EC2 - ELB - AccessLogsEnabled
 - AWS - EC2 - ALB - AccessLogsEnabled
-
-### Changed
-
-### Removed
 
 ## [1.7.0] - 2020-11-2
 
@@ -90,19 +107,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - refactor resource listing
 - `package.json` `main` attribute outputs scan classes
+
+### Fixed
+
 - fixed bug with async/await in ebs volumeEncrypted
 
-### Removed
-
 ## [1.6.1] - 2020-10-27
-
-### Added
 
 ### Changed
 
 - centralized audit object creation across all services
-
-### Removed
 
 ## [1.6.0] - 2020-10-26
 
@@ -114,11 +128,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - AWS - guardduty - DetectorExists
 - AWS - guardduty - DetectorDataSources
 
-### Changed
+### Fixed
 
 - fixed region reference as `all` when it should have been `global`
-
-### Removed
 
 ## [1.5.0] - 2020-10-24
 
@@ -131,8 +143,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - service arg and class constructor param changes no longer require manual updating should the cli's argument interface change in the future
-
-### Removed
 
 ## [1.4.0] - 2020-10-22
 
@@ -147,8 +157,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - updated documentation formatting
 - enforcing file naming conventions
 
-### Removed
-
 ## [1.3.0] - 2020-10-20
 
 ### Added
@@ -159,8 +167,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Changed
 
 - removed unnecessary keyId references
-
-### Removed
 
 ## [1.2.0] - 2020-10-19
 
@@ -174,8 +180,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Cli description updates
 - AWS class method naming updates to fall in line with project established conventions
 - README.md wording
-
-### Removed
 
 ## [1.1.1] - 2020-10-18
 
@@ -200,6 +204,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 - AWS - kms - KeyRotationEnabled
+
+### Fixed
+
 - verbosity option bug fixes
 
 ### Changed
@@ -213,5 +220,3 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Refactored various functions to remove the need to manually define the handler arguments type
 - Refactored the spinner and cli output to terminal to account for silent scans mainly to benefit testing
 - New scans will now release as minor updates
-
-### Removed

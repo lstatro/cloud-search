@@ -13,6 +13,7 @@ import {
   sns,
   sqs,
   emr,
+  eks,
 } from './AWS'
 
 describe('AWS module', () => {
@@ -129,13 +130,13 @@ describe('AWS module', () => {
       expect(iam.users.HasManagedAdmin.name).to.eql('HasManagedAdmin')
       expect(iam.users.MaxKeyAge.name).to.eql('MaxKeyAge')
       expect(iam.users.PasswordAge.name).to.eql('PasswordAge')
-      expect(iam.users.RootUserMfaEnabled.name).to.eql('RootUserMfaEnabled')
+      expect(iam.users.RootUser.name).to.eql('RootUser')
       expect(iam.users.UserMfaEnabled.name).to.eql('UserMfaEnabled')
       expect(keys).to.eql([
         'HasManagedAdmin',
         'MaxKeyAge',
         'PasswordAge',
-        'RootUserMfaEnabled',
+        'RootUser',
         'UserMfaEnabled',
       ])
     })
@@ -190,5 +191,12 @@ describe('AWS module', () => {
     expect(emr.EmrCluster.name).to.eql('EmrCluster')
     expect(emr.SecurityConfigSetting.name).to.eql('SecurityConfigSetting')
     expect(keys).to.eql(['EmrCluster', 'SecurityConfigSetting'])
+  })
+
+  it('should have all eks rules', () => {
+    const keys = Object.keys(eks)
+    expect(eks.Eks.name).to.eql('Eks')
+    expect(eks.Eks.name).to.eql('Eks')
+    expect(keys).to.eql(['Eks'])
   })
 })

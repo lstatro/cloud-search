@@ -36,7 +36,7 @@ const epilogue = `
 
   This also means that when looking for resources that have admin more then one
   scan is necessary.  For example when looking for users with admin it is
-  necessary to check the user, the user's, groups, and any inline policy they
+  necessary to check the user, the user's groups, and any inline policy they
   have.
 
 ********************************************************************************
@@ -62,6 +62,9 @@ export const builder = (yargs: Argv) => {
     .commandDir('./aws/dynamodb', opts)
     .commandDir('./aws/secrets-manager', opts)
     .commandDir('./aws/emr', opts)
+    .commandDir('./aws/efs', opts)
+    .commandDir('./aws/cloudwatch', opts)
+    .commandDir('./aws/eks', opts)
     .demandCommand(1)
     .option('region', {
       alias: 'r',
