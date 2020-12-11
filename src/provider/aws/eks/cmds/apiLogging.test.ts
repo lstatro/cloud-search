@@ -18,7 +18,7 @@ describe('eks secrets encryption', () => {
     sinonRestore()
   })
 
-  it('should report OK if the cluster has audit logging enabled', async () => {
+  it('should report OK if the cluster has api logging enabled', async () => {
     mock('EKS', 'listClusters', { clusters: ['test'] })
     mock('EKS', 'describeCluster', {
       cluster: {
@@ -53,7 +53,7 @@ describe('eks secrets encryption', () => {
     ])
   })
 
-  it('should report FAIL if the cluster does not have audit logging enabled', async () => {
+  it('should report FAIL if the cluster does not have api logging enabled', async () => {
     mock('EKS', 'listClusters', { clusters: ['test'] })
     mock('EKS', 'describeCluster', {
       cluster: {

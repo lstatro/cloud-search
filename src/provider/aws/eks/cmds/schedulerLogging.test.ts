@@ -1,9 +1,9 @@
 import { useFakeTimers, SinonFakeTimers, restore as sinonRestore } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { handler } from './authenticatorLogging'
+import { handler } from './schedulerLogging'
 import { expect } from 'chai'
 
-describe('#AuthenticatorLogging', () => {
+describe('#ScheduleLogging', () => {
   const now = new Date(0)
   let clock: SinonFakeTimers
 
@@ -18,14 +18,14 @@ describe('#AuthenticatorLogging', () => {
     sinonRestore()
   })
 
-  it('should report OK if the cluster has authenticator logging enabled', async () => {
+  it('should report OK if the cluster has schedule logging enabled', async () => {
     mock('EKS', 'listClusters', { clusters: ['test'] })
     mock('EKS', 'describeCluster', {
       cluster: {
         logging: {
           clusterLogging: [
             {
-              types: ['authenticator'],
+              types: ['scheduler'],
               enabled: true,
             },
           ],
@@ -36,7 +36,7 @@ describe('#AuthenticatorLogging', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      rule: 'AuthenticatorLogging',
+      rule: 'SchedulerLogging',
     })
 
     expect(audits).to.eql([
@@ -45,7 +45,7 @@ describe('#AuthenticatorLogging', () => {
         profile: 'test',
         provider: 'aws',
         region: 'us-east-1',
-        rule: 'AuthenticatorLogging',
+        rule: 'SchedulerLogging',
         service: 'eks',
         state: 'OK',
         time: '1970-01-01T00:00:00.000Z',
@@ -53,14 +53,14 @@ describe('#AuthenticatorLogging', () => {
     ])
   })
 
-  it('should report FAIL if the cluster does not have authenticator logging enabled', async () => {
+  it('should report FAIL if the cluster does not have schedule logging enabled', async () => {
     mock('EKS', 'listClusters', { clusters: ['test'] })
     mock('EKS', 'describeCluster', {
       cluster: {
         logging: {
           clusterLogging: [
             {
-              types: ['authenticator'],
+              types: ['scheduler'],
               enabled: false,
             },
           ],
@@ -71,7 +71,7 @@ describe('#AuthenticatorLogging', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      rule: 'AuthenticatorLogging',
+      rule: 'SchedulerLogging',
     })
 
     expect(audits).to.eql([
@@ -80,7 +80,7 @@ describe('#AuthenticatorLogging', () => {
         profile: 'test',
         provider: 'aws',
         region: 'us-east-1',
-        rule: 'AuthenticatorLogging',
+        rule: 'SchedulerLogging',
         service: 'eks',
         state: 'FAIL',
         time: '1970-01-01T00:00:00.000Z',

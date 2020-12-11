@@ -20,6 +20,8 @@ export interface EksInterface extends AWSScannerInterface {
     | 'AuditLogging'
     | 'ApiLogging'
     | 'AuthenticatorLogging'
+    | 'ControllerManagerLogging'
+    | 'SchedulerLogging'
 }
 
 export class Eks extends AWS {
@@ -34,6 +36,8 @@ export class Eks extends AWS {
       AuditLogging: 'audit',
       ApiLogging: 'api',
       AuthenticatorLogging: 'authenticator',
+      ControllerManagerLogging: 'controllerManager',
+      SchedulerLogging: 'scheduler',
     }
     this.loggingType = types[params.rule]
   }
@@ -155,6 +159,8 @@ export class Eks extends AWS {
       AuditLogging: this.handleLogging,
       ApiLogging: this.handleLogging,
       AuthenticatorLogging: this.handleLogging,
+      ControllerManagerLogging: this.handleLogging,
+      SchedulerLogging: this.handleLogging,
     }
 
     if (describeCluster.cluster) {

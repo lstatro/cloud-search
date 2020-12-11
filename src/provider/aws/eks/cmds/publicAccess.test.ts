@@ -3,7 +3,7 @@ import { mock, restore } from 'aws-sdk-mock'
 import { handler } from './publicAccess'
 import { expect } from 'chai'
 
-describe('eks secrets encryption', () => {
+describe('#publicAccess', () => {
   const now = new Date(0)
   let clock: SinonFakeTimers
 
