@@ -1,11 +1,7 @@
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-} from '@lstatro/cloud-search'
 import { AWS } from '../../../../../lib/aws/AWS'
 import { CommandBuilder } from 'yargs'
-import { assert } from 'console'
 import { User } from 'aws-sdk/clients/iam'
+import { assert } from 'console'
 
 const rule = 'PasswordAge'
 

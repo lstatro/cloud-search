@@ -1,11 +1,8 @@
-import { CommandBuilder } from 'yargs'
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-} from '@lstatro/cloud-search'
 import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
-import assert from 'assert'
 import { Bucket, ServerSideEncryptionConfiguration } from 'aws-sdk/clients/s3'
+
+import { CommandBuilder } from 'yargs'
+import assert from 'assert'
 
 const rule = 'BucketEncryption'
 

@@ -1,9 +1,6 @@
-import { CommandBuilder } from 'yargs'
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-} from '@lstatro/cloud-search'
 import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
+
+import { CommandBuilder } from 'yargs'
 import assert from 'assert'
 
 const rule = 'QueueEncrypted'

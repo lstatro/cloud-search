@@ -1,10 +1,6 @@
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-} from '@lstatro/cloud-search'
-import assert from 'assert'
 import { AWS } from '../../../../lib/aws/AWS'
 import { SecretListEntry } from 'aws-sdk/clients/secretsmanager'
+import assert from 'assert'
 
 export interface SecretsManagerInterface extends AWSScannerInterface {
   rule: 'RotationEnabled' | 'SecretEncryptedWithCmk'

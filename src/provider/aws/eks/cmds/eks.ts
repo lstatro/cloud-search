@@ -1,10 +1,6 @@
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-} from '@lstatro/cloud-search'
-import assert from 'assert'
-import { Cluster } from 'aws-sdk/clients/eks'
 import { AWS } from '../../../../lib/aws/AWS'
+import { Cluster } from 'aws-sdk/clients/eks'
+import assert from 'assert'
 
 export type LoggingType =
   | 'api'

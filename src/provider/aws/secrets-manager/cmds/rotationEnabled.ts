@@ -1,4 +1,3 @@
-import { AWSScannerInterface } from '@lstatro/cloud-search'
 import { SecretsManager } from './secretsManager'
 
 const rule = 'RotationEnabled'

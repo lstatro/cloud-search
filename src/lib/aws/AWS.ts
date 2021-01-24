@@ -1,13 +1,7 @@
 import { CommandBuilder } from 'yargs'
-import {
-  AuditResultInterface,
-  AWSClientOptionsInterface,
-  AWSParamsInterface,
-  KeyType,
-} from '@lstatro/cloud-search'
 import { KeyMetadata } from 'aws-sdk/clients/kms'
-import _AWS from 'aws-sdk'
 import Provider from '../Provider'
+import _AWS from 'aws-sdk'
 import assert from 'assert'
 
 interface ScanInterface {
@@ -54,7 +48,7 @@ export abstract class AWS extends Provider {
   keyMetaData: KeyCacheInterface[] = []
   profile?: string
   resourceId?: string
-  keyType?: KeyType
+  keyType?: AWSKeyType
 
   constructor(params: AWSParamsInterface) {
     super(params.rule, params.verbosity, params.format)
@@ -226,7 +220,7 @@ export abstract class AWS extends Provider {
     return this.keyMetaData.find((metaData) => metaData.givenKeyId === keyId)
   }
 
-  isKeyTrusted = async (keyId: string, type: 'aws' | 'cmk', region: string) => {
+  isKeyTrusted = async (keyId: string, type: AWSKeyType, region: string) => {
     let trusted: 'UNKNOWN' | 'OK' | 'WARNING' | 'FAIL' = 'UNKNOWN'
     const matched = await this.findKey(keyId, region)
     if (matched) {

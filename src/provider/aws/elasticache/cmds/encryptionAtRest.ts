@@ -1,10 +1,7 @@
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-} from '@lstatro/cloud-search'
-import assert from 'assert'
 import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
+
 import { CacheCluster } from 'aws-sdk/clients/elasticache'
+import assert from 'assert'
 
 const rule = 'EncryptionAtRest'
 

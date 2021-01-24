@@ -1,6 +1,7 @@
-import { expect } from 'chai'
-import { useFakeTimers, SinonFakeTimers } from 'sinon'
+import { SinonFakeTimers, useFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
+
+import { expect } from 'chai'
 import { handler } from './queueEncrypted'
 
 describe('sqs topic encryption', () => {

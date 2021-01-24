@@ -1,4 +1,3 @@
-import { AWSScannerInterface } from '@lstatro/cloud-search'
 import { EmrCluster } from './emrCluster'
 
 const rule = 'LoggingEnabled'

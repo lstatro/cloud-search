@@ -1,16 +1,17 @@
-import { mock, restore } from 'aws-sdk-mock'
-import AWS from 'aws-sdk'
-import { expect } from 'chai'
-import { handler } from './rootUserMfaEnabled'
 import {
-  useFakeTimers,
   SinonFakeTimers,
-  stub,
   SinonStub,
   restore as sinonRestore,
+  stub,
+  useFakeTimers,
 } from 'sinon'
-import papa from 'papaparse'
+import { mock, restore } from 'aws-sdk-mock'
+
+import AWS from 'aws-sdk'
 import { AWSError } from 'aws-sdk'
+import { expect } from 'chai'
+import { handler } from './rootUserMfaEnabled'
+import papa from 'papaparse'
 
 const csv_fail = `user,arn,user_creation_time,password_enabled,password_last_used,password_last_changed,password_next_rotation,mfa_active,access_key_1_active,access_key_1_last_rotated,access_key_1_last_used_date,access_key_1_last_used_region,access_key_1_last_used_service,access_key_2_active,access_key_2_last_rotated,access_key_2_last_used_date,access_key_2_last_used_region,access_key_2_last_used_service,cert_1_active,cert_1_last_rotated,cert_2_active,cert_2_last_rotated
 <root_account>,arn:aws:iam::test:root,2018-03-07T21:35:12+00:00,not_supported,2020-10-15T01:16:31+00:00,not_supported,not_supported,false,false,N/A,N/A,N/A,N/A,false,N/A,N/A,N/A,N/A,false,N/A,false,N/A

@@ -1,10 +1,6 @@
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-} from '@lstatro/cloud-search'
 import { AWS } from '../../../../../lib/aws/AWS'
-import assert from 'assert'
 import { LoadBalancerDescription } from 'aws-sdk/clients/elb'
+import assert from 'assert'
 
 const rule = 'ElbDesyncMode'
 

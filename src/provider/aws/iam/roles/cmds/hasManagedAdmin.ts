@@ -1,8 +1,5 @@
 import { AttachedPolicy, Role } from 'aws-sdk/clients/iam'
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-} from '@lstatro/cloud-search'
+
 import { AWS } from '../../../../../lib/aws/AWS'
 
 const rule = 'HasManagedAdmin'

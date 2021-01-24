@@ -1,10 +1,5 @@
-import { Vpc } from 'aws-sdk/clients/ec2'
-import {
-  AuditResultInterface,
-  AWSClientOptionsInterface,
-  AWSScannerInterface,
-} from '@lstatro/cloud-search'
 import { AWS } from '../../../../../lib/aws/AWS'
+import { Vpc } from 'aws-sdk/clients/ec2'
 import assert from 'assert'
 
 const rule = 'FlowlogsEnabled'

@@ -1,11 +1,8 @@
 /** TODO: this needs to support resource */
 
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-} from '@lstatro/cloud-search'
-import { AWS } from '../../../../../lib/aws/AWS'
 import { AccessKeyMetadata, User } from 'aws-sdk/clients/iam'
+
+import { AWS } from '../../../../../lib/aws/AWS'
 import { CommandBuilder } from 'yargs'
 
 const rule = 'MaxKeyAge'

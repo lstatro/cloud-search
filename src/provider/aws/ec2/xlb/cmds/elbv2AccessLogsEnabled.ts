@@ -1,10 +1,7 @@
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-} from '@lstatro/cloud-search'
+import { LoadBalancer, LoadBalancerAttribute } from 'aws-sdk/clients/elbv2'
+
 import { AWS } from '../../../../../lib/aws/AWS'
 import assert from 'assert'
-import { LoadBalancer, LoadBalancerAttribute } from 'aws-sdk/clients/elbv2'
 
 export type LoadBalancerType = 'application' | 'network'
 

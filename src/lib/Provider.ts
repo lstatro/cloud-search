@@ -1,11 +1,7 @@
-import {
-  AuditResultInterface,
-  VerbosityType,
-  FormatType,
-} from '@lstatro/cloud-search'
-import chalk from 'chalk'
 import ora, { Ora } from 'ora'
+
 import { assert } from 'console'
+import chalk from 'chalk'
 
 export default abstract class Provider {
   audits: AuditResultInterface[] = []

@@ -1,8 +1,5 @@
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-} from '@lstatro/cloud-search'
 import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
+
 import { DBInstance } from 'aws-sdk/clients/neptune'
 import assert from 'assert'
 const rule = 'InstanceEncrypted'

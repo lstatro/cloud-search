@@ -1,12 +1,8 @@
 /** TODO: can this be handled by iam.simulatePrincipalPolicy? */
 
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-} from '@lstatro/cloud-search'
-import assert from 'assert'
 import { AWS } from '../../../../lib/aws/AWS'
 import { DBInstance } from 'aws-sdk/clients/rds'
+import assert from 'assert'
 
 const rule = 'PublicInstance'
 

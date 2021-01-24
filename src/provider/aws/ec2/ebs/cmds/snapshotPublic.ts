@@ -1,11 +1,6 @@
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-} from '@lstatro/cloud-search'
-import assert from 'assert'
-
 import { AWS } from '../../../../../lib/aws/AWS'
 import { Snapshot } from 'aws-sdk/clients/ec2'
+import assert from 'assert'
 
 const rule = 'SnapshotPublic'
 

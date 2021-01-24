@@ -1,10 +1,6 @@
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-} from '@lstatro/cloud-search'
-import assert from 'assert'
 import { AWS } from '../../../../../lib/aws/AWS'
 import { LogGroup } from 'aws-sdk/clients/cloudwatchlogs'
+import assert from 'assert'
 
 const rule = 'EncryptionEnabled'
 

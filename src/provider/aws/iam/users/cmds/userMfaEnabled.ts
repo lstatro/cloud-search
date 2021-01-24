@@ -1,7 +1,3 @@
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-} from '@lstatro/cloud-search'
 import { AWS } from '../../../../../lib/aws/AWS'
 import { User } from 'aws-sdk/clients/iam'
 

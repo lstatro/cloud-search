@@ -1,11 +1,6 @@
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-  UserReportJsonInterface,
-} from '@lstatro/cloud-search'
+import { AWS } from '../../../../../lib/aws/AWS'
 import { GetCredentialReportResponse } from 'aws-sdk/clients/iam'
 import assert from 'assert'
-import { AWS } from '../../../../../lib/aws/AWS'
 import { parse } from 'papaparse'
 
 export type RootUserRuleType = 'MfaEnabled' | 'ApiKeys'

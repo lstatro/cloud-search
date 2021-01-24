@@ -1,11 +1,8 @@
+import { AWS, keyTypeArg } from '../../../../../lib/aws/AWS'
+
 import { CommandBuilder } from 'yargs'
 import { Volume } from 'aws-sdk/clients/ec2'
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-} from '@lstatro/cloud-search'
 import assert from 'assert'
-import { AWS, keyTypeArg } from '../../../../../lib/aws/AWS'
 
 const rule = 'VolumeEncrypted'
 

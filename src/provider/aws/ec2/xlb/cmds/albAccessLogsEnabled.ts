@@ -1,4 +1,3 @@
-import { AWSScannerInterface } from '@lstatro/cloud-search'
 import { Elbv2AccessLogsEnabled } from './elbv2AccessLogsEnabled'
 
 const rule = 'AlbAccessLogsEnabled'

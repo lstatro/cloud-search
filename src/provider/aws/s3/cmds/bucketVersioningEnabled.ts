@@ -1,9 +1,5 @@
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-} from '@lstatro/cloud-search'
-import { Bucket } from 'aws-sdk/clients/s3'
 import { AWS } from '../../../../lib/aws/AWS'
+import { Bucket } from 'aws-sdk/clients/s3'
 import assert from 'assert'
 const rule = 'BucketVersioningEnabled'
 

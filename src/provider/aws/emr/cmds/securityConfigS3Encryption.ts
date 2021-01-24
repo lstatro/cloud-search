@@ -1,4 +1,3 @@
-import { AWSScannerInterface } from '@lstatro/cloud-search'
 import { SecurityConfigSetting } from './securityConfigSetting'
 
 const rule = 'SecurityConfigS3Encryption'

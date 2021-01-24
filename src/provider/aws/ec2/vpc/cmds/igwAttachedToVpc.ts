@@ -1,9 +1,5 @@
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-} from '@lstatro/cloud-search'
-import { InternetGateway } from 'aws-sdk/clients/ec2'
 import { AWS } from '../../../../../lib/aws/AWS'
+import { InternetGateway } from 'aws-sdk/clients/ec2'
 import assert from 'assert'
 
 const rule = 'IgwAttachedToVpc'

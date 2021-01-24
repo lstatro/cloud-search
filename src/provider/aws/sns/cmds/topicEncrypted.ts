@@ -1,11 +1,8 @@
-import { CommandBuilder } from 'yargs'
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-} from '@lstatro/cloud-search'
-import assert from 'assert'
 import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
+
+import { CommandBuilder } from 'yargs'
 import { Topic } from 'aws-sdk/clients/sns'
+import assert from 'assert'
 
 const rule = 'TopicEncrypted'
 

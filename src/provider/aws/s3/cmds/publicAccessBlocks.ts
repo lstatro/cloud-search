@@ -1,7 +1,7 @@
 import { Bucket, GetPublicAccessBlockOutput } from 'aws-sdk/clients/s3'
-import { AWSScannerInterface } from '@lstatro/cloud-search'
-import assert from 'assert'
+
 import { AWS } from '../../../../lib/aws/AWS'
+import assert from 'assert'
 
 interface PublicAccessBlocksInterface extends AWSScannerInterface {
   rule: string

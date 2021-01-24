@@ -1,12 +1,8 @@
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-} from '@lstatro/cloud-search'
 import { AWS } from '../../../../../lib/aws/AWS'
 import { LoadBalancer } from 'aws-sdk/clients/elbv2'
-import assert from 'assert'
 import { WebACLSummary } from 'aws-sdk/clients/wafregional'
 import { WebACLSummary as WebACLSummaryV2 } from 'aws-sdk/clients/wafv2'
+import assert from 'assert'
 
 const rule = 'AlbWafEnabled'
 

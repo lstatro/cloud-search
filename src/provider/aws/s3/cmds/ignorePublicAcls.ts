@@ -1,4 +1,3 @@
-import { AWSScannerCliArgsInterface } from '@lstatro/cloud-search'
 import { PublicAccessBlocks } from './publicAccessBlocks'
 
 const rule = 'IgnorePublicAcls'

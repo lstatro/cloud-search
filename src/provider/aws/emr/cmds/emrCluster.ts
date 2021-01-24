@@ -1,9 +1,5 @@
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-} from '@lstatro/cloud-search'
-import assert from 'assert'
 import { AWS } from '../../../../lib/aws/AWS'
+import assert from 'assert'
 
 export type ClusterAttributeType = 'SecurityConfiguration' | 'LogUri'
 

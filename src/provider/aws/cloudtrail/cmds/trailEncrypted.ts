@@ -1,11 +1,7 @@
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-} from '@lstatro/cloud-search'
-import assert from 'assert'
-
 import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
+
 import { TrailInfo } from 'aws-sdk/clients/cloudtrail'
+import assert from 'assert'
 
 const rule = 'TrailEncrypted'
 

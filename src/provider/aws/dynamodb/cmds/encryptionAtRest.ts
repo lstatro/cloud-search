@@ -1,10 +1,8 @@
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-} from '@lstatro/cloud-search'
 import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
+
 import { TableName } from 'aws-sdk/clients/dynamodb'
 import assert from 'assert'
+
 const rule = 'EncryptionAtRest'
 
 export const command = `${rule} [args]`
