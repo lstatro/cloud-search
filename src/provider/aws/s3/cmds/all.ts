@@ -3,7 +3,7 @@ import { PublicAccessBlocks } from './publicAccessBlocks'
 export const command = 'PublicAccessBlocks [args]'
 export const desc = 'report on all four s3 public access blocks toggles'
 
-export const handler = async (args: AWSScannerCliArgsInterface) => {
+export const handler = async (args: AWSScannerInterface) => {
   const blockPublicAcls = new PublicAccessBlocks({
     region: args.region,
     profile: args.profile,

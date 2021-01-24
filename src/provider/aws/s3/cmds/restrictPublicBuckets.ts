@@ -13,7 +13,7 @@ export const desc = `report on the restrict public access toggle
 
 `
 
-export const handler = async (args: AWSScannerCliArgsInterface) => {
+export const handler = async (args: AWSScannerInterface) => {
   const scanner = new PublicAccessBlocks({
     ...args,
     rule,

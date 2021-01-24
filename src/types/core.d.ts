@@ -1,9 +1,5 @@
 declare module '@lstatro/cloud-search' {}
 
-declare interface AWSScannerCliArgsInterface
-  extends AWSScannerInterface,
-    Arguments {}
-
 /** the friendly name of the resource */
 declare type ResourceFriendlyNameType = string
 
