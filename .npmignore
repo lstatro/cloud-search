@@ -2,9 +2,7 @@
 .eslintrc.js
 .gitattributes
 .prettierignore
-*.test.js
 *.tgz
 .nyc_output
 coverage
-*.test.ts
 .github
