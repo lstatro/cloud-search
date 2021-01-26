@@ -1,13 +1,14 @@
-import { CommandBuilder } from 'yargs'
 import {
-  AuditResultInterface,
   AWSClientOptionsInterface,
   AWSParamsInterface,
+  AuditResultInterface,
   KeyType,
 } from '@lstatro/cloud-search'
+
+import { CommandBuilder } from 'yargs'
 import { KeyMetadata } from 'aws-sdk/clients/kms'
-import _AWS from 'aws-sdk'
 import Provider from '../Provider'
+import _AWS from 'aws-sdk'
 import assert from 'assert'
 
 interface ScanInterface {
