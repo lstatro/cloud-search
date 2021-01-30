@@ -1,10 +1,11 @@
-import { Vpc } from 'aws-sdk/clients/ec2'
 import {
-  AuditResultInterface,
   AWSClientOptionsInterface,
   AWSScannerInterface,
+  AuditResultInterface,
 } from '@lstatro/cloud-search'
+
 import { AWS } from '../../../../../lib/aws/AWS'
+import { Vpc } from 'aws-sdk/clients/ec2'
 import assert from 'assert'
 
 const rule = 'FlowlogsEnabled'
@@ -17,7 +18,7 @@ export const desc = `VPC Instances should have flowlogs enabled
   UNKNOWN - Unable to determine flowlogs are enabled
   FAIL    - Flowlogs are not enabled
 
-  resourceId: VpcId
+  resource: VpcId
 
 `
 
@@ -59,16 +60,16 @@ export default class FlowlogsEnabled extends AWS {
   }
 
   scan = async ({
-    resourceId,
+    resource,
     region,
   }: {
-    resourceId?: string
+    resource?: string
     region: string
   }) => {
     const options = this.getOptions()
     options.region = region
-    if (resourceId) {
-      await this.audit({ resource: resourceId, region })
+    if (resource) {
+      await this.audit({ resource, region })
     } else {
       const promise = new this.AWS.EC2(options).describeVpcs().promise()
       const vpcs = await this.pager<Vpc>(promise, 'Vpcs')
@@ -81,14 +82,14 @@ export default class FlowlogsEnabled extends AWS {
 
   private async getFlowLogs(
     options: AWSClientOptionsInterface,
-    resourceId: string
+    resource: string
   ) {
     const flowlogs = await new this.AWS.EC2(options)
       .describeFlowLogs({
         Filter: [
           {
             Name: 'resource-id',
-            Values: [resourceId],
+            Values: [resource],
           },
         ],
       })

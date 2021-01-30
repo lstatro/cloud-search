@@ -1,7 +1,8 @@
+import { SinonFakeTimers, useFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { useFakeTimers, SinonFakeTimers } from 'sinon'
-import { handler } from './securityConfigS3Encryption'
+
 import { expect } from 'chai'
+import { handler } from './securityConfigS3Encryption'
 
 describe('emr clusters should launch with a security configuration group', () => {
   const now = new Date(0)
@@ -208,7 +209,7 @@ describe('emr clusters should launch with a security configuration group', () =>
       SecurityConfiguration: 'test',
     })
 
-    const audits = await handler({ region: 'us-east-1', resourceId: 'test' })
+    const audits = await handler({ region: 'us-east-1', resource: 'test' })
 
     expect(audits).to.eql([
       {

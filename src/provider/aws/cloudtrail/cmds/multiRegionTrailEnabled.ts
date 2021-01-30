@@ -1,11 +1,11 @@
 import {
-  AuditResultInterface,
   AWSScannerInterface,
+  AuditResultInterface,
 } from '@lstatro/cloud-search'
-import assert from 'assert'
 
 import { AWS } from '../../../../lib/aws/AWS'
 import { TrailInfo } from 'aws-sdk/clients/cloudtrail'
+import assert from 'assert'
 
 const rule = 'MultiRegionTrailEnabled'
 
@@ -18,7 +18,7 @@ export const desc = `a cloudtrail trail's multi-region flag is set to true and t
   WARNING - This trail has its multi-region flag set to true, but is not logging
   FAIL    - This trail has its multi-region flag set to false, or is undefined
 
-  resourceId: trail ARN
+  resource: trail ARN
 
   note: multi-regional trails are global.  Meaning, we only need to search one region to find a multi-region
         trail.  To combat this we validate the trail returned in a scan lives in the region we made the api 
@@ -69,15 +69,9 @@ export class MultiRegionTrailEnabled extends AWS {
     this.audits.push(audit)
   }
 
-  scan = async ({
-    resourceId,
-    region,
-  }: {
-    resourceId: string
-    region: string
-  }) => {
-    if (resourceId) {
-      await this.audit({ resource: resourceId, region })
+  scan = async ({ resource, region }: { resource: string; region: string }) => {
+    if (resource) {
+      await this.audit({ resource: resource, region })
     } else {
       const options = this.getOptions()
       options.region = region

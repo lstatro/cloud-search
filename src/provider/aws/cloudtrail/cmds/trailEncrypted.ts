@@ -1,11 +1,11 @@
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-} from '@lstatro/cloud-search'
-import assert from 'assert'
-
 import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
+import {
+  AWSScannerInterface,
+  AuditResultInterface,
+} from '@lstatro/cloud-search'
+
 import { TrailInfo } from 'aws-sdk/clients/cloudtrail'
+import assert from 'assert'
 
 const rule = 'TrailEncrypted'
 
@@ -22,7 +22,7 @@ export const desc = `a cloudtrail trail must be configured for encryption
   UNKNOWN - Unable to determine trail encryption
   FAIL    - The trail is not encrypted
 
-  resourceId: trail name
+  resource: trail name
 
 `
 
@@ -65,15 +65,9 @@ export class TrailEncrypted extends AWS {
     this.audits.push(audit)
   }
 
-  scan = async ({
-    resourceId,
-    region,
-  }: {
-    resourceId: string
-    region: string
-  }) => {
-    if (resourceId) {
-      await this.audit({ resource: resourceId, region })
+  scan = async ({ resource, region }: { resource: string; region: string }) => {
+    if (resource) {
+      await this.audit({ resource: resource, region })
     } else {
       const options = this.getOptions()
       options.region = region

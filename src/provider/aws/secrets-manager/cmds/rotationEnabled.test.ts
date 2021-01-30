@@ -1,5 +1,6 @@
-import { mock, restore } from 'aws-sdk-mock'
 import { SinonFakeTimers, useFakeTimers } from 'sinon'
+import { mock, restore } from 'aws-sdk-mock'
+
 import { expect } from 'chai'
 import { handler } from './rotationEnabled'
 
@@ -88,7 +89,7 @@ describe('secrets-manager secrets rotation should be enabled', () => {
     const audits = await handler({
       region: 'test',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
     })
 
     expect(audits).to.eql([

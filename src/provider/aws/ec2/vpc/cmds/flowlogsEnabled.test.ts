@@ -1,7 +1,8 @@
-import { useFakeTimers, SinonFakeTimers } from 'sinon'
+import { SinonFakeTimers, useFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { handler } from './flowlogsEnabled'
+
 import { expect } from 'chai'
+import { handler } from './flowlogsEnabled'
 
 describe('vpc flowlogs enabled', () => {
   const now = new Date(0)
@@ -17,14 +18,14 @@ describe('vpc flowlogs enabled', () => {
     restore()
   })
 
-  it('should return OK when passed in a ResourceId that has FlowLogs enabled ', async () => {
+  it('should return OK when passed in a resource that has FlowLogs enabled ', async () => {
     mock('EC2', 'describeFlowLogs', {
-      FlowLogs: [{ ResourceId: 'test' }],
+      FlowLogs: [{ resource: 'test' }],
     })
     const audits = await handler({
       region: 'test',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
     })
     expect(audits).to.eql([
       {
@@ -39,14 +40,14 @@ describe('vpc flowlogs enabled', () => {
       },
     ])
   })
-  it('should return FAIL when passed a ResourceId with no FlowLogs', async () => {
+  it('should return FAIL when passed a resource with no FlowLogs', async () => {
     mock('EC2', 'describeFlowLogs', {
       FlowLogs: [],
     })
     const audits = await handler({
       region: 'test',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
     })
     expect(audits).to.eql([
       {
@@ -68,7 +69,7 @@ describe('vpc flowlogs enabled', () => {
     mock('EC2', 'describeFlowLogs', {
       FlowLogs: [
         {
-          ResourceId: 'test',
+          resource: 'test',
         },
       ],
     })

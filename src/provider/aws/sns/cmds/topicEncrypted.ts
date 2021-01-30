@@ -1,11 +1,12 @@
-import { CommandBuilder } from 'yargs'
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-} from '@lstatro/cloud-search'
-import assert from 'assert'
 import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
+import {
+  AWSScannerInterface,
+  AuditResultInterface,
+} from '@lstatro/cloud-search'
+
+import { CommandBuilder } from 'yargs'
 import { Topic } from 'aws-sdk/clients/sns'
+import assert from 'assert'
 
 const rule = 'TopicEncrypted'
 
@@ -22,7 +23,7 @@ export const desc = `SNS topics must have encryption at rest enabled
   WARNING - Topic encrypted but not with the specified key type
   FAIL    - Topic is not encrypted
 
-  resourceId - Topic ARN
+  resource - Topic ARN
 
 `
 
@@ -66,15 +67,9 @@ export class TopicEncrypted extends AWS {
     this.audits.push(audit)
   }
 
-  scan = async ({
-    resourceId,
-    region,
-  }: {
-    resourceId: string
-    region: string
-  }) => {
-    if (resourceId) {
-      await this.audit({ resource: resourceId, region })
+  scan = async ({ resource, region }: { resource: string; region: string }) => {
+    if (resource) {
+      await this.audit({ resource: resource, region })
     } else {
       const options = this.getOptions()
       options.region = region

@@ -1,6 +1,6 @@
 import {
+  AWSArgsInterface,
   AWSClientOptionsInterface,
-  AWSParamsInterface,
   AuditResultInterface,
   KeyType,
 } from '@lstatro/cloud-search'
@@ -11,19 +11,13 @@ import Provider from '../Provider'
 import _AWS from 'aws-sdk'
 import assert from 'assert'
 
-interface ScanInterface {
+interface AuditInterface {
   region?: string
-  resourceId?: unknown
+  resource?: unknown
 }
 
 interface KeyCacheInterface extends KeyMetadata {
   givenKeyId?: string
-}
-
-interface AuditInterface {
-  [key: string]: unknown
-  resource: unknown
-  region?: string
 }
 
 export const keyTypeArg: CommandBuilder = {
@@ -54,24 +48,24 @@ export abstract class AWS extends Provider {
   AWS = _AWS
   keyMetaData: KeyCacheInterface[] = []
   profile?: string
-  resourceId?: string
+  resource?: string
   keyType?: KeyType
 
-  constructor(params: AWSParamsInterface) {
-    super(params.rule, params.verbosity, params.format)
+  constructor(args: AWSArgsInterface) {
+    super(args.rule, args.verbosity, args.format)
 
-    this.region = params.region
-    this.profile = params.profile
-    this.resourceId = params.resourceId
+    this.region = args.region
+    this.profile = args.profile
+    this.resource = args.resource
 
     this.AWS.config.update({
       maxRetries: 20,
     })
 
-    this.keyType = params.keyType
+    this.keyType = args.keyType
   }
 
-  abstract scan(params: ScanInterface): Promise<void>
+  abstract scan(params: AuditInterface): Promise<void>
 
   abstract audit(params: AuditInterface): Promise<void>
 
@@ -166,12 +160,12 @@ export abstract class AWS extends Provider {
   start = async () => {
     try {
       this.handleSpinnerStatus({ method: 'start' })
-      if (this.resourceId) {
+      if (this.resource) {
         assert(
           this.region !== 'all',
           'must provide a region for a resource specific scan'
         )
-        await this.scan({ region: this.region, resourceId: this.resourceId })
+        await this.scan({ region: this.region, resource: this.resource })
       } else {
         await this.handleRegions()
       }

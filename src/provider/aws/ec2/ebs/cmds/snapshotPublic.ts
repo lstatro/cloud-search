@@ -1,11 +1,11 @@
 import {
-  AuditResultInterface,
   AWSScannerInterface,
+  AuditResultInterface,
 } from '@lstatro/cloud-search'
-import assert from 'assert'
 
 import { AWS } from '../../../../../lib/aws/AWS'
 import { Snapshot } from 'aws-sdk/clients/ec2'
+import assert from 'assert'
 
 const rule = 'SnapshotPublic'
 
@@ -17,7 +17,7 @@ export const desc = `SQS topics must be encrypted
   UNKNOWN - Unable to determine if snapshot is public
   FAIL    - Snapshot is public
 
-  resourceId - snapshot id
+  resource - snapshot id
 
 `
 
@@ -63,15 +63,9 @@ export class SnapshotPublic extends AWS {
     this.audits.push(audit)
   }
 
-  scan = async ({
-    region,
-    resourceId,
-  }: {
-    region: string
-    resourceId: string
-  }) => {
-    if (resourceId) {
-      await this.audit({ resource: resourceId, region })
+  scan = async ({ region, resource }: { region: string; resource: string }) => {
+    if (resource) {
+      await this.audit({ resource, region })
     } else {
       const options = this.getOptions()
       options.region = region

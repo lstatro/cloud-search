@@ -10,7 +10,7 @@ export const desc = `report the ignore public ACLs toggle
   UNKNOWN - IgnorePublicAcls state us unknown
   FAIL    - IgnorePublicAcls set to false
 
-  resourceId: bucket name
+  resource: bucket name
 
 `
 

@@ -1,10 +1,11 @@
 import {
-  AuditResultInterface,
   AWSScannerInterface,
+  AuditResultInterface,
 } from '@lstatro/cloud-search'
+import { LoadBalancer, LoadBalancerAttribute } from 'aws-sdk/clients/elbv2'
+
 import { AWS } from '../../../../../lib/aws/AWS'
 import assert from 'assert'
-import { LoadBalancer, LoadBalancerAttribute } from 'aws-sdk/clients/elbv2'
 
 export type LoadBalancerType = 'application' | 'network'
 
@@ -85,20 +86,20 @@ export class Elbv2AccessLogsEnabled extends AWS {
 
   scan = async ({
     region,
-    resourceId,
+    resource,
   }: {
     region: string
-    resourceId?: string
+    resource?: string
   }) => {
     const options = this.getOptions()
     options.region = region
 
     let promise
 
-    if (resourceId) {
+    if (resource) {
       promise = new this.AWS.ELBv2(options)
         .describeLoadBalancers({
-          LoadBalancerArns: [resourceId],
+          LoadBalancerArns: [resource],
         })
         .promise()
     } else {

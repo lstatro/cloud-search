@@ -1,8 +1,10 @@
 import 'mocha'
-import { useFakeTimers, SinonFakeTimers, SinonStub, stub } from 'sinon'
+
+import { SinonFakeTimers, SinonStub, stub, useFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { handler } from './bucketVersioningEnabled'
+
 import { expect } from 'chai'
+import { handler } from './bucketVersioningEnabled'
 
 describe('S3 Bucket Versioning Enabled', () => {
   const now = new Date(0)
@@ -84,12 +86,12 @@ describe('S3 Bucket Versioning Enabled', () => {
       },
     ])
   })
-  it('should return OK when a resourceId is passed in and versioning is enabled', async () => {
+  it('should return OK when a resource is passed in and versioning is enabled', async () => {
     mock('S3', 'getBucketVersioning', { Status: 'Enabled' })
     const audits = await handler({
       region: 'test',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
     })
     expect(audits).to.eql([
       {
@@ -110,7 +112,7 @@ describe('S3 Bucket Versioning Enabled', () => {
     const audits = await handler({
       region: 'test',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
     })
 
     expect(errStub.args[0][0].message).to.eql('test')

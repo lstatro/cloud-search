@@ -1,9 +1,10 @@
 import {
-  AuditResultInterface,
   AWSScannerInterface,
+  AuditResultInterface,
 } from '@lstatro/cloud-search'
-import { InternetGateway } from 'aws-sdk/clients/ec2'
+
 import { AWS } from '../../../../../lib/aws/AWS'
+import { InternetGateway } from 'aws-sdk/clients/ec2'
 import assert from 'assert'
 
 const rule = 'IgwAttachedToVpc'
@@ -17,7 +18,7 @@ show up in this scan.
   UNKNOWN - Unable to determine if the IGW has an attachment
   FAIL    - The IGW is attached to a VPC
 
-  resourceId - IGW ID (igw-xxxxxx)
+  resource - IGW ID (igw-xxxxxx)
   
 `
 
@@ -62,17 +63,17 @@ export class IgwAttachedToVpc extends AWS {
 
   scan = async ({
     region,
-    resourceId,
+    resource,
   }: {
     region: string
-    resourceId?: string
+    resource?: string
   }) => {
     const options = this.getOptions()
     options.region = region
 
     const promise = new this.AWS.EC2(options)
       .describeInternetGateways({
-        InternetGatewayIds: resourceId ? [resourceId] : undefined,
+        InternetGatewayIds: resource ? [resource] : undefined,
       })
       .promise()
 

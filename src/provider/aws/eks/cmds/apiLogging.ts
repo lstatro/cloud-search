@@ -10,7 +10,7 @@ export const desc = `EKS Clusters should have API logging enabled
   UNKNOWN - Unable to determine if cluster has API logging enabled
   FAIL    - Cluster does not have API logging enabled
 
-  resourceId - cluster name
+  resource - cluster name
 
 `
 

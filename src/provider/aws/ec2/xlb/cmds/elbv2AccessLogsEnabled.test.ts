@@ -1,9 +1,10 @@
-import { useFakeTimers, SinonFakeTimers } from 'sinon'
+import { SinonFakeTimers, useFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { handler as alb } from './albAccessLogsEnabled'
-import { handler as nlb } from './nlbAccessLogsEnabled'
+
 import { Elbv2AccessLogsEnabled } from './elbv2AccessLogsEnabled'
+import { handler as alb } from './albAccessLogsEnabled'
 import { expect } from 'chai'
+import { handler as nlb } from './nlbAccessLogsEnabled'
 
 describe('elbv2 load balancers should log connections', () => {
   const now = new Date(0)
@@ -206,7 +207,7 @@ describe('elbv2 load balancers should log connections', () => {
         const audits = await handler({
           region: 'test',
           profile: 'test',
-          resourceId: 'test',
+          resource: 'test',
         })
 
         expect(audits).to.eql([

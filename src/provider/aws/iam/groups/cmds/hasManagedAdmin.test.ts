@@ -1,7 +1,8 @@
+import { SinonFakeTimers, useFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { useFakeTimers, SinonFakeTimers } from 'sinon'
-import { handler } from './hasManagedAdmin'
+
 import { expect } from 'chai'
+import { handler } from './hasManagedAdmin'
 
 describe('groups should not have managed admin attached', () => {
   const now = new Date(0)
@@ -117,7 +118,7 @@ describe('groups should not have managed admin attached', () => {
 
     const audits = await handler({
       region: 'us-east-1',
-      resourceId: 'test',
+      resource: 'test',
       profile: 'test',
     })
 
@@ -157,7 +158,7 @@ describe('groups should not have managed admin attached', () => {
 
     const audits = await handler({
       region: 'us-east-1',
-      resourceId: 'test',
+      resource: 'test',
       profile: 'test',
     })
     expect(audits).to.eql([

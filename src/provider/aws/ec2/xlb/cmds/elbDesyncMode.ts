@@ -1,10 +1,11 @@
 import {
-  AuditResultInterface,
   AWSScannerInterface,
+  AuditResultInterface,
 } from '@lstatro/cloud-search'
+
 import { AWS } from '../../../../../lib/aws/AWS'
-import assert from 'assert'
 import { LoadBalancerDescription } from 'aws-sdk/clients/elb'
+import assert from 'assert'
 
 const rule = 'ElbDesyncMode'
 
@@ -17,7 +18,7 @@ enabled
   UNKNOWN - Unable to determine LB'er desync mode
   FAIL    - LB is set to monitor or does not have the mode enabled
 
-  resourceId - load balancer name
+  resource - load balancer name
 
 `
 
@@ -85,20 +86,20 @@ export class ElbDesyncMode extends AWS {
 
   scan = async ({
     region,
-    resourceId,
+    resource,
   }: {
     region: string
-    resourceId?: string
+    resource?: string
   }) => {
     const options = this.getOptions()
     options.region = region
 
     let promise
 
-    if (resourceId) {
+    if (resource) {
       promise = new this.AWS.ELB(options)
         .describeLoadBalancers({
-          LoadBalancerNames: [resourceId],
+          LoadBalancerNames: [resource],
         })
         .promise()
     } else {

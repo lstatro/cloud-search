@@ -1,9 +1,10 @@
 import {
-  AuditResultInterface,
   AWSScannerInterface,
+  AuditResultInterface,
 } from '@lstatro/cloud-search'
-import assert from 'assert'
+
 import { AWS } from '../../../../lib/aws/AWS'
+import assert from 'assert'
 
 export type ClusterAttributeType = 'SecurityConfiguration' | 'LogUri'
 
@@ -127,18 +128,12 @@ export class SecurityConfigSetting extends AWS {
     this.audits.push(audit)
   }
 
-  scan = async ({
-    resourceId,
-    region,
-  }: {
-    resourceId: string
-    region: string
-  }) => {
+  scan = async ({ resource, region }: { resource: string; region: string }) => {
     const options = this.getOptions()
     options.region = region
 
-    if (resourceId) {
-      await this.audit({ resource: resourceId, region })
+    if (resource) {
+      await this.audit({ resource: resource, region })
     } else {
       const configurations = await new this.AWS.EMR(options)
         .listSecurityConfigurations()

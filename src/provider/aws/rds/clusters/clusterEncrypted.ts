@@ -1,10 +1,11 @@
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-} from '@lstatro/cloud-search'
-import assert from 'assert'
 import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
+import {
+  AWSScannerInterface,
+  AuditResultInterface,
+} from '@lstatro/cloud-search'
+
 import { DBCluster } from 'aws-sdk/clients/rds'
+import assert from 'assert'
 
 const rule = 'ClusterEncrypted'
 
@@ -21,7 +22,7 @@ export const desc = `RDS clusters must have their storage at rest encrypted
   WARNING - RDS cluster storage is encrypted but not with the specified key type
   FAIL    - RDS cluster storage is not encrypted at rest
 
-  resourceId: RDS clusters ARN
+  resource: RDS clusters ARN
 
   note: this rule targets DB Clusters not DB Instances' (MySQL, PostgreSQL, Oracle, MariaDB, MSSQL).
 
@@ -62,22 +63,16 @@ export class ClusterEncrypted extends AWS {
     this.audits.push(audit)
   }
 
-  scan = async ({
-    resourceId,
-    region,
-  }: {
-    resourceId: string
-    region: string
-  }) => {
+  scan = async ({ resource, region }: { resource: string; region: string }) => {
     let clusters
 
     const options = this.getOptions()
     options.region = region
 
-    if (resourceId) {
+    if (resource) {
       const promise = new this.AWS.RDS(options)
         .describeDBClusters({
-          DBClusterIdentifier: resourceId,
+          DBClusterIdentifier: resource,
         })
         .promise()
       clusters = await this.pager<DBCluster>(promise, 'DBClusters')

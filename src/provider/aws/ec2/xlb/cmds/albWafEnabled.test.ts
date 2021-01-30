@@ -1,7 +1,8 @@
-import { useFakeTimers, SinonFakeTimers } from 'sinon'
+import { SinonFakeTimers, useFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { handler } from './albWafEnabled'
+
 import { expect } from 'chai'
+import { handler } from './albWafEnabled'
 
 describe('albs have a WAF attached', () => {
   const now = new Date(0)
@@ -109,7 +110,7 @@ describe('albs have a WAF attached', () => {
     const audits = await handler({
       region: 'test',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
     })
 
     expect(audits).to.eql([

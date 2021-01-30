@@ -1,7 +1,8 @@
-import { useFakeTimers, SinonFakeTimers } from 'sinon'
+import { SinonFakeTimers, useFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { handler } from './clusterEncrypted'
+
 import { expect } from 'chai'
+import { handler } from './clusterEncrypted'
 
 describe('neptune cluster storage is encrypted at rest', () => {
   const now = new Date(0)
@@ -118,7 +119,7 @@ describe('neptune cluster storage is encrypted at rest', () => {
     })
 
     const audits = await handler({
-      resourceId: 'test',
+      resource: 'test',
       region: 'test',
       profile: 'test',
       keyType: 'cmk',
@@ -151,7 +152,7 @@ describe('neptune cluster storage is encrypted at rest', () => {
     })
 
     const audits = await handler({
-      resourceId: 'test',
+      resource: 'test',
       region: 'test',
       profile: 'test',
       keyType: 'cmk',

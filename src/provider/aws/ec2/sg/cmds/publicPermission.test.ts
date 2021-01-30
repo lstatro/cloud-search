@@ -1,8 +1,10 @@
 import 'chai'
-import { useFakeTimers, SinonFakeTimers } from 'sinon'
+
+import { SinonFakeTimers, useFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { handler } from './publicPermission'
+
 import { expect } from 'chai'
+import { handler } from './publicPermission'
 
 /** none of these tests should throw */
 
@@ -39,7 +41,7 @@ describe('security group with a public permission', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
     })
     expect(audits).to.eql([
       {
@@ -76,7 +78,7 @@ describe('security group with a public permission', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
     })
     expect(audits).to.eql([
       {
@@ -93,7 +95,7 @@ describe('security group with a public permission', () => {
     ])
   })
 
-  it('should report OK if it is not 0.0.0.0/0 without a resourceId', async () => {
+  it('should report OK if it is not 0.0.0.0/0 without a resource', async () => {
     mock('EC2', 'describeSecurityGroups', {
       SecurityGroups: [
         {
@@ -141,7 +143,7 @@ describe('security group with a public permission', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
     })
     expect(audits).to.eql([
       {
@@ -169,7 +171,7 @@ describe('security group with a public permission', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
     })
     expect(audits).to.eql([
       {
@@ -206,7 +208,7 @@ describe('security group with a public permission', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
     })
     expect(audits).to.eql([
       {
@@ -243,7 +245,7 @@ describe('security group with a public permission', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
     })
     expect(audits).to.eql([
       {
@@ -265,7 +267,7 @@ describe('security group with a public permission', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
     })
     expect(audits).to.eql([])
   })
@@ -281,7 +283,7 @@ describe('security group with a public permission', () => {
       audits = await handler({
         region: 'us-east-1',
         profile: 'test',
-        resourceId: 'test',
+        resource: 'test',
       })
     } catch (err) {
       audits = err

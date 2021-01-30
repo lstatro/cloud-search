@@ -1,7 +1,8 @@
+import { SinonFakeTimers, useFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { useFakeTimers, SinonFakeTimers } from 'sinon'
-import { handler } from './encryptionEnabled'
+
 import { expect } from 'chai'
+import { handler } from './encryptionEnabled'
 
 describe('efs encryption enabled', () => {
   const now = new Date(0)
@@ -35,7 +36,7 @@ describe('efs encryption enabled', () => {
     const audits = await handler({
       region: 'test',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
       keyType: 'aws',
     })
     expect(audits).to.eql([
@@ -63,7 +64,7 @@ describe('efs encryption enabled', () => {
     const audits = await handler({
       region: 'test',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
       keyType: 'cmk',
     })
     expect(audits).to.eql([
@@ -86,7 +87,7 @@ describe('efs encryption enabled', () => {
     const audits = await handler({
       region: 'test',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
     })
     expect(audits).to.eql([
       {

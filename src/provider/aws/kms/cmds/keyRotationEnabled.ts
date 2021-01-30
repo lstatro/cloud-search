@@ -1,10 +1,12 @@
 import {
-  AuditResultInterface,
   AWSScannerInterface,
+  AuditResultInterface,
 } from '@lstatro/cloud-search'
+
 import { AWS } from '../../../../lib/aws/AWS'
-import assert from 'assert'
 import { KeyListEntry } from 'aws-sdk/clients/kms'
+import assert from 'assert'
+
 const rule = 'KeyRotationEnabled'
 
 export const command = `${rule} [args]`
@@ -15,7 +17,7 @@ export const desc = `AWS managed customer keys (CMK's) should have yearly rotati
   UNKNOWN - Unable to determine if yearly rotation is enabled
   FAIL    - Yearly rotation is not enabled
 
-  resourceId: KMS Key ID
+  resource: KMS Key ID
 
 `
 
@@ -58,15 +60,9 @@ export class KeyRotationEnabled extends AWS {
     }
   }
 
-  scan = async ({
-    resourceId,
-    region,
-  }: {
-    resourceId: string
-    region: string
-  }) => {
-    if (resourceId) {
-      await this.audit({ resource: resourceId, region })
+  scan = async ({ resource, region }: { resource: string; region: string }) => {
+    if (resource) {
+      await this.audit({ resource: resource, region })
     } else {
       const options = this.getOptions()
       options.region = region

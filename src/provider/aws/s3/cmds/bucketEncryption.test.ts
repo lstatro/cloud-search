@@ -1,8 +1,9 @@
+import { SinonFakeTimers, useFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { useFakeTimers, SinonFakeTimers } from 'sinon'
-import { handler } from './bucketEncryption'
-import { expect } from 'chai'
+
 import { AWSError } from 'aws-sdk'
+import { expect } from 'chai'
+import { handler } from './bucketEncryption'
 describe('s3 bucket encryption', () => {
   const now = new Date(0)
   let clock: SinonFakeTimers
@@ -30,7 +31,7 @@ describe('s3 bucket encryption', () => {
       },
     })
     const audits = await handler({
-      resourceId: 'test',
+      resource: 'test',
 
       region: 'test',
       keyType: 'aws',
@@ -64,7 +65,7 @@ describe('s3 bucket encryption', () => {
       },
     })
     const audits = await handler({
-      resourceId: 'test',
+      resource: 'test',
       region: 'test',
       keyType: 'cmk',
     })

@@ -10,7 +10,7 @@ export const desc = `report on the restrict public access toggle
   UNKNOWN - RestrictPublicBuckets state us unknown
   FAIL    - RestrictPublicBuckets set to false
 
-  resourceId: bucket name
+  resource: bucket name
 
 `
 

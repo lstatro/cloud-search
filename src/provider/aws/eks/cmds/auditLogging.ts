@@ -10,7 +10,7 @@ export const desc = `EKS Clusters should have audit logging enabled
   UNKNOWN - Unable to determine if cluster has audit logging enabled
   FAIL    - Cluster does not have audit logging enabled
 
-  resourceId - cluster name
+  resource - cluster name
 
 `
 

@@ -1,11 +1,12 @@
-import { CommandBuilder } from 'yargs'
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-} from '@lstatro/cloud-search'
 import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
-import assert from 'assert'
+import {
+  AWSScannerInterface,
+  AuditResultInterface,
+} from '@lstatro/cloud-search'
 import { Bucket, ServerSideEncryptionConfiguration } from 'aws-sdk/clients/s3'
+
+import { CommandBuilder } from 'yargs'
+import assert from 'assert'
 
 const rule = 'BucketEncryption'
 
@@ -22,7 +23,7 @@ export const desc = `SQS topics must be encrypted
   WARNING - Bucket encrypted but not with the specified key type
   FAIL    - Bucket is not encrypted
 
-  resourceId - bucket name
+  resource - bucket name
 
 `
 
@@ -123,15 +124,9 @@ export class BucketEncryption extends AWS {
     this.audits.push(audit)
   }
 
-  scan = async ({
-    resourceId,
-    region,
-  }: {
-    resourceId: string
-    region: string
-  }) => {
-    if (resourceId) {
-      await this.audit({ resource: resourceId, region })
+  scan = async ({ resource, region }: { resource: string; region: string }) => {
+    if (resource) {
+      await this.audit({ resource: resource, region })
     } else {
       const options = this.getOptions()
       options.region = region

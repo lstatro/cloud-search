@@ -1,9 +1,10 @@
 import {
-  AuditResultInterface,
   AWSScannerInterface,
+  AuditResultInterface,
 } from '@lstatro/cloud-search'
-import { SecurityGroup } from 'aws-sdk/clients/ec2'
+
 import { AWS } from '../../../../../lib/aws/AWS'
+import { SecurityGroup } from 'aws-sdk/clients/ec2'
 import assert from 'assert'
 
 const rule = 'PublicPermission'
@@ -15,7 +16,7 @@ export const desc = `searches security groups for 0.0.0.0/0 or ::/0 on any port
   UNKNOWN - Unable to determine if the group includes 0.0.0.0/0 or ::/0
   FAIL    - The group allows 0.0.0.0/0 or ::/0 ingress
 
-  resourceId - security group id (sg-xxxxxx)
+  resource - security group id (sg-xxxxxx)
 
 `
 
@@ -78,17 +79,17 @@ export class PublicPermission extends AWS {
 
   scan = async ({
     region,
-    resourceId,
+    resource,
   }: {
     region: string
-    resourceId?: string
+    resource?: string
   }) => {
     const options = this.getOptions()
     options.region = region
 
     const promise = new this.AWS.EC2(options)
       .describeSecurityGroups({
-        GroupIds: resourceId ? [resourceId] : undefined,
+        GroupIds: resource ? [resource] : undefined,
       })
       .promise()
     const groups = await this.pager<SecurityGroup>(promise, 'SecurityGroups')

@@ -1,7 +1,8 @@
-import { useFakeTimers, SinonFakeTimers, restore as sinonRestore } from 'sinon'
+import { SinonFakeTimers, restore as sinonRestore, useFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { handler } from './publicAccess'
+
 import { expect } from 'chai'
+import { handler } from './publicAccess'
 
 describe('#publicAccess', () => {
   const now = new Date(0)
@@ -72,7 +73,7 @@ describe('#publicAccess', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
       rule: 'PublicAccess',
     })
     expect(audits).to.eql([

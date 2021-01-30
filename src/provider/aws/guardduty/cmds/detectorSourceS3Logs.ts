@@ -12,7 +12,7 @@ export const desc = `GuardDuty detectors must have the S3 logs data source enabl
   UNKNOWN - Unable to determine if the detector ahs the S3 logs source enabled
   FAIL    - The detector does not have the S3 logs data source enabled
 
-  resourceId: detector ID
+  resource: detector ID
 
 `
 

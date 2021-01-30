@@ -1,7 +1,8 @@
 import { Bucket, GetPublicAccessBlockOutput } from 'aws-sdk/clients/s3'
+
+import { AWS } from '../../../../lib/aws/AWS'
 import { AWSScannerInterface } from '@lstatro/cloud-search'
 import assert from 'assert'
-import { AWS } from '../../../../lib/aws/AWS'
 
 interface PublicAccessBlocksInterface extends AWSScannerInterface {
   rule: string
@@ -63,9 +64,9 @@ export class PublicAccessBlocks extends AWS {
     this.audits.push(audit)
   }
 
-  scan = async ({ resourceId }: { resourceId: string }) => {
-    if (resourceId) {
-      await this.audit({ resource: resourceId })
+  scan = async ({ resource }: { resource: string }) => {
+    if (resource) {
+      await this.audit({ resource })
     } else {
       const options = this.getOptions()
 

@@ -1,7 +1,8 @@
-import { useFakeTimers, SinonFakeTimers } from 'sinon'
+import { SinonFakeTimers, useFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { handler } from './multiRegionTrailEnabled'
+
 import { expect } from 'chai'
+import { handler } from './multiRegionTrailEnabled'
 
 describe('cloudtrail multi region trail enabled', () => {
   const now = new Date(0)
@@ -97,7 +98,7 @@ describe('cloudtrail multi region trail enabled', () => {
 
     const audits = await handler({
       region: 'test',
-      resourceId: 'test',
+      resource: 'test',
       profile: 'test',
     })
 

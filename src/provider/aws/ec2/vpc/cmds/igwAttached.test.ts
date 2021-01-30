@@ -1,8 +1,10 @@
 import 'chai'
-import { useFakeTimers, SinonFakeTimers } from 'sinon'
+
+import { SinonFakeTimers, useFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { handler } from './igwAttachedToVpc'
+
 import { expect } from 'chai'
+import { handler } from './igwAttachedToVpc'
 
 describe('igw vpc attachment', () => {
   const now = new Date(0)
@@ -33,7 +35,7 @@ describe('igw vpc attachment', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
     })
     expect(audits).to.eql([
       {
@@ -65,7 +67,7 @@ describe('igw vpc attachment', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
     })
 
     expect(audits).to.eql([
@@ -94,7 +96,7 @@ describe('igw vpc attachment', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
     })
 
     expect(audits).to.eql([
@@ -123,7 +125,7 @@ describe('igw vpc attachment', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
     })
 
     expect(audits).to.eql([
@@ -151,7 +153,7 @@ describe('igw vpc attachment', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
     })
 
     expect(audits).to.eql([

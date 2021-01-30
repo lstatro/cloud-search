@@ -1,10 +1,11 @@
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-} from '@lstatro/cloud-search'
-import assert from 'assert'
 import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
+import {
+  AWSScannerInterface,
+  AuditResultInterface,
+} from '@lstatro/cloud-search'
+
 import { CacheCluster } from 'aws-sdk/clients/elasticache'
+import assert from 'assert'
 
 const rule = 'TransitEncryptionEnabled'
 
@@ -20,7 +21,7 @@ export const desc = `Elasticache instances should enforce encryption in flight
   UNKNOWN - Unable to determine if the elasticache cluster has transit encryption
   FAIL    - Elasticache cluster does not have encryption enabled
 
-  resourceId: cluster, instance, or shard name
+  resource: cluster, instance, or shard name
 
   note: Memcached instances do not support encryption therefore they'll always return FAIL
   note: Even standalone instances have a cluster ID
@@ -59,21 +60,15 @@ export class TransitEncryptionEnabled extends AWS {
     this.audits.push(audit)
   }
 
-  scan = async ({
-    resourceId,
-    region,
-  }: {
-    resourceId: string
-    region: string
-  }) => {
+  scan = async ({ resource, region }: { resource: string; region: string }) => {
     let clusters
     const options = this.getOptions()
     options.region = region
 
-    if (resourceId) {
+    if (resource) {
       const promise = new this.AWS.ElastiCache(options)
         .describeCacheClusters({
-          CacheClusterId: resourceId,
+          CacheClusterId: resource,
         })
         .promise()
       clusters = await this.pager<CacheCluster>(promise, 'CacheClusters')

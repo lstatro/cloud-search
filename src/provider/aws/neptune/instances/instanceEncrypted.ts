@@ -1,10 +1,12 @@
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-} from '@lstatro/cloud-search'
 import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
+import {
+  AWSScannerInterface,
+  AuditResultInterface,
+} from '@lstatro/cloud-search'
+
 import { DBInstance } from 'aws-sdk/clients/neptune'
 import assert from 'assert'
+
 const rule = 'InstanceEncrypted'
 
 export const command = `${rule} [args]`
@@ -15,7 +17,7 @@ export const desc = `Amazon Neptune graph database instances should have encrypt
   UNKNOWN - Unable to determine if Neptune instance encryption enabled
   FAIL    - Neptune instance is not encrypted at rest
 
-  resourceId: Database Identifier
+  resource: Database Identifier
 
 `
 export const builder = {
@@ -55,20 +57,14 @@ export class InstanceEncrypted extends AWS {
     this.audits.push(audit)
   }
 
-  scan = async ({
-    resourceId,
-    region,
-  }: {
-    resourceId: string
-    region: string
-  }) => {
+  scan = async ({ resource, region }: { resource: string; region: string }) => {
     let instances
     const options = this.getOptions()
     options.region = region
-    if (resourceId) {
+    if (resource) {
       const promise = new this.AWS.Neptune(options)
         .describeDBInstances({
-          DBInstanceIdentifier: resourceId,
+          DBInstanceIdentifier: resource,
         })
         .promise()
       instances = await this.pager<DBInstance>(promise, 'DBInstances')

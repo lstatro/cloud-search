@@ -10,7 +10,7 @@ export const desc = `report on the block public policy toggle
   UNKNOWN - BlockPublicPolicy state us unknown
   FAIL    - BlockPublicPolicy set to false
 
-  resourceId: bucket name
+  resource: bucket name
 
 `
 

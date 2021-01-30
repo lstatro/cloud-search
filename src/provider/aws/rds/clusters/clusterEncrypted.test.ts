@@ -1,13 +1,14 @@
 import {
-  useFakeTimers,
   SinonFakeTimers,
-  stub,
   restore as sinonRestore,
+  stub,
+  useFakeTimers,
 } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
+
 import AWS from 'aws-sdk'
-import { handler } from './clusterEncrypted'
 import { expect } from 'chai'
+import { handler } from './clusterEncrypted'
 
 describe('rds cluster storage is encrypted at rest', () => {
   const now = new Date(0)
@@ -134,7 +135,7 @@ describe('rds cluster storage is encrypted at rest', () => {
 
     const audits = await handler({
       region: 'test',
-      resourceId: 'test',
+      resource: 'test',
       profile: 'test',
       keyType: 'cmk',
     })
@@ -169,7 +170,7 @@ describe('rds cluster storage is encrypted at rest', () => {
 
     const audits = await handler({
       region: 'test',
-      resourceId: 'test',
+      resource: 'test',
       profile: 'test',
       keyType: 'cmk',
     })

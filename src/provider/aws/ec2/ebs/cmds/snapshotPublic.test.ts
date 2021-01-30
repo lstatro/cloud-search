@@ -1,7 +1,8 @@
-import { useFakeTimers, SinonFakeTimers } from 'sinon'
+import { SinonFakeTimers, useFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { handler } from './snapshotPublic'
+
 import { expect } from 'chai'
+import { handler } from './snapshotPublic'
 
 describe('ebs snapshot should not be public', () => {
   const now = new Date(0)
@@ -41,7 +42,7 @@ describe('ebs snapshot should not be public', () => {
     const audits = await handler({
       profile: 'test',
       region: 'test',
-      resourceId: 'test',
+      resource: 'test',
     })
 
     expect(audits).to.eql([
@@ -86,7 +87,7 @@ describe('ebs snapshot should not be public', () => {
     const audits = await handler({
       profile: 'test',
       region: 'test',
-      resourceId: 'test',
+      resource: 'test',
     })
 
     expect(audits).to.eql([
@@ -111,7 +112,7 @@ describe('ebs snapshot should not be public', () => {
     const audits = await handler({
       profile: 'test',
       region: 'test',
-      resourceId: 'test',
+      resource: 'test',
     })
 
     expect(audits).to.eql([
@@ -136,7 +137,7 @@ describe('ebs snapshot should not be public', () => {
     const audits = await handler({
       profile: 'test',
       region: 'test',
-      resourceId: 'test',
+      resource: 'test',
     })
 
     expect(audits).to.eql([

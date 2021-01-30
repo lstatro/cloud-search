@@ -1,6 +1,7 @@
+import { Eks, EksInterface } from './eks'
+
 import { CommandBuilder } from 'yargs'
 import { keyTypeArg } from '../../../../lib/aws/AWS'
-import { Eks, EksInterface } from './eks'
 
 const rule = 'SecretsEncryption'
 
@@ -17,7 +18,7 @@ export const desc = `EKS Clusters should encrypt secrets
   WARNING - Cluster uses secrets encryption but with the wrong key type
   FAIL    - Cluster does not use secrets encryption
 
-  resourceId - cluster name
+  resource - cluster name
 
 `
 

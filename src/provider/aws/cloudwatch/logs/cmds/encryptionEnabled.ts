@@ -1,10 +1,11 @@
 import {
-  AuditResultInterface,
   AWSScannerInterface,
+  AuditResultInterface,
 } from '@lstatro/cloud-search'
-import assert from 'assert'
+
 import { AWS } from '../../../../../lib/aws/AWS'
 import { LogGroup } from 'aws-sdk/clients/cloudwatchlogs'
+import assert from 'assert'
 
 const rule = 'EncryptionEnabled'
 
@@ -17,7 +18,7 @@ CMK
   WARNING - The log group is encrypted with a AWS managed KMS key (this should never happen)
   FAIL    - The log group is not encrypted at rest (AWS default encryption)
 
-  resourceId - log group name
+  resource - log group name
 
   note: AWS encrypts log groups by default using internal keys that the customer
         has no insight or control over.  This is unlike other AWS managed keys
@@ -68,16 +69,16 @@ export class SnapshotEncrypted extends AWS {
 
   scan = async ({
     region,
-    resourceId,
+    resource,
   }: {
     region: string
-    resourceId?: string
+    resource?: string
   }) => {
     const options = this.getOptions()
     options.region = region
     const promise = new this.AWS.CloudWatchLogs(options)
       .describeLogGroups({
-        logGroupNamePrefix: resourceId,
+        logGroupNamePrefix: resource,
       })
       .promise()
 

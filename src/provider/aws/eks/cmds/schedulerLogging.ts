@@ -10,7 +10,7 @@ export const desc = `EKS Clusters should have scheduler logging enabled
   UNKNOWN - Unable to determine if cluster has scheduler logging enabled
   FAIL    - Cluster does not have scheduler logging enabled
 
-  resourceId - cluster name
+  resource - cluster name
 
 `
 

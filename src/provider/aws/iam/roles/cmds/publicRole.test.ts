@@ -1,6 +1,7 @@
-import { expect } from 'chai'
-import { useFakeTimers, SinonFakeTimers } from 'sinon'
+import { SinonFakeTimers, useFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
+
+import { expect } from 'chai'
 import { handler } from './publicRole'
 
 describe('iam public role tests', () => {
@@ -61,7 +62,7 @@ describe('iam public role tests', () => {
 
     const audits = await handler({
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
       region: 'test',
     })
     expect(audits).to.eql([

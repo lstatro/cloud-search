@@ -1,11 +1,12 @@
 import {
-  AuditResultInterface,
   AWSScannerInterface,
+  AuditResultInterface,
 } from '@lstatro/cloud-search'
+
 import { AWS } from '../../../../../lib/aws/AWS'
 import { CommandBuilder } from 'yargs'
-import { assert } from 'console'
 import { User } from 'aws-sdk/clients/iam'
+import { assert } from 'console'
 
 const rule = 'PasswordAge'
 
@@ -93,9 +94,9 @@ export class PasswordAge extends AWS {
     this.audits.push(audit)
   }
 
-  scan = async ({ resourceId }: { resourceId: string }) => {
-    if (resourceId) {
-      await this.audit({ resource: resourceId })
+  scan = async ({ resource }: { resource: string }) => {
+    if (resource) {
+      await this.audit({ resource })
     } else {
       const options = this.getOptions()
 

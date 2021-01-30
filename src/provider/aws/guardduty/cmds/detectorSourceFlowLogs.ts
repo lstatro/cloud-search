@@ -12,7 +12,7 @@ export const desc = `GuardDuty detectors must have the flow logs data source ena
   UNKNOWN - Unable to determine if the detector ahs the flow logs source enabled
   FAIL    - The detector does not have the flow logs data source enabled
 
-  resourceId: detector ID
+  resource: detector ID
 
 `
 

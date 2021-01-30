@@ -12,7 +12,7 @@ enabled
   UNKNOWN - Unable to determine if security configuration has transit encryption enabled
   FAIL    - Security configuration does not have transit encryption enabled
 
-  resourceId - security configuration name
+  resource - security configuration name
 
   note: this rule checks to see if any value is set
 `

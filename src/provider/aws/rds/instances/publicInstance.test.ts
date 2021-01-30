@@ -1,7 +1,8 @@
-import { useFakeTimers, SinonFakeTimers } from 'sinon'
+import { SinonFakeTimers, useFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { handler } from './publicInstance'
+
 import { expect } from 'chai'
+import { handler } from './publicInstance'
 
 describe('rds public instance', () => {
   const now = new Date(0)
@@ -92,7 +93,7 @@ describe('rds public instance', () => {
 
     const audits = await handler({
       region: 'us-east-1',
-      resourceId: 'test',
+      resource: 'test',
       profile: 'test',
     })
     expect(audits).to.eql([
@@ -120,7 +121,7 @@ describe('rds public instance', () => {
 
     const audits = await handler({
       region: 'us-east-1',
-      resourceId: 'test',
+      resource: 'test',
       profile: 'test',
     })
     expect(audits).to.eql([

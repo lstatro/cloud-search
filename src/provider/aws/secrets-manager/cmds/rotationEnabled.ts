@@ -11,7 +11,7 @@ export const desc = `Secrets Manager passwords should have automatic rotation en
   UNKNOWN - Unable to determine if rotation is enabled
   FAIL    - Rotation is not enabled
 
-  resourceId: secret name
+  resource: secret name
 
 `
 

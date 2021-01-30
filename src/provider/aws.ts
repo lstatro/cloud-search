@@ -20,7 +20,7 @@ const epilogue = `
   intentionally as some level of encryption is better then no encryption.
 
 • If a key used to encrypt an object no longer exists it is possible that the
-  resourceId is encrypted, but scans will still report FAIL.  This is because the
+  resource is encrypted, but scans will still report FAIL.  This is because the
   scan is attempting to link the key with something known.  This happens when
   the key used to encrypt the object is shared from another account, and that
   source account has removed access to the target account.  This also
@@ -77,7 +77,7 @@ export const builder = (yargs: Argv) => {
       describe: 'aws profile name',
       type: 'string',
     })
-    .option('resourceId', {
+    .option('resource', {
       alias: 'i',
       describe: 'resource id',
       type: 'string',

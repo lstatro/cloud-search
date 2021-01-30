@@ -1,7 +1,8 @@
-import { mock, restore } from 'aws-sdk-mock'
 import { SinonFakeTimers, useFakeTimers } from 'sinon'
-import { handler } from './volumeEncrypted'
+import { mock, restore } from 'aws-sdk-mock'
+
 import { expect } from 'chai'
+import { handler } from './volumeEncrypted'
 
 describe('ebs volume encryption', () => {
   const now = new Date(0)
@@ -147,7 +148,7 @@ describe('ebs volume encryption', () => {
       region: 'test',
       profile: 'test',
       keyType: 'aws',
-      resourceId: 'test',
+      resource: 'test',
     })
     expect(audits).to.eql([])
   })
@@ -159,7 +160,7 @@ describe('ebs volume encryption', () => {
       region: 'us-east-1',
       profile: 'test',
       keyType: 'aws',
-      resourceId: 'test',
+      resource: 'test',
     })
     expect(audits).to.eql([])
   })

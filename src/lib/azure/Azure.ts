@@ -1,7 +1,9 @@
-import Provider from '../Provider'
+import { AzureArgsInterface } from '@lstatro/cloud-search'
+// import Provider from '../Provider'
 
-export class Azure extends Provider {
-
-  constructor(params: )
-
+export class Azure {
+  constructor(args: AzureArgsInterface) {
+    // super(args.rule, args.verbosity, args.format)
+    console.log(args)
+  }
 }

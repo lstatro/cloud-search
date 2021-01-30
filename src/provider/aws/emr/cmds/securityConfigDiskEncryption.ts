@@ -12,7 +12,7 @@ enabled
   UNKNOWN - Unable to determine if security configuration has disk encryption enabled
   FAIL    - Security configuration does not have disk encryption enabled
 
-  resourceId - security configuration name
+  resource - security configuration name
 
   note: this rule checks to see if any value is set.  Use volume scans to audit
         a volume's encryption level.

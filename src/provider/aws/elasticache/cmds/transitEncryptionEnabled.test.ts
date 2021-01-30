@@ -1,7 +1,8 @@
-import { useFakeTimers, SinonFakeTimers } from 'sinon'
+import { SinonFakeTimers, useFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { handler } from './transitEncryptionEnabled'
+
 import { expect } from 'chai'
+import { handler } from './transitEncryptionEnabled'
 
 describe('elasticache cluster storage is encrypted at rest', () => {
   const now = new Date(0)
@@ -95,7 +96,7 @@ describe('elasticache cluster storage is encrypted at rest', () => {
     const audits = await handler({
       region: 'test',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
       keyType: 'aws',
     })
 

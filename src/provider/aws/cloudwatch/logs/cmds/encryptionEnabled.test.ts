@@ -1,7 +1,8 @@
-import { useFakeTimers, SinonFakeTimers } from 'sinon'
+import { SinonFakeTimers, useFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { handler } from './encryptionEnabled'
+
 import { expect } from 'chai'
+import { handler } from './encryptionEnabled'
 
 /** test2 */
 
@@ -30,7 +31,7 @@ describe('cloudwatch log groups should be encrypted with a cmk at rest', () => {
   it('should report nothing if describe logs returns an empty array of logs', async () => {
     mock('CloudWatchLogs', 'describeLogGroups', { logGroups: [] })
 
-    const audits = await handler({ region: 'us-east-1', resourceId: 'test' })
+    const audits = await handler({ region: 'us-east-1', resource: 'test' })
 
     expect(audits).to.eql([])
   })
@@ -44,7 +45,7 @@ describe('cloudwatch log groups should be encrypted with a cmk at rest', () => {
       ],
     })
 
-    const audits = await handler({ region: 'us-east-1', resourceId: 'test' })
+    const audits = await handler({ region: 'us-east-1', resource: 'test' })
 
     expect(audits).to.eql([
       {
@@ -72,7 +73,7 @@ describe('cloudwatch log groups should be encrypted with a cmk at rest', () => {
 
     mock('KMS', 'describeKey', { KeyMetadata: { KeyManager: 'CUSTOMER' } })
 
-    const audits = await handler({ region: 'us-east-1', resourceId: 'test' })
+    const audits = await handler({ region: 'us-east-1', resource: 'test' })
 
     expect(audits).to.eql([
       {

@@ -1,12 +1,13 @@
-import { useFakeTimers, SinonFakeTimers } from 'sinon'
+import { SinonFakeTimers, useFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { handler as all } from './all'
-import { handler as ignorePublicAcls } from './ignorePublicAcls'
-import { handler as blockPublicAcls } from './blockPublicAcls'
-import { handler as restrictPublicBuckets } from './restrictPublicBuckets'
-import { handler as blockPublicPolicy } from './blockPublicPolicy'
+
 import { AWSError } from 'aws-sdk'
+import { handler as all } from './all'
+import { handler as blockPublicAcls } from './blockPublicAcls'
+import { handler as blockPublicPolicy } from './blockPublicPolicy'
 import { expect } from 'chai'
+import { handler as ignorePublicAcls } from './ignorePublicAcls'
+import { handler as restrictPublicBuckets } from './restrictPublicBuckets'
 
 describe('publicAccessBlocks', () => {
   const now = new Date(0)
@@ -50,7 +51,7 @@ describe('publicAccessBlocks', () => {
         _: ['test'],
         $0: 'test',
         profile: 'test',
-        resourceId: 'test',
+        resource: 'test',
         region: 'us-east-1',
       })
       expect(audits[0].state).to.equal('OK')
@@ -101,7 +102,7 @@ describe('publicAccessBlocks', () => {
         _: ['test'],
         $0: 'test',
         profile: 'test',
-        resourceId: 'test',
+        resource: 'test',
         region: 'us-east-1',
       })
       expect(audits[0].state).to.equal('FAIL')
@@ -127,7 +128,7 @@ describe('publicAccessBlocks', () => {
         _: ['test'],
         $0: 'test',
         profile: 'test',
-        resourceId: 'test',
+        resource: 'test',
         region: 'us-east-1',
       })
       expect(audits[0].state).to.equal('UNKNOWN')
@@ -149,7 +150,7 @@ describe('publicAccessBlocks', () => {
         _: ['test'],
         $0: 'test',
         profile: 'test',
-        resourceId: 'test',
+        resource: 'test',
         region: 'us-east-1',
       })
 
@@ -172,7 +173,7 @@ describe('publicAccessBlocks', () => {
         _: ['test'],
         $0: 'test',
         profile: 'test',
-        resourceId: 'test',
+        resource: 'test',
         region: 'us-east-1',
       })
 

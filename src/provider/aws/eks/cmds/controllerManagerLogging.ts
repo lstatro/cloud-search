@@ -10,7 +10,7 @@ export const desc = `EKS Clusters should have controller manager logging enabled
   UNKNOWN - Unable to determine if cluster has controller manager logging enabled
   FAIL    - Cluster does not have controller manager logging enabled
 
-  resourceId - cluster name
+  resource - cluster name
 
 `
 

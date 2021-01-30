@@ -1,12 +1,13 @@
 /** TODO: can this be handled by iam.simulatePrincipalPolicy? */
 
 import {
-  AuditResultInterface,
   AWSScannerInterface,
+  AuditResultInterface,
 } from '@lstatro/cloud-search'
-import assert from 'assert'
+
 import { AWS } from '../../../../../lib/aws/AWS'
 import { Role } from 'aws-sdk/clients/iam'
+import assert from 'assert'
 
 const rule = 'PublicRole'
 
@@ -19,7 +20,7 @@ export const desc = `Roles must not allow * in trust policy principal
   WARNING - Role allows for public access under a specific condition more investigation is required
   FAIL    - Role allows * in the trust document principal
 
-  resourceId: role name
+  resource: role name
 
   note: iam is global, passing in a region won't change results
   note: this does not take into account the statement ACTION, this means that even DENY statements will flag as
@@ -119,14 +120,14 @@ export class PublicRole extends AWS {
     this.audits.push(audit)
   }
 
-  scan = async ({ resourceId }: { resourceId: string }) => {
+  scan = async ({ resource }: { resource: string }) => {
     const options = this.getOptions()
 
-    if (resourceId) {
+    if (resource) {
       const iam = new this.AWS.IAM(options)
       const getRole = await iam
         .getRole({
-          RoleName: resourceId,
+          RoleName: resource,
         })
         .promise()
       assert(getRole.Role, 'unable to find role')
@@ -135,7 +136,7 @@ export class PublicRole extends AWS {
         'unable to find trust document'
       )
       await this.audit({
-        resource: resourceId,
+        resource,
         policyDocument: getRole.Role.AssumeRolePolicyDocument,
       })
     } else {

@@ -12,7 +12,7 @@ export const desc = `GuardDuty detectors must have the DNSLogs data source enabl
   UNKNOWN - Unable to determine if the detector ahs the DNSLogs source enabled
   FAIL    - The detector does not have the DNSLogs data source enabled
 
-  resourceId: detector ID
+  resource: detector ID
 
 `
 

@@ -1,10 +1,11 @@
 import {
-  AuditResultInterface,
   AWSScannerInterface,
+  AuditResultInterface,
 } from '@lstatro/cloud-search'
-import assert from 'assert'
-import { Cluster } from 'aws-sdk/clients/eks'
+
 import { AWS } from '../../../../lib/aws/AWS'
+import { Cluster } from 'aws-sdk/clients/eks'
+import assert from 'assert'
 
 export type LoggingType =
   | 'api'
@@ -174,15 +175,9 @@ export class Eks extends AWS {
     this.audits.push(audit)
   }
 
-  scan = async ({
-    resourceId,
-    region,
-  }: {
-    resourceId: string
-    region: string
-  }) => {
-    if (resourceId) {
-      await this.audit({ resource: resourceId, region })
+  scan = async ({ resource, region }: { resource: string; region: string }) => {
+    if (resource) {
+      await this.audit({ resource: resource, region })
     } else {
       const options = this.getOptions()
       options.region = region

@@ -12,7 +12,7 @@ export const desc = `GuardDuty detectors must have the CloudTrail data source en
   UNKNOWN - Unable to determine if the detector ahs the CloudTrail source enabled
   FAIL    - The detector does not have the CloudTrail data source enabled
 
-  resourceId: detector ID
+  resource: detector ID
 
 `
 

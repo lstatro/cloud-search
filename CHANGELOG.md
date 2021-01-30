@@ -211,10 +211,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Updated cli to correctly distinguish between a resource and resourceId
+- Updated cli to correctly distinguish between a resource and resource
 - Centralized AWS key type CLI argument
 - Refactored the AWS module to export more then just the AWS class
-- Refactored all functions and tests to honor resourceId and resource level scans
+- Refactored all functions and tests to honor resource and resource level scans
 - Refactored all functions to use audit instead of auditObject
 - Refactored VolumeEncrypted scan to use centralized KMS trust system
 - Refactored various functions to remove the need to manually define the handler arguments type

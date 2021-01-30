@@ -1,7 +1,8 @@
-import { useFakeTimers, SinonFakeTimers } from 'sinon'
+import { SinonFakeTimers, useFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { handler } from './encryptionAtRest'
+
 import { expect } from 'chai'
+import { handler } from './encryptionAtRest'
 
 describe('dynamodb table encrypted at rest', () => {
   const now = new Date(0)
@@ -106,7 +107,7 @@ describe('dynamodb table encrypted at rest', () => {
     ])
   })
 
-  it('should return an audit given a resourceId', async () => {
+  it('should return an audit given a resource', async () => {
     mock('DynamoDB', 'listTables', {
       TableNames: ['test'],
     })
@@ -119,7 +120,7 @@ describe('dynamodb table encrypted at rest', () => {
       region: 'test',
       profile: 'test',
       keyType: 'aws',
-      resourceId: 'test',
+      resource: 'test',
     })
     expect(audits).to.eql([
       {
@@ -167,7 +168,7 @@ describe('dynamodb table encrypted at rest', () => {
       },
     ])
   })
-  it('should report OK when passed a resourceId and that resource is encrypted with an AWS managed key', async () => {
+  it('should report OK when passed a resource and that resource is encrypted with an AWS managed key', async () => {
     mock('KMS', 'describeKey', {
       KeyMetadata: { ARN: 'test', KeyManager: 'AWS' },
     })
@@ -186,7 +187,7 @@ describe('dynamodb table encrypted at rest', () => {
       region: 'test',
       profile: 'test',
       keyType: 'aws',
-      resourceId: 'test',
+      resource: 'test',
     })
     expect(audits).to.eql([
       {
@@ -201,7 +202,7 @@ describe('dynamodb table encrypted at rest', () => {
       },
     ])
   })
-  it('should report OK when passed a resourceId and that resource is encrypted with a CUSTOMER managed key', async () => {
+  it('should report OK when passed a resource and that resource is encrypted with a CUSTOMER managed key', async () => {
     mock('KMS', 'describeKey', {
       KeyMetadata: { ARN: 'test', KeyManager: 'CUSTOMER' },
     })
@@ -220,7 +221,7 @@ describe('dynamodb table encrypted at rest', () => {
       region: 'test',
       profile: 'test',
       keyType: 'cmk',
-      resourceId: 'test',
+      resource: 'test',
     })
     expect(audits).to.eql([
       {
@@ -235,7 +236,7 @@ describe('dynamodb table encrypted at rest', () => {
       },
     ])
   })
-  it('should return WARNING when passed a resourceId and that resource is encrypted with DEFAULT', async () => {
+  it('should return WARNING when passed a resource and that resource is encrypted with DEFAULT', async () => {
     mock('DynamoDB', 'listTables', {
       TableNames: ['test'],
     })
@@ -249,7 +250,7 @@ describe('dynamodb table encrypted at rest', () => {
       region: 'test',
       profile: 'test',
       keyType: 'aws',
-      resourceId: 'test',
+      resource: 'test',
     })
     expect(audits).to.eql([
       {

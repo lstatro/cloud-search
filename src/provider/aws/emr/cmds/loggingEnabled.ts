@@ -11,7 +11,7 @@ export const desc = `EMR clusters should have logging enabled
   UNKNOWN - Unable to determine if cluster is logging
   FAIL    - Cluster is not logging
 
-  resourceId - cluster ID
+  resource - cluster ID
 
 `
 

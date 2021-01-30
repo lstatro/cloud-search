@@ -1,7 +1,8 @@
-import { useFakeTimers, SinonFakeTimers } from 'sinon'
+import { SinonFakeTimers, useFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { handler } from './elbAccessLogsEnabled'
+
 import { expect } from 'chai'
+import { handler } from './elbAccessLogsEnabled'
 
 describe('elbs should log connections', () => {
   const now = new Date(0)
@@ -85,7 +86,7 @@ describe('elbs should log connections', () => {
     const audits = await handler({
       region: 'test',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
     })
 
     expect(audits).to.eql([
@@ -122,7 +123,7 @@ describe('elbs should log connections', () => {
     const audits = await handler({
       region: 'test',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
     })
 
     expect(audits).to.eql([
@@ -182,7 +183,7 @@ describe('elbs should log connections', () => {
     const audits = await handler({
       region: 'test',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
     })
 
     expect(audits).to.eql([

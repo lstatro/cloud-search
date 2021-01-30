@@ -1,7 +1,8 @@
-import { useFakeTimers, SinonFakeTimers, restore as sinonRestore } from 'sinon'
+import { SinonFakeTimers, restore as sinonRestore, useFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { handler } from './secretsEncryption'
+
 import { expect } from 'chai'
+import { handler } from './secretsEncryption'
 
 describe('eks secrets encryption', () => {
   const now = new Date(0)
@@ -138,7 +139,7 @@ describe('eks secrets encryption', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
       keyType: 'aws',
       rule: 'SecretsEncryption',
     })

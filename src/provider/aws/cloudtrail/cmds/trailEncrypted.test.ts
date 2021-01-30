@@ -1,7 +1,8 @@
-import { useFakeTimers, SinonFakeTimers } from 'sinon'
+import { SinonFakeTimers, useFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { handler } from './trailEncrypted'
+
 import { expect } from 'chai'
+import { handler } from './trailEncrypted'
 
 describe('cloudtrail events must be configured correctly', () => {
   const now = new Date(0)
@@ -190,7 +191,7 @@ describe('cloudtrail events must be configured correctly', () => {
 
     const audits = await handler({
       region: 'us-east-1',
-      resourceId: 'test',
+      resource: 'test',
       keyType: 'cmk',
       profile: 'test',
     })

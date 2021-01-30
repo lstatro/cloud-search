@@ -1,7 +1,8 @@
-import { useFakeTimers, SinonFakeTimers } from 'sinon'
+import { SinonFakeTimers, useFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { handler } from './elbDesyncMode'
+
 import { expect } from 'chai'
+import { handler } from './elbDesyncMode'
 
 describe('elbs should have desync mode set to strict', () => {
   const now = new Date(0)
@@ -210,7 +211,7 @@ describe('elbs should have desync mode set to strict', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
     })
 
     expect(audits).to.eql([
@@ -250,7 +251,7 @@ describe('elbs should have desync mode set to strict', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
     })
 
     expect(audits).to.eql([

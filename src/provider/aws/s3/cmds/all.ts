@@ -1,8 +1,9 @@
-import { PublicAccessBlocks } from './publicAccessBlocks'
 import {
-  AuditResultInterface,
   AWSScannerCliArgsInterface,
+  AuditResultInterface,
 } from '@lstatro/cloud-search'
+
+import { PublicAccessBlocks } from './publicAccessBlocks'
 
 export const command = 'PublicAccessBlocks [args]'
 export const desc = 'report on all four s3 public access blocks toggles'
@@ -11,7 +12,7 @@ export const handler = async (args: AWSScannerCliArgsInterface) => {
   const blockPublicAcls = new PublicAccessBlocks({
     region: args.region,
     profile: args.profile,
-    resourceId: args.resourceId,
+    resource: args.resource,
     verbosity: args.verbosity,
     rule: 'BlockPublicAcls',
   })
@@ -20,7 +21,7 @@ export const handler = async (args: AWSScannerCliArgsInterface) => {
   const blockPublicPolicy = new PublicAccessBlocks({
     region: args.region,
     profile: args.profile,
-    resourceId: args.resourceId,
+    resource: args.resource,
     verbosity: args.verbosity,
     rule: 'BlockPublicPolicy',
   })
@@ -29,7 +30,7 @@ export const handler = async (args: AWSScannerCliArgsInterface) => {
   const ignorePublicAcls = new PublicAccessBlocks({
     region: args.region,
     profile: args.profile,
-    resourceId: args.resourceId,
+    resource: args.resource,
     verbosity: args.verbosity,
     rule: 'IgnorePublicAcls',
   })
@@ -38,7 +39,7 @@ export const handler = async (args: AWSScannerCliArgsInterface) => {
   const restrictPublicBuckets = new PublicAccessBlocks({
     region: args.region,
     profile: args.profile,
-    resourceId: args.resourceId,
+    resource: args.resource,
     verbosity: args.verbosity,
     rule: 'RestrictPublicBuckets',
   })

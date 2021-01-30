@@ -1,13 +1,14 @@
 import {
-  useFakeTimers,
   SinonFakeTimers,
-  stub,
   restore as sinonRestore,
+  stub,
+  useFakeTimers,
 } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
+
 import AWS from 'aws-sdk'
-import { handler } from './topicEncrypted'
 import { expect } from 'chai'
+import { handler } from './topicEncrypted'
 
 describe('sns topic encryption', () => {
   const now = new Date(0)
@@ -149,7 +150,7 @@ describe('sns topic encryption', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
       keyType: 'cmk',
     })
     expect(audits).to.eql([
@@ -185,7 +186,7 @@ describe('sns topic encryption', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
       keyType: 'cmk',
     })
     expect(audits).to.eql([
@@ -219,7 +220,7 @@ describe('sns topic encryption', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
       keyType: 'cmk',
     })
     expect(audits).to.eql([
@@ -253,7 +254,7 @@ describe('sns topic encryption', () => {
     const audits = await handler({
       region: 'us-east-1',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
       keyType: 'cmk',
     })
     expect(audits).to.eql([
@@ -291,7 +292,7 @@ describe('sns topic encryption', () => {
       audits = await handler({
         region: 'us-east-1',
         profile: 'test',
-        resourceId: 'test',
+        resource: 'test',
         keyType: 'test' as 'aws',
       })
     } catch (err) {

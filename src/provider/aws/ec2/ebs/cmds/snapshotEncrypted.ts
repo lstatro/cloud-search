@@ -1,11 +1,12 @@
+import { AWS, keyTypeArg } from '../../../../../lib/aws/AWS'
+import {
+  AWSScannerInterface,
+  AuditResultInterface,
+} from '@lstatro/cloud-search'
+
 import { CommandBuilder } from 'yargs'
 import { Snapshot } from 'aws-sdk/clients/ec2'
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-} from '@lstatro/cloud-search'
 import assert from 'assert'
-import { AWS, keyTypeArg } from '../../../../../lib/aws/AWS'
 
 const rule = 'SnapshotEncrypted'
 
@@ -22,7 +23,7 @@ export const desc = `EBS Snapshots should be encrypted
   WARNING - The snapshot is encrypted, but not with the key type
   FAIL    - The snapshot is not encrypted
 
-  resourceId - volume id
+  resource - volume id
 
 `
 
@@ -62,10 +63,10 @@ export class SnapshotEncrypted extends AWS {
 
   scan = async ({
     region,
-    resourceId,
+    resource,
   }: {
     region: string
-    resourceId?: string
+    resource?: string
   }) => {
     const options = this.getOptions()
     options.region = region
@@ -73,7 +74,7 @@ export class SnapshotEncrypted extends AWS {
     const promise = new this.AWS.EC2(options)
       .describeSnapshots({
         OwnerIds: ['self'],
-        SnapshotIds: resourceId ? [resourceId] : undefined,
+        SnapshotIds: resource ? [resource] : undefined,
       })
       .promise()
     const snapshots = await this.pager<Snapshot>(promise, 'Snapshots')

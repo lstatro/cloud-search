@@ -10,7 +10,7 @@ export const desc = `report on the block public acl toggle
   UNKNOWN - BlockPublicAcls state us unknown
   FAIL    - BlockPublicAcls set to false
 
-  resourceId: bucket name
+  resource: bucket name
 
 `
 

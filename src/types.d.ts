@@ -28,16 +28,27 @@ declare module '@lstatro/cloud-search' {
   /** output formatting */
   export type FormatType = 'terminal' | 'json'
 
+  /** audit result */
   export type AuditStateType = 'OK' | 'FAIL' | 'UNKNOWN' | 'WARNING'
 
-  export interface AWSParamsInterface {
-    profile?: string
+  /** relative path to a azure cred file */
+  export type AzureCredFilePath = string
+
+  export interface ProviderInterface {
     rule: string
-    resourceId?: string
-    region: string
     verbosity?: VerbosityType
-    keyType?: KeyType
     format?: FormatType
+  }
+
+  export interface AzureArgsInterface extends ProviderInterface {
+    credFilePath?: AzureCredFilePath
+  }
+
+  export interface AWSArgsInterface extends ProviderInterface {
+    profile?: string
+    resource?: string
+    region: string
+    keyType?: KeyType
   }
 
   /** The compliance data about the resource */
@@ -68,7 +79,7 @@ declare module '@lstatro/cloud-search' {
     region: string
     keyType?: KeyType
     profile?: string
-    resourceId?: string
+    resource?: string
     verbosity?: VerbosityType
     format?: FormatType
   }

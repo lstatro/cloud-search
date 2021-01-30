@@ -1,12 +1,12 @@
 import {
-  AuditResultInterface,
   AWSScannerInterface,
+  AuditResultInterface,
 } from '@lstatro/cloud-search'
-import assert from 'assert'
 
 import { AWS } from '../../../../lib/aws/AWS'
 import { CloudTrail } from 'aws-sdk'
 import { TrailInfo } from 'aws-sdk/clients/cloudtrail'
+import assert from 'assert'
 
 const rule = 'TrailEvents'
 
@@ -23,7 +23,7 @@ export const desc = `a cloudtrail configuration must include:
   UNKNOWN - Unable to determine if the trail is configured correctly
   FAIL    - The trail is missing one or all of the desired configuration targets
 
-  resourceId: trail name
+  resource: trail name
 
 `
 
@@ -128,15 +128,9 @@ export class TrailEvents extends AWS {
     return found
   }
 
-  scan = async ({
-    resourceId,
-    region,
-  }: {
-    resourceId: string
-    region: string
-  }) => {
-    if (resourceId) {
-      await this.audit({ resource: resourceId, region })
+  scan = async ({ resource, region }: { resource: string; region: string }) => {
+    if (resource) {
+      await this.audit({ resource: resource, region })
     } else {
       const options = this.getOptions()
       options.region = region

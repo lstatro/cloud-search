@@ -1,5 +1,5 @@
+import { SinonFakeTimers, useFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { useFakeTimers, SinonFakeTimers } from 'sinon'
 
 import { handler as detectorSourceCloudTrail } from './detectorSourceCloudTrail'
 import { handler as detectorSourceDnsLogs } from './detectorSourceDnsLogs'
@@ -304,7 +304,7 @@ describe('guardduty detectors should exist in a region', () => {
     audits = await detectorSourceCloudTrail({
       region: 'test',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
       source: 'CloudTrail',
       rule: 'test',
     })
@@ -325,7 +325,7 @@ describe('guardduty detectors should exist in a region', () => {
     audits = await detectorSourceDnsLogs({
       region: 'test',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
       source: 'DNSLogs',
       rule: 'test',
     })
@@ -346,7 +346,7 @@ describe('guardduty detectors should exist in a region', () => {
     audits = await detectorSourceFlowLogs({
       region: 'test',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
       source: 'FlowLogs',
       rule: 'test',
     })
@@ -367,7 +367,7 @@ describe('guardduty detectors should exist in a region', () => {
     audits = await detectorSourceS3Logs({
       region: 'test',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
       source: 'S3Logs',
       rule: 'test',
     })
@@ -402,7 +402,7 @@ describe('guardduty detectors should exist in a region', () => {
     audits = await detectorSourceCloudTrail({
       region: 'test',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
       source: 'CloudTrail',
       rule: 'test',
     })
@@ -423,7 +423,7 @@ describe('guardduty detectors should exist in a region', () => {
     audits = await detectorSourceDnsLogs({
       region: 'test',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
       source: 'DNSLogs',
       rule: 'test',
     })
@@ -444,7 +444,7 @@ describe('guardduty detectors should exist in a region', () => {
     audits = await detectorSourceFlowLogs({
       region: 'test',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
       source: 'FlowLogs',
       rule: 'test',
     })
@@ -465,7 +465,7 @@ describe('guardduty detectors should exist in a region', () => {
     audits = await detectorSourceS3Logs({
       region: 'test',
       profile: 'test',
-      resourceId: 'test',
+      resource: 'test',
       source: 'S3Logs',
       rule: 'test',
     })

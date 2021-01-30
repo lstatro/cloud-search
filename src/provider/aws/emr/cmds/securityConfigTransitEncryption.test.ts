@@ -1,7 +1,8 @@
+import { SinonFakeTimers, useFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { useFakeTimers, SinonFakeTimers } from 'sinon'
-import { handler } from './securityConfigTransitEncryption'
+
 import { expect } from 'chai'
+import { handler } from './securityConfigTransitEncryption'
 
 describe('emr cluster security configurations should have transit encryption', () => {
   const now = new Date(0)
@@ -171,7 +172,7 @@ describe('emr cluster security configurations should have transit encryption', (
       SecurityConfiguration: 'test',
     })
 
-    const audits = await handler({ region: 'us-east-1', resourceId: 'test' })
+    const audits = await handler({ region: 'us-east-1', resource: 'test' })
 
     expect(audits).to.eql([
       {

@@ -1,7 +1,8 @@
+import { SinonFakeTimers, useFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { useFakeTimers, SinonFakeTimers } from 'sinon'
-import { handler } from './loggingEnabled'
+
 import { expect } from 'chai'
+import { handler } from './loggingEnabled'
 
 describe('emr clusters should have a logging bucket uri', () => {
   const now = new Date(0)
@@ -81,7 +82,7 @@ describe('emr clusters should have a logging bucket uri', () => {
 
     const audits = await handler({
       region: 'us-east-1',
-      resourceId: 'test',
+      resource: 'test',
       profile: 'test',
     })
 

@@ -12,7 +12,7 @@ enabled
   UNKNOWN - Unable to determine if LB has logging enabled
   FAIL    - LB does not have logging enabled
 
-  resourceId - load balancer name
+  resource - load balancer name
 
 `
 

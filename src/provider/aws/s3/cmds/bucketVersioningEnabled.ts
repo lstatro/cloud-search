@@ -1,10 +1,12 @@
 import {
-  AuditResultInterface,
   AWSScannerInterface,
+  AuditResultInterface,
 } from '@lstatro/cloud-search'
-import { Bucket } from 'aws-sdk/clients/s3'
+
 import { AWS } from '../../../../lib/aws/AWS'
+import { Bucket } from 'aws-sdk/clients/s3'
 import assert from 'assert'
+
 const rule = 'BucketVersioningEnabled'
 
 export const command = `${rule} [args]`
@@ -15,7 +17,7 @@ export const desc = `S3 Buckets should have versioning enabled.
   UNKNOWN - Unable to determine if versioning is enabled
   FAIL    - Versioning is not enabled
 
-  resourceId: bucket name
+  resource: bucket name
 
 `
 
@@ -57,15 +59,9 @@ export default class BucketVersioningEnabled extends AWS {
     this.audits.push(audit)
   }
 
-  scan = async ({
-    resourceId,
-    region,
-  }: {
-    resourceId: string
-    region: string
-  }) => {
-    if (resourceId) {
-      await this.audit({ resource: resourceId, region })
+  scan = async ({ resource, region }: { resource: string; region: string }) => {
+    if (resource) {
+      await this.audit({ resource, region })
     } else {
       const options = this.getOptions()
       options.region = region

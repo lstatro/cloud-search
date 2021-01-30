@@ -1,12 +1,13 @@
 import {
-  useFakeTimers,
   SinonFakeTimers,
-  stub,
   restore as sinonRestore,
+  stub,
+  useFakeTimers,
 } from 'sinon'
-import { restore, mock } from 'aws-sdk-mock'
-import { handler } from './keyRotationEnabled'
+import { mock, restore } from 'aws-sdk-mock'
+
 import { expect } from 'chai'
+import { handler } from './keyRotationEnabled'
 
 describe('cmk rotation enabled', () => {
   const now = new Date(0)
@@ -150,7 +151,7 @@ describe('cmk rotation enabled', () => {
 
     const audits = await handler({
       region: 'test',
-      resourceId: 'test',
+      resource: 'test',
       profile: 'test',
       verbosity: 'normal',
     })

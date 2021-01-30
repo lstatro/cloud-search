@@ -1,9 +1,10 @@
-import { CommandBuilder } from 'yargs'
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-} from '@lstatro/cloud-search'
 import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
+import {
+  AWSScannerInterface,
+  AuditResultInterface,
+} from '@lstatro/cloud-search'
+
+import { CommandBuilder } from 'yargs'
 import assert from 'assert'
 
 const rule = 'QueueEncrypted'
@@ -21,7 +22,7 @@ export const desc = `SQS topics must be encrypted
   WARNING - Queue encrypted but not with the specified key type
   FAIL    - Queue is not encrypted
 
-  resourceId - Queue URL
+  resource - Queue URL
 
 `
 
@@ -69,15 +70,9 @@ export class QueueEncrypted extends AWS {
     this.audits.push(audit)
   }
 
-  scan = async ({
-    resourceId,
-    region,
-  }: {
-    resourceId: string
-    region: string
-  }) => {
-    if (resourceId) {
-      await this.audit({ resource: resourceId, region })
+  scan = async ({ resource, region }: { resource: string; region: string }) => {
+    if (resource) {
+      await this.audit({ resource: resource, region })
     } else {
       const options = this.getOptions()
       options.region = region

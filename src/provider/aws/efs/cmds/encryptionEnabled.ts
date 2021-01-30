@@ -1,12 +1,14 @@
-import { CommandBuilder } from 'yargs'
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-} from '@lstatro/cloud-search'
 import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
+import {
+  AWSScannerInterface,
+  AuditResultInterface,
+} from '@lstatro/cloud-search'
+
+import { CommandBuilder } from 'yargs'
 import { FileSystemDescription } from 'aws-sdk/clients/efs'
-const rule = 'EncryptionEnabled'
 import assert from 'assert'
+
+const rule = 'EncryptionEnabled'
 
 export const command = `${rule} [args]`
 export const builder: CommandBuilder = {
@@ -19,7 +21,7 @@ export const desc = `EFS must be encrypted
   WARNING - EFS encrypted but not with the specified key type
   FAIL    - EFS is not encrypted
 
-  resourceId - FileSystemId
+  resource - FileSystemId
 
 `
 
@@ -58,16 +60,10 @@ export class EFSEncryption extends AWS {
 
     this.audits.push(audit)
   }
-  scan = async ({
-    region,
-    resourceId,
-  }: {
-    region: string
-    resourceId: string
-  }) => {
+  scan = async ({ region, resource }: { region: string; resource: string }) => {
     const params: { FileSystemId?: string } = {}
-    if (resourceId) {
-      params.FileSystemId = resourceId
+    if (resource) {
+      params.FileSystemId = resource
     }
     const options = this.getOptions()
     options.region = region

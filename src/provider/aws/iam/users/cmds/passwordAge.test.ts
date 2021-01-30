@@ -1,7 +1,8 @@
 import { mock, restore } from 'aws-sdk-mock'
-import { handler } from './passwordAge'
-import { expect } from 'chai'
+
 import { AWSError } from 'aws-sdk'
+import { expect } from 'chai'
+import { handler } from './passwordAge'
 describe('user passwords should not be older then a specific age', () => {
   beforeEach(() => {
     mock('EC2', 'describeRegions', { Regions: [{ RegionName: 'us-east-1' }] })
@@ -49,7 +50,7 @@ describe('user passwords should not be older then a specific age', () => {
     })
 
     const audits = await handler({
-      resourceId: 'test',
+      resource: 'test',
       region: 'us-east-1',
       maxAge: 90,
       profile: 'test',

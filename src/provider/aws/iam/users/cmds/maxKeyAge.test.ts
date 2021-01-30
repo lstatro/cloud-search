@@ -1,6 +1,7 @@
 import { mock, restore } from 'aws-sdk-mock'
-import { handler } from './maxKeyAge'
+
 import { expect } from 'chai'
+import { handler } from './maxKeyAge'
 
 describe('iam keys should not be older then a specific age', () => {
   beforeEach(() => {
@@ -28,7 +29,7 @@ describe('iam keys should not be older then a specific age', () => {
       ],
     })
     const audits = await handler({
-      resourceId: 'test',
+      resource: 'test',
       region: 'test',
       maxAge: 30,
       profile: 'test',
@@ -48,7 +49,7 @@ describe('iam keys should not be older then a specific age', () => {
       ],
     })
     const audits = await handler({
-      resourceId: 'test',
+      resource: 'test',
       region: 'test',
       maxAge: 30,
       profile: 'test',
@@ -74,7 +75,7 @@ describe('iam keys should not be older then a specific age', () => {
       ],
     })
     const audits = await handler({
-      resourceId: 'test',
+      resource: 'test',
       region: 'test',
       maxAge: 30,
       profile: 'test',
@@ -93,7 +94,7 @@ describe('iam keys should not be older then a specific age', () => {
     })
     mock('IAM', 'listAccessKeys', {})
     const audits = await handler({
-      resourceId: 'test',
+      resource: 'test',
       region: 'test',
       maxAge: 30,
       profile: 'test',

@@ -10,7 +10,7 @@ export const desc = `EKS Clusters should have authenticator logging enabled
   UNKNOWN - Unable to determine if cluster has authenticator logging enabled
   FAIL    - Cluster does not have authenticator logging enabled
 
-  resourceId - cluster name
+  resource - cluster name
 
 `
 

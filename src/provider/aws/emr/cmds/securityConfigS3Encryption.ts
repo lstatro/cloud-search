@@ -12,7 +12,7 @@ enabled
   UNKNOWN - Unable to determine if security configuration has s3 enabled
   FAIL    - Security configuration does not have s3 encryption enabled
 
-  resourceId - security configuration name
+  resource - security configuration name
 
   note: this rule checks to see if any value is set.  Use bucket scans to audit
         a bucket's encryption level.

@@ -1,7 +1,8 @@
-import { useFakeTimers, SinonFakeTimers } from 'sinon'
+import { SinonFakeTimers, useFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { handler } from './snapshotEncrypted'
+
 import { expect } from 'chai'
+import { handler } from './snapshotEncrypted'
 
 /** test2 */
 
@@ -99,7 +100,7 @@ describe('ebs snapshots should be encrypted', () => {
     const audits = await handler({
       profile: 'test',
       region: 'us-east-1',
-      resourceId: 'test',
+      resource: 'test',
       keyType: 'cmk',
     })
 

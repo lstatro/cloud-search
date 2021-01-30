@@ -12,7 +12,7 @@ configuration group
   UNKNOWN - Unable to determine if cluster was launched with a group
   FAIL    - Cluster not launched with group
 
-  resourceId - cluster ID
+  resource - cluster ID
 
 `
 

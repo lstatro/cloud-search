@@ -1,10 +1,12 @@
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-} from '@lstatro/cloud-search'
 import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
+import {
+  AWSScannerInterface,
+  AuditResultInterface,
+} from '@lstatro/cloud-search'
+
 import { DBCluster } from 'aws-sdk/clients/neptune'
 import assert from 'assert'
+
 const rule = 'ClusterEncrypted'
 
 export const command = `${rule} [args]`
@@ -15,7 +17,7 @@ export const desc = `Amazon Neptune graph cluster databases should have encrypti
   UNKNOWN - Unable to determine if Neptune cluster encryption enabled
   FAIL    - Neptune cluster is not encrypted at rest
 
-  resourceId: Database Identifier
+  resource: Database Identifier
 
 `
 export const builder = {
@@ -55,20 +57,14 @@ export class ClusterEncrypted extends AWS {
     this.audits.push(audit)
   }
 
-  scan = async ({
-    resourceId,
-    region,
-  }: {
-    resourceId: string
-    region: string
-  }) => {
+  scan = async ({ resource, region }: { resource: string; region: string }) => {
     let clusters
     const options = this.getOptions()
     options.region = region
-    if (resourceId) {
+    if (resource) {
       const promise = new this.AWS.Neptune(options)
         .describeDBClusters({
-          DBClusterIdentifier: resourceId,
+          DBClusterIdentifier: resource,
         })
         .promise()
       clusters = await this.pager<DBCluster>(promise, 'DBClusters')

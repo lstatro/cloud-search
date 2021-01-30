@@ -1,7 +1,8 @@
 import {
-  AuditResultInterface,
   AWSScannerInterface,
+  AuditResultInterface,
 } from '@lstatro/cloud-search'
+
 import { AWS } from '../../../../../lib/aws/AWS'
 import { User } from 'aws-sdk/clients/iam'
 
@@ -48,9 +49,9 @@ export class UserMfaEnabled extends AWS {
     this.audits.push(audit)
   }
 
-  scan = async ({ resourceId }: { resourceId: string }) => {
-    if (resourceId) {
-      await this.audit({ resource: resourceId })
+  scan = async ({ resource }: { resource: string }) => {
+    if (resource) {
+      await this.audit({ resource })
     } else {
       const options = this.getOptions()
 

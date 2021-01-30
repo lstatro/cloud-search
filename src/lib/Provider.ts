@@ -1,11 +1,12 @@
 import {
   AuditResultInterface,
-  VerbosityType,
   FormatType,
+  VerbosityType,
 } from '@lstatro/cloud-search'
-import chalk from 'chalk'
 import ora, { Ora } from 'ora'
+
 import { assert } from 'console'
+import chalk from 'chalk'
 
 export default abstract class Provider {
   audits: AuditResultInterface[] = []
@@ -24,9 +25,9 @@ export default abstract class Provider {
     }
   }
 
-  // getBackOff = (modifier: number) => {
-  //   return 100 * (modifier + Math.random()) ** 2
-  // }
+  abstract scan<T>(params: T): Promise<void>
+
+  abstract audit<T>(params: T): Promise<void>
 
   sleep = async (ms: number) => {
     let promise = Promise.resolve()

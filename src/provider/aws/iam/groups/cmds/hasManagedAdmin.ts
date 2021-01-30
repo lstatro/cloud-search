@@ -1,11 +1,13 @@
 /** TODO: this needs to support resource */
 
-import { AttachedPolicy, Group } from 'aws-sdk/clients/iam'
 import {
-  AuditResultInterface,
   AWSScannerInterface,
+  AuditResultInterface,
 } from '@lstatro/cloud-search'
+import { AttachedPolicy, Group } from 'aws-sdk/clients/iam'
+
 import { AWS } from '../../../../../lib/aws/AWS'
+
 const rule = 'HasManagedAdmin'
 
 export const command = `${rule} [args]`
@@ -68,9 +70,9 @@ export class HasManagedAdmin extends AWS {
     this.audits.push(audit)
   }
 
-  scan = async ({ resourceId }: { resourceId: string }) => {
-    if (resourceId) {
-      await this.audit({ resource: resourceId })
+  scan = async ({ resource }: { resource: string }) => {
+    if (resource) {
+      await this.audit({ resource })
     } else {
       const options = this.getOptions()
 

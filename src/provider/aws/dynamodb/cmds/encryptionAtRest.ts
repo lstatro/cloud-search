@@ -1,8 +1,9 @@
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-} from '@lstatro/cloud-search'
 import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
+import {
+  AWSScannerInterface,
+  AuditResultInterface,
+} from '@lstatro/cloud-search'
+
 import { TableName } from 'aws-sdk/clients/dynamodb'
 import assert from 'assert'
 const rule = 'EncryptionAtRest'
@@ -16,7 +17,7 @@ export const desc = `Amazon DynamoDB should have encryption at rest enabled
   UNKNOWN - Unable to determine if Neptune instance encryption enabled
   FAIL    - Table is not encrypted at rest
 
-  resourceId: Table Name
+  resource: Table Name
 
 `
 export const builder = {
@@ -71,19 +72,13 @@ export class EncryptionAtRest extends AWS {
     this.audits.push(audit)
   }
 
-  scan = async ({
-    resourceId,
-    region,
-  }: {
-    resourceId: string
-    region: string
-  }) => {
+  scan = async ({ resource, region }: { resource: string; region: string }) => {
     const options = this.getOptions()
     options.region = region
-    if (resourceId) {
+    if (resource) {
       const describeTable = await new this.AWS.DynamoDB(options)
         .describeTable({
-          TableName: resourceId,
+          TableName: resource,
         })
         .promise()
       assert(

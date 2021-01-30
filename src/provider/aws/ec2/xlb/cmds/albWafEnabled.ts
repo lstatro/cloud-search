@@ -1,12 +1,13 @@
 import {
-  AuditResultInterface,
   AWSScannerInterface,
+  AuditResultInterface,
 } from '@lstatro/cloud-search'
+
 import { AWS } from '../../../../../lib/aws/AWS'
 import { LoadBalancer } from 'aws-sdk/clients/elbv2'
-import assert from 'assert'
 import { WebACLSummary } from 'aws-sdk/clients/wafregional'
 import { WebACLSummary as WebACLSummaryV2 } from 'aws-sdk/clients/wafv2'
+import assert from 'assert'
 
 const rule = 'AlbWafEnabled'
 
@@ -17,7 +18,7 @@ regional WAF (v2 or classic)
   OK      - LB has a WAF attached
   FAIL    - LB does not have a WAF attached
 
-  resourceId - load balancer ARN
+  resource - load balancer ARN
 
 `
 
@@ -81,20 +82,20 @@ export class AlbWafEnabled extends AWS {
 
   scan = async ({
     region,
-    resourceId,
+    resource,
   }: {
     region: string
-    resourceId?: string
+    resource?: string
   }) => {
     const options = this.getOptions()
     options.region = region
 
     let promise
 
-    if (resourceId) {
+    if (resource) {
       promise = new this.AWS.ELBv2(options)
         .describeLoadBalancers({
-          LoadBalancerArns: [resourceId],
+          LoadBalancerArns: [resource],
         })
         .promise()
     } else {

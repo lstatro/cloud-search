@@ -1,11 +1,12 @@
+import { AWS, keyTypeArg } from '../../../../../lib/aws/AWS'
+import {
+  AWSScannerInterface,
+  AuditResultInterface,
+} from '@lstatro/cloud-search'
+
 import { CommandBuilder } from 'yargs'
 import { Volume } from 'aws-sdk/clients/ec2'
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-} from '@lstatro/cloud-search'
 import assert from 'assert'
-import { AWS, keyTypeArg } from '../../../../../lib/aws/AWS'
 
 const rule = 'VolumeEncrypted'
 
@@ -22,7 +23,7 @@ export const desc = `EBS volumes should be encrypted at rest
   WARNING - The volume is encrypted, but not with the right key type
   FAIL    - The volume is not encrypted
 
-  resourceId - snapshot id
+  resource - snapshot id
 
 `
 
@@ -62,17 +63,17 @@ export class VolumeEncrypted extends AWS {
 
   scan = async ({
     region,
-    resourceId,
+    resource,
   }: {
     region: string
-    resourceId?: string
+    resource?: string
   }) => {
     const options = this.getOptions()
     options.region = region
 
     const promise = new this.AWS.EC2(options)
       .describeVolumes({
-        VolumeIds: resourceId ? [resourceId] : undefined,
+        VolumeIds: resource ? [resource] : undefined,
       })
       .promise()
 

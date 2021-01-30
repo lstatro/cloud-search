@@ -1,10 +1,11 @@
 import {
-  AuditResultInterface,
   AWSScannerInterface,
+  AuditResultInterface,
 } from '@lstatro/cloud-search'
-import assert from 'assert'
+
 import { AWS } from '../../../../lib/aws/AWS'
 import { SecretListEntry } from 'aws-sdk/clients/secretsmanager'
+import assert from 'assert'
 
 export interface SecretsManagerInterface extends AWSScannerInterface {
   rule: 'RotationEnabled' | 'SecretEncryptedWithCmk'
@@ -85,22 +86,16 @@ export class SecretsManager extends AWS {
     await rules[this.rule]({ resource, audit, region })
   }
 
-  scan = async ({
-    resourceId,
-    region,
-  }: {
-    resourceId: string
-    region: string
-  }) => {
+  scan = async ({ resource, region }: { resource: string; region: string }) => {
     const options = this.getOptions()
     options.region = region
 
     let secrets: SecretListEntry[] = []
 
-    if (resourceId) {
+    if (resource) {
       const describeSecret = await new this.AWS.SecretsManager(options)
         .describeSecret({
-          SecretId: resourceId,
+          SecretId: resource,
         })
         .promise()
       secrets.push(describeSecret)

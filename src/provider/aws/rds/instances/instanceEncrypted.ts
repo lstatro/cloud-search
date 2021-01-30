@@ -1,11 +1,12 @@
-import { CommandBuilder } from 'yargs'
-import {
-  AuditResultInterface,
-  AWSScannerInterface,
-} from '@lstatro/cloud-search'
-import assert from 'assert'
 import { AWS, keyTypeArg } from '../../../../lib/aws/AWS'
+import {
+  AWSScannerInterface,
+  AuditResultInterface,
+} from '@lstatro/cloud-search'
+
+import { CommandBuilder } from 'yargs'
 import { DBInstance } from 'aws-sdk/clients/rds'
+import assert from 'assert'
 
 const rule = 'InstanceEncrypted'
 
@@ -22,7 +23,7 @@ export const desc = `RDS instances must have its storage encrypted at rest
   UNKNOWN - Unable to verify the instance has its storage encrypted at rest
   FAIL    - The RDS instance does not have its storage encrypted at rest
 
-  resourceId: DB instance identifier
+  resource: DB instance identifier
 
   note: this rule targets DB Instances not DB Cluster's (Aurora clusters).
 
@@ -65,22 +66,16 @@ export class InstanceEncrypted extends AWS {
     this.audits.push(audit)
   }
 
-  scan = async ({
-    resourceId,
-    region,
-  }: {
-    resourceId: string
-    region: string
-  }) => {
+  scan = async ({ resource, region }: { resource: string; region: string }) => {
     let instances
 
     const options = this.getOptions()
     options.region = region
 
-    if (resourceId) {
+    if (resource) {
       const promise = new this.AWS.RDS(options)
         .describeDBInstances({
-          DBInstanceIdentifier: resourceId,
+          DBInstanceIdentifier: resource,
         })
         .promise()
       instances = await this.pager<DBInstance>(promise, 'DBInstances')

@@ -10,7 +10,7 @@ export const desc = `EKS Clusters should not be public
   UNKNOWN - Unable to determine if cluster is public
   FAIL    - Cluster is public
 
-  resourceId - cluster name
+  resource - cluster name
 
 `
 

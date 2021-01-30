@@ -1,7 +1,8 @@
-import { useFakeTimers, SinonFakeTimers, restore as sinonRestore } from 'sinon'
+import { SinonFakeTimers, restore as sinonRestore, useFakeTimers } from 'sinon'
 import { mock, restore } from 'aws-sdk-mock'
-import { handler } from './userMfaEnabled'
+
 import { expect } from 'chai'
+import { handler } from './userMfaEnabled'
 
 describe('users should have MFA enabled', () => {
   const now = new Date(0)
@@ -79,7 +80,7 @@ describe('users should have MFA enabled', () => {
       ],
     })
 
-    const audits = await handler({ region: 'us-east-1', resourceId: 'test' })
+    const audits = await handler({ region: 'us-east-1', resource: 'test' })
     expect(audits).to.eql([
       {
         physicalId: 'test',

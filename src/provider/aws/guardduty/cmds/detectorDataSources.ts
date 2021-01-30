@@ -1,9 +1,10 @@
-import { DetectorId } from 'aws-sdk/clients/guardduty'
 import {
-  AuditResultInterface,
   AWSScannerInterface,
+  AuditResultInterface,
 } from '@lstatro/cloud-search'
+
 import { AWS } from '../../../../lib/aws/AWS'
+import { DetectorId } from 'aws-sdk/clients/guardduty'
 
 export type SourceType = 'CloudTrail' | 'DNSLogs' | 'FlowLogs' | 'S3Logs'
 
@@ -56,15 +57,9 @@ export class DetectorDataSources extends AWS {
     this.audits.push(audit)
   }
 
-  scan = async ({
-    region,
-    resourceId,
-  }: {
-    region: string
-    resourceId: string
-  }) => {
-    if (resourceId) {
-      await this.audit({ resource: resourceId, region })
+  scan = async ({ region, resource }: { region: string; resource: string }) => {
+    if (resource) {
+      await this.audit({ resource: resource, region })
     } else {
       const options = this.getOptions()
       options.region = region
